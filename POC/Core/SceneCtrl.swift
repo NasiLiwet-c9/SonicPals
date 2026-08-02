@@ -1,3 +1,10 @@
+//
+//  SceneCtrl.swift
+//  POC
+//
+//  Created by Shanon Newcastle on ??/??/??.
+//  Updated by Asaryun on 02/08/26.
+//
 import RealityKit
 import UIKit
 import simd
@@ -5,7 +12,7 @@ import simd
 @MainActor
 final class SceneCtrl:
     NSObject,
-    SceneControlling {
+    SceneControlling, UIGestureRecognizerDelegate {
 
     var onState: ((ARState) -> Void)?
 
@@ -108,7 +115,9 @@ final class SceneCtrl:
         )
 
         pan.cancelsTouchesInView = false
-
+        pan.maximumNumberOfTouches = 1
+        pan.delegate = self
+        
         view.addGestureRecognizer(pan)
     }
 
@@ -126,5 +135,12 @@ final class SceneCtrl:
 
     func push() {
         onState?(state)
+    }
+    
+    nonisolated func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        true
     }
 }

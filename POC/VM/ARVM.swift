@@ -1,4 +1,12 @@
+//
+//  ARVM.swift
+//  POC
+//
+//  Created by Shanon Newcastle on ??/??/??.
+//  Updated by Asaryun on 02/08/26.
+//
 import Combine
+import UIKit
 import RealityKit
 
 @MainActor
@@ -54,4 +62,6 @@ final class ARVM: ObservableObject {
     func clear() {
         ctrl.clear()
     }
+    
+    
 }
