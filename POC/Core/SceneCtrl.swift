@@ -26,6 +26,8 @@ final class SceneCtrl:
     let objectMaker: any ObjectMaking
     let waveSim: any WaveSimulating
     let waveDraw: any WaveDrawing
+    let pulseFX: any PulseEffecting
+    let beamFX: any BeamEffecting
     
     let world = AnchorEntity(
         world: .zero
@@ -45,13 +47,17 @@ final class SceneCtrl:
         placeSvc: any PlaceServing,
         objectMaker: any ObjectMaking,
         waveSim: any WaveSimulating,
-        waveDraw: any WaveDrawing
+        waveDraw: any WaveDrawing,
+        pulseFX: any PulseEffecting,
+        beamFX: any BeamEffecting
     ) {
         self.sess = sess
         self.placeSvc = placeSvc
         self.objectMaker = objectMaker
         self.waveSim = waveSim
         self.waveDraw = waveDraw
+        self.pulseFX = pulseFX
+        self.beamFX = beamFX
         
         super.init()
     }

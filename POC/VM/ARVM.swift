@@ -35,7 +35,11 @@ final class ARVM {
             placeSvc: PlaceSvc(),
             objectMaker: ObjectMaker(),
             waveSim: WaveSim(),
-            waveDraw: draw
+            waveDraw: draw,
+            pulseFX: PulseFX(),
+            beamFX: BeamFX(
+                shape: shape
+            )
         )
         
         self.ctrl =

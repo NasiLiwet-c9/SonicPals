@@ -12,6 +12,29 @@ import simd
 
 @MainActor
 final class WaveShape {
+    // MARK: - Resource reuse (test fix for HIGH-probability hypothesis)
+    //
+    // line()/dot() used to call .generateCylinder / .generateSphere with a
+    // fresh size on every single call (dozens of calls per Emit press).
+    // A unit-sized mesh generated once and reused via Entity.scale produces
+    // the same visuals (cylinder height = local Y axis, sphere is
+    // uniform), without regenerating MeshResource per shape.
+    //
+    // Materials only vary by (color, alpha) from a small fixed set, so
+    // they're cached the same way instead of being rebuilt every call.
+    // The cache is bounded by the number of distinct (color, alpha)
+    // combinations actually used (a handful), not by press count.
+    private let unitCylinder: MeshResource = .generateCylinder(
+        height: 1,
+        radius: 1
+    )
+    
+    private let unitSphere: MeshResource = .generateSphere(
+        radius: 1
+    )
+    
+    private var materialCache: [String: SimpleMaterial] = [:]
+    
     func line(
         from start: SIMD3<Float>,
         to end: SIMD3<Float>,
@@ -29,16 +52,20 @@ final class WaveShape {
         : SIMD3<Float>(0, 1, 0)
         
         let line = ModelEntity(
-            mesh: .generateCylinder(
-                height: len,
-                radius: radius
-            ),
+            mesh: unitCylinder,
             materials: [
                 material(
                     color: color,
                     alpha: alpha
                 )
             ]
+        )
+        
+        line.scale =
+        SIMD3<Float>(
+            radius,
+            len,
+            radius
         )
         
         line.position =
@@ -59,15 +86,18 @@ final class WaveShape {
         alpha: Float
     ) -> ModelEntity {
         let dot = ModelEntity(
-            mesh: .generateSphere(
-                radius: radius
-            ),
+            mesh: unitSphere,
             materials: [
                 material(
                     color: color,
                     alpha: alpha
                 )
             ]
+        )
+        
+        dot.scale =
+        SIMD3<Float>(
+            repeating: radius
         )
         
         dot.position = point
@@ -215,16 +245,38 @@ final class WaveShape {
         color: UIColor,
         alpha: Float
     ) -> SimpleMaterial {
-        SimpleMaterial(
+        let clampedAlpha =
+        min(
+            max(alpha, 0),
+            1
+        )
+        
+        // Round alpha so near-identical values (e.g. ring alphas that
+        // differ by fractions of a percent) collapse onto the same
+        // cache entry instead of growing the cache unboundedly.
+        let key =
+        "\(color)-"
+        + String(
+            format: "%.2f",
+            clampedAlpha
+        )
+        
+        if let cached =
+            materialCache[key] {
+            return cached
+        }
+        
+        let made = SimpleMaterial(
             color: color.withAlphaComponent(
                 CGFloat(
-                    min(
-                        max(alpha, 0),
-                        1
-                    )
+                    clampedAlpha
                 )
             ),
             isMetallic: false
         )
+        
+        materialCache[key] = made
+        
+        return made
     }
 }

@@ -27,6 +27,21 @@ extension SceneCtrl {
             return
         }
         
+        if state.viewMode == .first {
+            pulseFX.emit(
+                from: start,
+                into: world
+            )
+        }
+        
+        if state.viewMode == .third {
+            beamFX.emit(
+                from: start,
+                into: world,
+                in: ar
+            )
+        }
+        
         clearWave()
         
         let data =

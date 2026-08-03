@@ -66,3 +66,20 @@ protocol WaveDrawing {
         showAllPoints: Bool
     ) -> Entity
 }
+
+@MainActor
+protocol PulseEffecting {
+    func emit(
+        from start: WaveStart,
+        into root: Entity
+    )
+}
+
+@MainActor
+protocol BeamEffecting {
+    func emit(
+        from start: WaveStart,
+        into root: Entity,
+        in view: ARView
+    )
+}
