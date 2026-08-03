@@ -2,20 +2,18 @@
 //  WaveSim.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import RealityKit
 import simd
 
 @MainActor
-final class WaveSim:
-    WaveSimulating {
-    
+final class WaveSim: WaveSimulating {
     private let set: WaveSet
     private let rayMaker: RayMaker
     private let echoCalc: EchoCalc
-    
     private let maxDistance: Float
     private let soundSpeed: Float
     
@@ -39,7 +37,7 @@ final class WaveSim:
     ) -> WaveData {
         let checkRays = rayMaker.make(
             for: set.check,
-            ringCount: 2
+            ringCount: 1
         )
         
         let nearest = nearestDistance(
@@ -48,13 +46,8 @@ final class WaveSim:
             rays: checkRays
         )
         
-        let setting = set.pick(
-            nearest
-        )
-        
-        let rays = rayMaker.make(
-            for: setting
-        )
+        let setting = set.pick(nearest)
+        let rays = rayMaker.make(for: setting)
         
         let hits = scan(
             in: view,
@@ -81,7 +74,7 @@ final class WaveSim:
         var nearest: Float?
         
         for ray in rays {
-            let dir = worldDir(
+            let direction = worldDir(
                 ray.dir,
                 from: start
             )
@@ -89,7 +82,7 @@ final class WaveSim:
             guard let hit = firstHit(
                 in: view,
                 start: start.pos,
-                dir: dir
+                direction: direction
             ) else {
                 continue
             }
@@ -110,9 +103,10 @@ final class WaveSim:
         rays: [WaveRay]
     ) -> [WaveHit] {
         var hits: [WaveHit] = []
+        hits.reserveCapacity(rays.count)
         
         for ray in rays {
-            let dir = worldDir(
+            let direction = worldDir(
                 ray.dir,
                 from: start
             )
@@ -120,7 +114,7 @@ final class WaveSim:
             guard let hit = firstHit(
                 in: view,
                 start: start.pos,
-                dir: dir
+                direction: direction
             ) else {
                 continue
             }
@@ -129,16 +123,13 @@ final class WaveSim:
                 hit.normal
             )
             
-            if simd_dot(
-                dir,
-                normal
-            ) > 0 {
+            if simd_dot(direction, normal) > 0 {
                 normal = -normal
             }
             
             let anglePower = max(
                 simd_dot(
-                    -dir,
+                    -direction,
                      normal
                 ),
                 0.05
@@ -159,11 +150,11 @@ final class WaveSim:
             )
             
             let bounceDir = simd_normalize(
-                dir
+                direction
                 - (
                     2
                     * simd_dot(
-                        dir,
+                        direction,
                         normal
                     )
                     * normal
@@ -193,11 +184,11 @@ final class WaveSim:
     private func firstHit(
         in view: ARView,
         start: SIMD3<Float>,
-        dir: SIMD3<Float>
+        direction: SIMD3<Float>
     ) -> CollisionCastHit? {
         view.scene.raycast(
             origin: start,
-            direction: dir,
+            direction: direction,
             length: maxDistance,
             query: .nearest,
             mask: .sceneUnderstanding,
@@ -207,13 +198,13 @@ final class WaveSim:
     }
     
     private func worldDir(
-        _ dir: SIMD3<Float>,
+        _ direction: SIMD3<Float>,
         from start: WaveStart
     ) -> SIMD3<Float> {
         simd_normalize(
-            (start.right * dir.x)
-            + (start.up * dir.y)
-            + (start.forward * dir.z)
+            (start.right * direction.x)
+            + (start.up * direction.y)
+            + (start.forward * direction.z)
         )
     }
 }

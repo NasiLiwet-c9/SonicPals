@@ -22,9 +22,7 @@ extension SceneCtrl {
         
         guard state.lidarOK,
               let ar else {
-            setMsg(
-                "LiDAR not available"
-            )
+            setMsg("LiDAR not available")
             return
         }
         
@@ -33,47 +31,31 @@ extension SceneCtrl {
             y: ar.bounds.midY
         )
         
-        guard let hit =
-                placeSvc.hit(
-                    in: ar,
-                    at: point
-                ) else {
-            setMsg(
-                "Horizontal surface not found"
-            )
+        guard let hit = placeSvc.hit(
+            in: ar,
+            at: point
+        ) else {
+            setMsg("Horizontal surface not found")
             return
         }
         
         clearWave()
+        object?.removeFromParent()
         
-        object?
-            .removeFromParent()
+        let part = objectMaker.make()
         
-        let part =
-        objectMaker.make()
-        
-        world.addChild(
-            part.root
-        )
+        world.addChild(part.root)
         
         part.root.setPosition(
             hit.worldTransform.pos3,
             relativeTo: nil
         )
         
-        yaw =
-        camYaw(
-            in: ar
-        )
+        yaw = camYaw(in: ar)
         
-        let turn =
-        simd_quatf(
+        let turn = simd_quatf(
             angle: yaw,
-            axis: SIMD3<Float>(
-                0,
-                1,
-                0
-            )
+            axis: SIMD3<Float>(0, 1, 0)
         )
         
         part.root.setOrientation(
@@ -81,14 +63,9 @@ extension SceneCtrl {
             relativeTo: nil
         )
         
-        object =
-        part.root
-        
-        waveStart =
-        part.waveStart
-        
-        state.hasObject =
-        true
+        object = part.root
+        waveStart = part.waveStart
+        state.hasObject = true
         
         setMsg(
             "Object placed, drag or twist to move it"
@@ -103,19 +80,11 @@ extension SceneCtrl {
         
         clearWave()
         
-        yaw +=
-        deg
-        * Float.pi
-        / 180
+        yaw += deg * Float.pi / 180
         
-        let turn =
-        simd_quatf(
+        let turn = simd_quatf(
             angle: yaw,
-            axis: SIMD3<Float>(
-                0,
-                1,
-                0
-            )
+            axis: SIMD3<Float>(0, 1, 0)
         )
         
         object.setOrientation(
@@ -123,27 +92,19 @@ extension SceneCtrl {
             relativeTo: nil
         )
         
-        setMsg(
-            "Direction changed"
-        )
+        setMsg("Direction changed")
     }
     
     func clear() {
         clearWave()
-        
-        object?
-            .removeFromParent()
+        object?.removeFromParent()
         
         object = nil
         waveStart = nil
         yaw = 0
+        state.hasObject = false
         
-        state.hasObject =
-        false
-        
-        setMsg(
-            "Object removed"
-        )
+        setMsg("Object removed")
     }
     
     @objc func drag(
@@ -161,16 +122,12 @@ extension SceneCtrl {
             return
         }
         
-        let point =
-        pan.location(
-            in: ar
-        )
+        let point = pan.location(in: ar)
         
-        guard let hit =
-                placeSvc.hit(
-                    in: ar,
-                    at: point
-                ) else {
+        guard let hit = placeSvc.hit(
+            in: ar,
+            at: point
+        ) else {
             return
         }
         
@@ -182,39 +139,25 @@ extension SceneCtrl {
         )
         
         if pan.state == .ended {
-            setMsg(
-                "Object moved"
-            )
+            setMsg("Object moved")
         }
     }
     
     private func camYaw(
         in view: ARView
     ) -> Float {
-        let matrix =
-        view.cameraTransform.matrix
+        let matrix = view.cameraTransform.matrix
         
-        var forward =
-        SIMD3<Float>(
+        var forward = SIMD3<Float>(
             -matrix.columns.2.x,
              0,
              -matrix.columns.2.z
         )
         
-        if simd_length(
-            forward
-        ) < 0.001 {
-            forward =
-            SIMD3<Float>(
-                0,
-                0,
-                -1
-            )
+        if simd_length(forward) < 0.001 {
+            forward = SIMD3<Float>(0, 0, -1)
         } else {
-            forward =
-            simd_normalize(
-                forward
-            )
+            forward = simd_normalize(forward)
         }
         
         return atan2(

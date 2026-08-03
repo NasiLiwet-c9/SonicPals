@@ -2,27 +2,21 @@
 //  WaveDraw.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
 //
 
-import Foundation
 import RealityKit
 import UIKit
 import simd
 
 @MainActor
-final class WaveDraw:
-    WaveDrawing {
-    
+final class WaveDraw: WaveDrawing {
     private let shape: WaveShape
-    
     private let ringCount = 3
     private let ringParts = 16
     private let maxViewDistance: Float = 1.35
     
-    init(
-        shape: WaveShape
-    ) {
+    init(shape: WaveShape) {
         self.shape = shape
     }
     
@@ -63,31 +57,20 @@ final class WaveDraw:
         )
         
         let hScale = tan(
-            toRad(
-                data.setting.hAngleDeg
-            )
+            toRad(data.setting.hAngleDeg)
         )
         
         let vScale = tan(
-            toRad(
-                data.setting.vAngleDeg
-            )
+            toRad(data.setting.vAngleDeg)
         )
         
         for index in 1...ringCount {
-            let step =
-            Float(index)
-            / Float(ringCount)
-            
-            let ringDistance =
-            distance * step
+            let step = Float(index) / Float(ringCount)
+            let ringDistance = distance * step
             
             let center =
             data.start.pos
-            + (
-                data.start.forward
-                * ringDistance
-            )
+            + (data.start.forward * ringDistance)
             
             root.addChild(
                 shape.ring(
@@ -105,9 +88,7 @@ final class WaveDraw:
                     parts: ringParts,
                     lineRadius: 0.002,
                     color: .systemCyan,
-                    alpha:
-                        0.7
-                    - (step * 0.22)
+                    alpha: 0.7 - (step * 0.22)
                 )
             )
         }
@@ -117,22 +98,18 @@ final class WaveDraw:
         to root: Entity,
         data: WaveData
     ) {
-        if let echo =
-            data.strongestEcho {
-            
+        if let echo = data.strongestEcho {
             addEcho(
                 to: root,
                 data: data,
                 hit: echo
             )
-            
             return
         }
         
         if let miss =
             data.strongestMiss
             ?? data.nearestHit {
-            
             addMiss(
                 to: root,
                 data: data,
@@ -225,10 +202,7 @@ final class WaveDraw:
         
         let end =
         point
-        + (
-            hit.bounceDir
-            * 0.24
-        )
+        + (hit.bounceDir * 0.24)
         
         root.addChild(
             shape.flow(
@@ -286,12 +260,7 @@ final class WaveDraw:
         gap: Float
     ) -> SIMD3<Float> {
         hit.point
-        + (
-            safeNormal(
-                hit.normal
-            )
-            * gap
-        )
+        + (safeNormal(hit.normal) * gap)
     }
     
     private func wallAxes(
@@ -300,56 +269,38 @@ final class WaveDraw:
         right: SIMD3<Float>,
         up: SIMD3<Float>
     ) {
-        let normal =
-        safeNormal(normal)
+        let normal = safeNormal(normal)
         
-        let ref =
-        abs(normal.y) < 0.9
+        let ref = abs(normal.y) < 0.9
         ? SIMD3<Float>(0, 1, 0)
         : SIMD3<Float>(1, 0, 0)
         
         let right = simd_normalize(
-            simd_cross(
-                ref,
-                normal
-            )
+            simd_cross(ref, normal)
         )
         
         let up = simd_normalize(
-            simd_cross(
-                normal,
-                right
-            )
+            simd_cross(normal, right)
         )
         
-        return (
-            right,
-            up
-        )
+        return (right, up)
     }
     
     private func safeNormal(
         _ normal: SIMD3<Float>
     ) -> SIMD3<Float> {
-        let length =
-        simd_length(normal)
+        let length = simd_length(normal)
         
         guard length > 0.001 else {
-            return SIMD3<Float>(
-                0,
-                1,
-                0
-            )
+            return SIMD3<Float>(0, 1, 0)
         }
         
         return normal / length
     }
     
     private func toRad(
-        _ deg: Float
+        _ degrees: Float
     ) -> Float {
-        deg
-        * Float.pi
-        / 180
+        degrees * Float.pi / 180
     }
 }

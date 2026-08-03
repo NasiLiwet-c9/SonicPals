@@ -2,16 +2,34 @@
 //  WaveShape.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
-import Foundation
 import RealityKit
 import UIKit
 import simd
 
 @MainActor
 final class WaveShape {
+    private struct MatKey: Hashable {
+        let red: Int
+        let green: Int
+        let blue: Int
+        let alpha: Int
+    }
+    
+    private let cyl = MeshResource.generateCylinder(
+        height: 1,
+        radius: 1
+    )
+    
+    private let sphere = MeshResource.generateSphere(
+        radius: 1
+    )
+    
+    private var mats: [MatKey: SimpleMaterial] = [:]
+    
     func line(
         from start: SIMD3<Float>,
         to end: SIMD3<Float>,
@@ -19,20 +37,16 @@ final class WaveShape {
         color: UIColor,
         alpha: Float
     ) -> ModelEntity {
-        let vec = end - start
-        let rawLen = simd_length(vec)
-        let len = max(rawLen, 0.001)
+        let vector = end - start
+        let rawLength = simd_length(vector)
+        let length = max(rawLength, 0.001)
         
-        let dir =
-        rawLen > 0.0001
-        ? vec / rawLen
+        let direction = rawLength > 0.0001
+        ? vector / rawLength
         : SIMD3<Float>(0, 1, 0)
         
         let line = ModelEntity(
-            mesh: .generateCylinder(
-                height: len,
-                radius: radius
-            ),
+            mesh: cyl,
             materials: [
                 material(
                     color: color,
@@ -41,12 +55,16 @@ final class WaveShape {
             ]
         )
         
-        line.position =
-        (start + end) / 2
+        line.position = (start + end) / 2
+        line.scale = SIMD3<Float>(
+            radius,
+            length,
+            radius
+        )
         
         line.orientation = simd_quatf(
             from: SIMD3<Float>(0, 1, 0),
-            to: dir
+            to: direction
         )
         
         return line
@@ -59,9 +77,7 @@ final class WaveShape {
         alpha: Float
     ) -> ModelEntity {
         let dot = ModelEntity(
-            mesh: .generateSphere(
-                radius: radius
-            ),
+            mesh: sphere,
             materials: [
                 material(
                     color: color,
@@ -71,6 +87,9 @@ final class WaveShape {
         )
         
         dot.position = point
+        dot.scale = SIMD3<Float>(
+            repeating: radius
+        )
         
         return dot
     }
@@ -95,10 +114,7 @@ final class WaveShape {
             
             let point =
             start
-            + (
-                (end - start)
-                * step
-            )
+            + ((end - start) * step)
             
             root.addChild(
                 dot(
@@ -122,12 +138,8 @@ final class WaveShape {
         color: UIColor
     ) -> Entity {
         let root = Entity()
-        
-        let x =
-        right * size
-        
-        let y =
-        up * size
+        let x = right * size
+        let y = up * size
         
         root.addChild(
             line(
@@ -169,9 +181,11 @@ final class WaveShape {
             return root
         }
         
-        var points: [SIMD3<Float>] = []
+        var previous =
+        center
+        + (right * radiusX)
         
-        for index in 0...parts {
+        for index in 1...parts {
             let angle =
             2
             * Float.pi
@@ -191,21 +205,17 @@ final class WaveShape {
                 * radiusY
             )
             
-            points.append(
-                point
-            )
-        }
-        
-        for index in 0..<(points.count - 1) {
             root.addChild(
                 line(
-                    from: points[index],
-                    to: points[index + 1],
+                    from: previous,
+                    to: point,
                     radius: lineRadius,
                     color: color,
                     alpha: alpha
                 )
             )
+            
+            previous = point
         }
         
         return root
@@ -215,16 +225,48 @@ final class WaveShape {
         color: UIColor,
         alpha: Float
     ) -> SimpleMaterial {
-        SimpleMaterial(
-            color: color.withAlphaComponent(
-                CGFloat(
-                    min(
-                        max(alpha, 0),
-                        1
-                    )
-                )
+        let safeAlpha = min(
+            max(alpha, 0),
+            1
+        )
+        
+        let resolved = color.resolvedColor(
+            with: UITraitCollection(
+                userInterfaceStyle: .dark
+            )
+        )
+        
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var unusedAlpha: CGFloat = 0
+        
+        resolved.getRed(
+            &red,
+            green: &green,
+            blue: &blue,
+            alpha: &unusedAlpha
+        )
+        
+        let key = MatKey(
+            red: Int((red * 255).rounded()),
+            green: Int((green * 255).rounded()),
+            blue: Int((blue * 255).rounded()),
+            alpha: Int((safeAlpha * 100).rounded())
+        )
+        
+        if let cached = mats[key] {
+            return cached
+        }
+        
+        let mat = SimpleMaterial(
+            color: resolved.withAlphaComponent(
+                CGFloat(safeAlpha)
             ),
             isMetallic: false
         )
+        
+        mats[key] = mat
+        return mat
     }
 }

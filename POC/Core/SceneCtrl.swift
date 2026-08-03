@@ -4,12 +4,11 @@
 //
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Asaryun on 02/08/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import RealityKit
 import UIKit
-import simd
 
 @MainActor
 final class SceneCtrl:
@@ -25,19 +24,20 @@ final class SceneCtrl:
     let placeSvc: any PlaceServing
     let objectMaker: any ObjectMaking
     let waveSim: any WaveSimulating
+    let fpCone: any FPConeDrawing
+    let fpMesh: any FPMeshBuilding
     let waveDraw: any WaveDrawing
     
-    let world = AnchorEntity(
-        world: .zero
-    )
+    let world = AnchorEntity(world: .zero)
     
     var state = ARState()
     
     var object: Entity?
     var waveStart: Entity?
-    var wave: Entity?
+    var fpRoot: Entity?
+    var tpWave: Entity?
     var lastData: WaveData?
-    
+    var visTask: Task<Void, Never>?
     var yaw: Float = 0
     
     init(
@@ -45,12 +45,16 @@ final class SceneCtrl:
         placeSvc: any PlaceServing,
         objectMaker: any ObjectMaking,
         waveSim: any WaveSimulating,
+        fpCone: any FPConeDrawing,
+        fpMesh: any FPMeshBuilding,
         waveDraw: any WaveDrawing
     ) {
         self.sess = sess
         self.placeSvc = placeSvc
         self.objectMaker = objectMaker
         self.waveSim = waveSim
+        self.fpCone = fpCone
+        self.fpMesh = fpMesh
         self.waveDraw = waveDraw
         
         super.init()
@@ -63,47 +67,34 @@ final class SceneCtrl:
         
         ar = view
         
-        let supported =
-        sess.start(view)
+        let supported = sess.start(view)
         
-        view.scene.addAnchor(
-            world
-        )
+        view.scene.addAnchor(world)
         
-        state.lidarOK =
-        supported
-        
-        state.meshOn =
-        supported
-        
-        state.msg =
-        supported
-        ? "FIRST POV ready, move phone to aim"
+        state.lidarOK = supported
+        state.meshOn = false
+        state.msg = supported
+        ? "BAT VISION ready, move phone to aim"
         : "LiDAR scene reconstruction unavailable"
         
-        sess.addCoach(
-            to: view
-        )
-        
-        addPan(
-            to: view
-        )
-        
+        sess.showMesh(false, in: view)
+        sess.addCoach(to: view)
+        addPan(to: view)
         push()
     }
     
     func toggleMesh() {
-        guard let ar,
-              state.lidarOK else {
+        guard state.viewMode == .third else {
+            setMsg("The full mesh stays hidden in BAT VISION")
+            return
+        }
+        
+        guard let ar, state.lidarOK else {
             return
         }
         
         state.meshOn.toggle()
-        
-        sess.showMesh(
-            state.meshOn,
-            in: ar
-        )
+        sess.showMesh(state.meshOn, in: ar)
         
         setMsg(
             state.meshOn
@@ -112,39 +103,43 @@ final class SceneCtrl:
         )
     }
     
-    func addPan(to view: ARView) {
-        let pan =
-        UIPanGestureRecognizer(
-            target: self,
-            action: #selector(
-                drag(_:)
-            )
-        )
+    func handleMemoryWarning() {
+        clearWave()
         
-        pan.cancelsTouchesInView =
-        false
+        if let ar {
+            sess.showMesh(false, in: ar)
+        }
         
-        pan.maximumNumberOfTouches =
-        1
+        state.meshOn = false
+        state.pointsOn = false
         
-        pan.delegate =
-        self
-        
-        view.addGestureRecognizer(
-            pan
-        )
+        setMsg("Temporary wave graphics cleared")
     }
     
-    func removeWave() {
-        wave?.removeFromParent()
+    func addPan(to view: ARView) {
+        let pan = UIPanGestureRecognizer(
+            target: self,
+            action: #selector(drag(_:))
+        )
         
-        wave = nil
-        state.hasWave = false
+        pan.cancelsTouchesInView = false
+        pan.maximumNumberOfTouches = 1
+        pan.delegate = self
+        
+        view.addGestureRecognizer(pan)
     }
     
     func clearWave() {
-        removeWave()
+        visTask?.cancel()
+        visTask = nil
+        
+        fpRoot?.removeFromParent()
+        tpWave?.removeFromParent()
+        
+        fpRoot = nil
+        tpWave = nil
         lastData = nil
+        state.hasWave = false
     }
     
     func setMsg(_ text: String) {
@@ -158,8 +153,8 @@ final class SceneCtrl:
     
     nonisolated func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith
-        otherGestureRecognizer: UIGestureRecognizer
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer:
+        UIGestureRecognizer
     ) -> Bool {
         true
     }

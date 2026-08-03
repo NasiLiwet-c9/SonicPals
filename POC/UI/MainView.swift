@@ -4,33 +4,31 @@
 //
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Asaryun on 02/08/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
+import Foundation
 import SwiftUI
+import UIKit
 
 @MainActor
-struct MainView:
-    View {
-    
+struct MainView: View {
     @State
-    private var vm =
-    ARVM()
+    private var vm = ARVM()
     
     @GestureState
-    private var rotationDelta:
-    Angle = .zero
+    private var rotationDelta: Angle = .zero
     
-    var body:
-    some View {
+    var body: some View {
         ZStack {
-            ARViewBox(
-                vm:
-                    vm
-            )
-            .ignoresSafeArea()
-            .simultaneousGesture(
-                rotationGesture
+            ARViewBox(vm: vm)
+                .ignoresSafeArea()
+                .simultaneousGesture(
+                    rotationGesture
+                )
+            
+            FPShade(
+                mode: vm.state.viewMode
             )
             
             crosshair
@@ -40,83 +38,55 @@ struct MainView:
                 
                 Spacer()
                 
-                ToggleBar(
-                    vm:
-                        vm
-                )
-                
-                ControlsView(
-                    vm:
-                        vm
-                )
+                ToggleBar(vm: vm)
+                ControlsView(vm: vm)
             }
             .padding()
         }
-        .preferredColorScheme(
-            .dark
-        )
+        .preferredColorScheme(.dark)
+        .task {
+            for await _ in
+                    NotificationCenter.default
+                .notifications(
+                    named:
+                        UIApplication
+                        .didReceiveMemoryWarningNotification
+                ) {
+                vm.handleMemoryWarning()
+            }
+        }
     }
     
-    private var status:
-    some View {
-        Text(
-            vm.state.msg
-        )
-        .font(
-            .subheadline
-        )
-        .multilineTextAlignment(
-            .center
-        )
-        .padding(
-            10
-        )
-        .frame(
-            maxWidth:
-                    .infinity
-        )
-        .background(
-            Color.black
-                .opacity(
-                    0.6
+    private var status: some View {
+        Text(vm.state.msg)
+            .font(.subheadline)
+            .multilineTextAlignment(.center)
+            .padding(10)
+            .frame(maxWidth: .infinity)
+            .background(
+                Color.black.opacity(0.6)
+            )
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 10
                 )
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius:
-                    10
             )
-        )
     }
     
-    private var crosshair:
-    some View {
-        Image(
-            systemName:
-                "plus"
-        )
-        .font(
-            .system(
-                size:
-                    26,
-                weight:
-                        .bold
+    private var crosshair: some View {
+        Image(systemName: "plus")
+            .font(
+                .system(
+                    size: 26,
+                    weight: .bold
+                )
             )
-        )
-        .foregroundStyle(
-            .white
-        )
-        .shadow(
-            radius:
-                3
-        )
-        .allowsHitTesting(
-            false
-        )
+            .foregroundStyle(.white)
+            .shadow(radius: 3)
+            .allowsHitTesting(false)
     }
     
-    private var rotationGesture:
-    some Gesture {
+    private var rotationGesture: some Gesture {
         RotationGesture()
             .updating(
                 $rotationDelta
@@ -125,12 +95,8 @@ struct MainView:
                 state,
                 _ in
                 
-                let delta =
-                value
-                - state
-                
-                state =
-                value
+                let delta = value - state
+                state = value
                 
                 guard
                     vm.state.viewMode == .third,
@@ -140,9 +106,7 @@ struct MainView:
                 }
                 
                 vm.turn(
-                    Float(
-                        -delta.degrees
-                    )
+                    Float(-delta.degrees)
                 )
             }
     }
