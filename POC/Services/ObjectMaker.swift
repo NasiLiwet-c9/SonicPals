@@ -4,7 +4,7 @@
 //
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Shanon Newcastle on 03/08/26.
-//
+//  Updated by Asaryun on 03/08/26.
 
 import RealityKit
 import UIKit
@@ -14,107 +14,40 @@ import simd
 final class ObjectMaker:
     ObjectMaking {
     
-    func make()
-    -> ObjectPart {
-        let root =
-        Entity()
+    func make() -> ObjectPart {
+        let root = Entity()
+        root.name = "object"
         
-        root.name =
-        "object"
+        // Load the bat model, fall back to the placeholder box if it fails
+        let body: Entity
+        if let bat = try? Entity.load(named: "Bat3") {
+            bat.name = "body"
+            body = bat
+        } else {
+            let bodyMat = SimpleMaterial(color: .lightGray, isMetallic: false)
+            body = ModelEntity(
+                mesh: .generateBox(size: SIMD3<Float>(0.16, 0.10, 0.14)),
+                materials: [bodyMat]
+            )
+        }
         
-        let bodyMat =
-        SimpleMaterial(
-            color:
-                    .lightGray,
-            isMetallic:
-                false
-        )
+        body.position = SIMD3<Float>(0, 1, 0)
+        root.addChild(body)
+//        
+//        let waveMat = SimpleMaterial(color: .systemCyan, isMetallic: false)
+//        
+        let waveStart = Entity()
+        waveStart.name = "waveStart"
+        waveStart.position = SIMD3<Float>(0, 1, -0.085)
+        root.addChild(waveStart)
         
-        let waveMat =
-        SimpleMaterial(
-            color:
-                    .systemCyan,
-            isMetallic:
-                false
-        )
+//        let disk = ModelEntity(
+//            mesh: .generateCylinder(height: 0.025, radius: 0.022),
+//            materials: [waveMat]
+//        )
+//        disk.orientation = simd_quatf(angle: Float.pi / 2, axis: SIMD3<Float>(1, 0, 0))
+//        waveStart.addChild(disk)
         
-        let body =
-        ModelEntity(
-            mesh:
-                    .generateBox(
-                        size:
-                            SIMD3<Float>(
-                                0.16,
-                                0.10,
-                                0.14
-                            )
-                    ),
-            materials: [
-                bodyMat
-            ]
-        )
-        
-        body.position =
-        SIMD3<Float>(
-            0,
-            0.05,
-            0
-        )
-        
-        root.addChild(
-            body
-        )
-        
-        let waveStart =
-        Entity()
-        
-        waveStart.name =
-        "waveStart"
-        
-        waveStart.position =
-        SIMD3<Float>(
-            0,
-            0.06,
-            -0.085
-        )
-        
-        root.addChild(
-            waveStart
-        )
-        
-        let disk =
-        ModelEntity(
-            mesh:
-                    .generateCylinder(
-                        height:
-                            0.025,
-                        radius:
-                            0.022
-                    ),
-            materials: [
-                waveMat
-            ]
-        )
-        
-        disk.orientation =
-        simd_quatf(
-            angle:
-                Float.pi / 2,
-            axis:
-                SIMD3<Float>(
-                    1,
-                    0,
-                    0
-                )
-        )
-        
-        waveStart.addChild(
-            disk
-        )
-        
-        return ObjectPart(
-            root: root,
-            waveStart: waveStart
-        )
+        return ObjectPart(root: root, waveStart: waveStart)
     }
 }

@@ -4,7 +4,7 @@
 //
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Shanon Newcastle on 03/08/26.
-//
+//  Updated by Asaryun on 03/08/26.
 
 import ARKit
 import RealityKit
@@ -42,10 +42,10 @@ final class ARSessSvc:
                     .occlusion
                 ]
             
-            showMesh(
-                true,
-                in: view
-            )
+//            showMesh(
+//                true,
+//                in: view
+//            )
         }
         
         view.session.run(

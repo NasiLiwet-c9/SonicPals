@@ -5,7 +5,8 @@
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Asaryun on 02/08/26.
 //  Updated by Shanon Newcastle on 03/08/26.
-//
+//  Updated by Asaryun on 03/08/26.
+
 
 import RealityKit
 import UIKit
@@ -74,7 +75,7 @@ final class SceneCtrl:
         supported
         
         state.meshOn =
-        supported
+        false
         
         state.msg =
         supported

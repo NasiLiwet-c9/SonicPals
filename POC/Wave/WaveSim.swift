@@ -3,7 +3,7 @@
 //  POC
 //
 //  Created by Shanon Giuly Istanto on 03/08/26.
-//
+//  Updated by Asaryun on 03/08/26.
 
 import RealityKit
 import simd
@@ -20,15 +20,15 @@ final class WaveSim:
     private let soundSpeed: Float
     
     init(
-        set: WaveSet = .standard,
-        rayMaker: RayMaker = RayMaker(),
-        echoCalc: EchoCalc = EchoCalc(),
+        set: WaveSet? = nil,
+        rayMaker: RayMaker? = nil,
+        echoCalc: EchoCalc? = nil,
         maxDistance: Float = 5,
         soundSpeed: Float = 343
     ) {
-        self.set = set
-        self.rayMaker = rayMaker
-        self.echoCalc = echoCalc
+        self.set = set ?? .standard
+        self.rayMaker = rayMaker ?? RayMaker()
+        self.echoCalc = echoCalc ?? EchoCalc()
         self.maxDistance = maxDistance
         self.soundSpeed = soundSpeed
     }
