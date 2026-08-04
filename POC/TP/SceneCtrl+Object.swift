@@ -3,10 +3,9 @@
 //  POC
 //
 //  Created by Shanon Newcastle on 30/07/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
-import ARKit
 import RealityKit
 import UIKit
 import simd
@@ -15,64 +14,64 @@ extension SceneCtrl {
     func place() {
         guard state.viewMode == .third else {
             setMsg(
-                "Switch to THIRD POV before placing the object"
+                "Switch to THIRD POV before placing the bat"
             )
             return
         }
         
         guard state.lidarOK,
-              let ar else {
-            setMsg("LiDAR not available")
+              ar != nil else {
+            setMsg(
+                "LiDAR not available"
+            )
             return
         }
         
-        let point = CGPoint(
-            x: ar.bounds.midX,
-            y: ar.bounds.midY
-        )
-        
-        guard let hit = placeSvc.hit(
-            in: ar,
-            at: point
-        ) else {
-            setMsg("Horizontal surface not found")
+        guard !isPlacing else {
             return
         }
         
-        clearWave()
-        object?.removeFromParent()
-        
-        let part = objectMaker.make()
-        
-        world.addChild(part.root)
-        
-        part.root.setPosition(
-            hit.worldTransform.pos3,
-            relativeTo: nil
-        )
-        
-        yaw = camYaw(in: ar)
-        
-        let turn = simd_quatf(
-            angle: yaw,
-            axis: SIMD3<Float>(0, 1, 0)
-        )
-        
-        part.root.setOrientation(
-            turn,
-            relativeTo: nil
-        )
-        
-        object = part.root
-        waveStart = part.waveStart
-        state.hasObject = true
+        isPlacing = true
         
         setMsg(
-            "Object placed, drag or twist to move it"
+            "Loading Bat3…"
         )
+        
+        Task { [weak self] in
+            guard let self else {
+                return
+            }
+            
+            let ready = await self
+                .objectMaker
+                .prepare()
+            
+            guard ready,
+                  let part =
+                    self.objectMaker.make(),
+                  let ar = self.ar else {
+                self.isPlacing = false
+                
+                self.setMsg(
+                    self.objectMaker.loadError
+                    ?? "Bat3.usdz could not be loaded"
+                )
+                
+                return
+            }
+            
+            self.isPlacing = false
+            
+            self.spawn(
+                part,
+                in: ar
+            )
+        }
     }
     
-    func turn(_ deg: Float) {
+    func turn(
+        _ deg: Float
+    ) {
         guard state.viewMode == .third,
               let object else {
             return
@@ -80,31 +79,43 @@ extension SceneCtrl {
         
         clearWave()
         
-        yaw += deg * Float.pi / 180
-        
-        let turn = simd_quatf(
-            angle: yaw,
-            axis: SIMD3<Float>(0, 1, 0)
-        )
+        yaw +=
+        deg
+        * Float.pi
+        / 180
         
         object.setOrientation(
-            turn,
+            simd_quatf(
+                angle: yaw,
+                axis: SIMD3<Float>(
+                    0,
+                    1,
+                    0
+                )
+            ),
             relativeTo: nil
         )
         
-        setMsg("Direction changed")
+        setMsg(
+            "Bat direction changed"
+        )
     }
     
     func clear() {
         clearWave()
+        
         object?.removeFromParent()
         
         object = nil
         waveStart = nil
+        dragStart = nil
         yaw = 0
+        
         state.hasObject = false
         
-        setMsg("Object removed")
+        setMsg(
+            "Bat removed"
+        )
     }
     
     @objc func drag(
@@ -116,53 +127,97 @@ extension SceneCtrl {
             return
         }
         
-        guard pan.state == .began
-                || pan.state == .changed
-                || pan.state == .ended else {
-            return
-        }
-        
-        let point = pan.location(in: ar)
-        
-        guard let hit = placeSvc.hit(
-            in: ar,
-            at: point
-        ) else {
-            return
-        }
-        
-        clearWave()
-        
-        object.setPosition(
-            hit.worldTransform.pos3,
-            relativeTo: nil
-        )
-        
-        if pan.state == .ended {
-            setMsg("Object moved")
+        switch pan.state {
+        case .began:
+            clearWave()
+            
+            dragStart =
+            object.position(
+                relativeTo: nil
+            )
+            
+            pan.setTranslation(
+                .zero,
+                in: ar
+            )
+            
+        case .changed:
+            guard let dragStart else {
+                return
+            }
+            
+            let position = tpSpawn.move(
+                from: dragStart,
+                translation:
+                    pan.translation(
+                        in: ar
+                    ),
+                in: ar
+            )
+            
+            object.setPosition(
+                position,
+                relativeTo: nil
+            )
+            
+        case .ended:
+            dragStart = nil
+            
+            setMsg(
+                "Bat moved"
+            )
+            
+        case .cancelled,
+                .failed:
+            dragStart = nil
+            
+        default:
+            break
         }
     }
     
-    private func camYaw(
+    private func spawn(
+        _ part: ObjectPart,
         in view: ARView
-    ) -> Float {
-        let matrix = view.cameraTransform.matrix
+    ) {
+        clearWave()
         
-        var forward = SIMD3<Float>(
-            -matrix.columns.2.x,
-             0,
-             -matrix.columns.2.z
+        object?.removeFromParent()
+        
+        let pose = tpSpawn.pose(
+            in: view
         )
         
-        if simd_length(forward) < 0.001 {
-            forward = SIMD3<Float>(0, 0, -1)
-        } else {
-            forward = simd_normalize(forward)
-        }
+        world.addChild(
+            part.root
+        )
         
-        return atan2(
-            -forward.x,
-             -forward.z
+        part.root.setPosition(
+            pose.position,
+            relativeTo: nil
+        )
+        
+        yaw = pose.yaw
+        
+        part.root.setOrientation(
+            simd_quatf(
+                angle: yaw,
+                axis: SIMD3<Float>(
+                    0,
+                    1,
+                    0
+                )
+            ),
+            relativeTo: nil
+        )
+        
+        object = part.root
+        waveStart = part.waveStart
+        
+        state.hasObject = true
+        
+        setMsg(
+            "Bat floating in front • tap Place to recenter"
         )
     }
 }

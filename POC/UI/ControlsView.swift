@@ -3,7 +3,7 @@
 //  POC
 //
 //  Created by Asaryun on 02/08/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import SwiftUI
@@ -20,7 +20,8 @@ struct ControlsView: View {
                     tint: .blue,
                     disabled:
                         !vm.state.lidarOK
-                    || vm.state.viewMode == .first
+                    || vm.state.viewMode
+                    == .first
                 ) {
                     vm.place()
                 }
@@ -29,7 +30,8 @@ struct ControlsView: View {
                     title: "Wave",
                     icon: "waveform",
                     tint: .cyan,
-                    disabled: !vm.state.canWave
+                    disabled:
+                        !vm.state.canWave
                 ) {
                     vm.sendWave()
                 }
@@ -38,7 +40,8 @@ struct ControlsView: View {
                     title: "Clear",
                     icon: "trash",
                     tint: .red,
-                    disabled: !vm.state.hasObject
+                    disabled:
+                        !vm.state.hasObject
                 ) {
                     vm.clear()
                 }
@@ -46,7 +49,9 @@ struct ControlsView: View {
             
             Text(helpText)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(
+                    .secondary
+                )
         }
         .padding(12)
         .background(
@@ -60,14 +65,17 @@ struct ControlsView: View {
     
     private var helpText: String {
         if vm.state.viewMode == .first {
-            return "FIRST POV · move phone to aim · tap Wave"
+            return
+            "FIRST POV · move phone to aim · tap Wave"
         }
         
         if vm.state.hasObject {
-            return "THIRD POV · drag to move · twist to rotate"
+            return
+            "THIRD POV · Place recenters · drag moves · twist rotates"
         }
         
-        return "THIRD POV · aim at floor / table · tap Place"
+        return
+        "THIRD POV · tap Place to float Bat3 in front"
     }
     
     private func controlButton(
@@ -77,23 +85,34 @@ struct ControlsView: View {
         disabled: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button(
+            action: action
+        ) {
             VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(
-                        .system(size: 17)
-                    )
+                Image(
+                    systemName: icon
+                )
+                .font(
+                    .system(size: 17)
+                )
                 
                 Text(title)
                     .font(
-                        .caption2.weight(.medium)
+                        .caption2
+                            .weight(.medium)
                     )
             }
-            .frame(maxWidth: .infinity)
+            .frame(
+                maxWidth: .infinity
+            )
             .frame(height: 48)
         }
-        .buttonStyle(.borderedProminent)
-        .tint(tint.opacity(0.22))
+        .buttonStyle(
+            .borderedProminent
+        )
+        .tint(
+            tint.opacity(0.22)
+        )
         .foregroundStyle(tint)
         .disabled(disabled)
     }

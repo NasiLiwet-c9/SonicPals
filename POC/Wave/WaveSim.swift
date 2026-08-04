@@ -10,12 +10,23 @@ import RealityKit
 import simd
 
 @MainActor
-final class WaveSim: WaveSimulating {
-    private let set: WaveSet
-    private let rayMaker: RayMaker
-    private let echoCalc: EchoCalc
-    private let maxDistance: Float
-    private let soundSpeed: Float
+final class WaveSim:
+    WaveSimulating {
+    
+    private let set:
+    WaveSet
+    
+    private let rayMaker:
+    RayMaker
+    
+    private let echoCalc:
+    EchoCalc
+    
+    private let maxDistance:
+    Float
+    
+    private let soundSpeed:
+    Float
     
     init(
         set: WaveSet = .standard,
@@ -37,7 +48,7 @@ final class WaveSim: WaveSimulating {
     ) -> WaveData {
         let checkRays = rayMaker.make(
             for: set.check,
-            ringCount: 1
+            ringCount: 2
         )
         
         let nearest = nearestDistance(
@@ -46,8 +57,13 @@ final class WaveSim: WaveSimulating {
             rays: checkRays
         )
         
-        let setting = set.pick(nearest)
-        let rays = rayMaker.make(for: setting)
+        let setting = set.pick(
+            nearest
+        )
+        
+        let rays = rayMaker.make(
+            for: setting
+        )
         
         let hits = scan(
             in: view,
@@ -103,7 +119,10 @@ final class WaveSim: WaveSimulating {
         rays: [WaveRay]
     ) -> [WaveHit] {
         var hits: [WaveHit] = []
-        hits.reserveCapacity(rays.count)
+        
+        hits.reserveCapacity(
+            rays.count
+        )
         
         for ray in rays {
             let direction = worldDir(
@@ -123,7 +142,10 @@ final class WaveSim: WaveSimulating {
                 hit.normal
             )
             
-            if simd_dot(direction, normal) > 0 {
+            if simd_dot(
+                direction,
+                normal
+            ) > 0 {
                 normal = -normal
             }
             
@@ -139,7 +161,8 @@ final class WaveSim: WaveSimulating {
                 distanceM: hit.distance,
                 rayPower: ray.power,
                 anglePower: anglePower,
-                frequencyKHz: setting.midKHz
+                frequencyKHz:
+                    setting.midKHz
             )
             
             let heard = echoCalc.heard(

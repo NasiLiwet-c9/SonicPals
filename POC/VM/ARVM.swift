@@ -13,23 +13,29 @@ import RealityKit
 @MainActor
 @Observable
 final class ARVM {
-    private(set) var state = ARState()
+    private(set) var state =
+    ARState()
     
     @ObservationIgnored
     private let ctrl:
     any SceneControlling
     
     init() {
-        let waveShape = WaveShape()
-        let coneShape = FPConeShape()
+        let waveShape =
+        WaveShape()
         
-        let meshRead = FPMeshRead()
+        let coneShape =
+        FPConeShape()
+        
+        let meshRead =
+        FPMeshRead()
         
         let meshPack = FPMeshPack(
             liftM: 0.018
         )
         
-        let meshFact = FPMeshFact()
+        let meshFact =
+        FPMeshFact()
         
         let meshBuild = FPMeshBuild(
             read: meshRead,
@@ -37,17 +43,33 @@ final class ARVM {
             fact: meshFact
         )
         
+        let objectMaker = ObjectMaker(
+            asset: TPAssetSvc(
+                name: "Bat3",
+                targetSpanM: 0.34
+            )
+        )
+        
         let ctrl = SceneCtrl(
             sess: ARSessSvc(),
-            placeSvc: PlaceSvc(),
-            objectMaker: ObjectMaker(),
-            waveSim: WaveSim(),
+            
+            objectMaker:
+                objectMaker,
+            
+            tpSpawn: TPSpawn(
+                frontM: 0.85,
+                downM: 0.18
+            ),
+            
+            waveSim:
+                WaveSim(),
             
             fpCone: FPConeDraw(
                 shape: coneShape
             ),
             
-            fpMesh: meshBuild,
+            fpMesh:
+                meshBuild,
             
             waveDraw: WaveDraw(
                 shape: waveShape
@@ -66,7 +88,9 @@ final class ARVM {
     func setup(
         _ view: ARView
     ) {
-        ctrl.setup(view)
+        ctrl.setup(
+            view
+        )
     }
     
     func place() {
@@ -80,7 +104,9 @@ final class ARVM {
     func turn(
         _ deg: Float
     ) {
-        ctrl.turn(deg)
+        ctrl.turn(
+            deg
+        )
     }
     
     func toggleMesh() {

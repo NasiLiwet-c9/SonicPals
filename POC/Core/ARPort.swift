@@ -41,11 +41,6 @@ protocol PlaceServing {
 }
 
 @MainActor
-protocol ObjectMaking {
-    func make() -> ObjectPart
-}
-
-@MainActor
 protocol WaveSimulating {
     func run(
         in view: ARView,
@@ -55,7 +50,9 @@ protocol WaveSimulating {
 
 @MainActor
 protocol FPConeDrawing {
-    func make(from data: WaveData) -> Entity
+    func make(
+        from data: WaveData
+    ) -> Entity
 }
 
 @MainActor

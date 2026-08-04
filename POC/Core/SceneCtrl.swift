@@ -9,6 +9,7 @@
 
 import RealityKit
 import UIKit
+import simd
 
 @MainActor
 final class SceneCtrl:
@@ -16,42 +17,67 @@ final class SceneCtrl:
     SceneControlling,
     UIGestureRecognizerDelegate {
     
-    var onState: ((ARState) -> Void)?
+    var onState:
+    ((ARState) -> Void)?
     
     weak var ar: ARView?
     
-    let sess: any ARSessionServing
-    let placeSvc: any PlaceServing
-    let objectMaker: any ObjectMaking
-    let waveSim: any WaveSimulating
-    let fpCone: any FPConeDrawing
-    let fpMesh: any FPMeshBuilding
-    let waveDraw: any WaveDrawing
+    let sess:
+    any ARSessionServing
     
-    let world = AnchorEntity(world: .zero)
+    let objectMaker:
+    any ObjectMaking
+    
+    let tpSpawn:
+    any TPSpawning
+    
+    let waveSim:
+    any WaveSimulating
+    
+    let fpCone:
+    any FPConeDrawing
+    
+    let fpMesh:
+    any FPMeshBuilding
+    
+    let waveDraw:
+    any WaveDrawing
+    
+    let world = AnchorEntity(
+        world: .zero
+    )
     
     var state = ARState()
     
     var object: Entity?
     var waveStart: Entity?
+    
     var fpRoot: Entity?
     var tpWave: Entity?
+    
     var lastData: WaveData?
-    var visTask: Task<Void, Never>?
+    var visTask:
+    Task<Void, Never>?
+    
+    var isPlacing = false
+    
+    var dragStart:
+    SIMD3<Float>?
+    
     var yaw: Float = 0
     
     init(
         sess: any ARSessionServing,
-        placeSvc: any PlaceServing,
         objectMaker: any ObjectMaking,
+        tpSpawn: any TPSpawning,
         waveSim: any WaveSimulating,
         fpCone: any FPConeDrawing,
         fpMesh: any FPMeshBuilding,
         waveDraw: any WaveDrawing
     ) {
         self.sess = sess
-        self.placeSvc = placeSvc
         self.objectMaker = objectMaker
+        self.tpSpawn = tpSpawn
         self.waveSim = waveSim
         self.fpCone = fpCone
         self.fpMesh = fpMesh
@@ -60,41 +86,76 @@ final class SceneCtrl:
         super.init()
     }
     
-    func setup(_ view: ARView) {
+    func setup(
+        _ view: ARView
+    ) {
         guard ar == nil else {
             return
         }
         
         ar = view
         
-        let supported = sess.start(view)
+        let supported = sess.start(
+            view
+        )
         
-        view.scene.addAnchor(world)
+        view.scene.addAnchor(
+            world
+        )
         
         state.lidarOK = supported
         state.meshOn = false
+        
         state.msg = supported
         ? "BAT VISION ready, move phone to aim"
         : "LiDAR scene reconstruction unavailable"
         
-        sess.showMesh(false, in: view)
-        sess.addCoach(to: view)
-        addPan(to: view)
+        sess.showMesh(
+            false,
+            in: view
+        )
+        
+        sess.addCoach(
+            to: view
+        )
+        
+        addPan(
+            to: view
+        )
+        
         push()
+        
+        // Preload Bat3 before the user presses Place.
+        Task { [weak self] in
+            guard let self else {
+                return
+            }
+            
+            _ = await self
+                .objectMaker
+                .prepare()
+        }
     }
     
     func toggleMesh() {
         guard state.viewMode == .third else {
-            setMsg("The full mesh stays hidden in BAT VISION")
+            setMsg(
+                "The full mesh stays hidden in BAT VISION"
+            )
             return
         }
         
-        guard let ar, state.lidarOK else {
+        guard let ar,
+              state.lidarOK else {
             return
         }
         
         state.meshOn.toggle()
-        sess.showMesh(state.meshOn, in: ar)
+        
+        sess.showMesh(
+            state.meshOn,
+            in: ar
+        )
         
         setMsg(
             state.meshOn
@@ -107,26 +168,42 @@ final class SceneCtrl:
         clearWave()
         
         if let ar {
-            sess.showMesh(false, in: ar)
+            sess.showMesh(
+                false,
+                in: ar
+            )
         }
         
         state.meshOn = false
         state.pointsOn = false
         
-        setMsg("Temporary wave graphics cleared")
+        setMsg(
+            "Temporary wave graphics cleared"
+        )
     }
     
-    func addPan(to view: ARView) {
-        let pan = UIPanGestureRecognizer(
+    func addPan(
+        to view: ARView
+    ) {
+        let pan =
+        UIPanGestureRecognizer(
             target: self,
-            action: #selector(drag(_:))
+            action: #selector(
+                drag(_:)
+            )
         )
         
-        pan.cancelsTouchesInView = false
-        pan.maximumNumberOfTouches = 1
+        pan.cancelsTouchesInView =
+        false
+        
+        pan.maximumNumberOfTouches =
+        1
+        
         pan.delegate = self
         
-        view.addGestureRecognizer(pan)
+        view.addGestureRecognizer(
+            pan
+        )
     }
     
     func clearWave() {
@@ -139,21 +216,28 @@ final class SceneCtrl:
         fpRoot = nil
         tpWave = nil
         lastData = nil
+        
         state.hasWave = false
     }
     
-    func setMsg(_ text: String) {
+    func setMsg(
+        _ text: String
+    ) {
         state.msg = text
         push()
     }
     
     func push() {
-        onState?(state)
+        onState?(
+            state
+        )
     }
     
     nonisolated func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer:
+        _ gestureRecognizer:
+        UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith
+        otherGestureRecognizer:
         UIGestureRecognizer
     ) -> Bool {
         true
