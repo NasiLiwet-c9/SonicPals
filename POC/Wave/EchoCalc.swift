@@ -2,23 +2,16 @@
 //  EchoCalc.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
 //
 
 import Foundation
 
 final class EchoCalc {
-    private let startDb:
-    Float = 110
-    
-    private let hearDb:
-    Float = 30
-    
-    private let surfaceLossDb:
-    Float = 8
-    
-    private let refDistanceM:
-    Float = 0.1
+    private let startDb: Float = 110
+    private let hearDb: Float = 30
+    private let surfaceLossDb: Float = 8
+    private let refDistanceM: Float = 0.1
     
     func level(
         distanceM: Float,
@@ -26,8 +19,7 @@ final class EchoCalc {
         anglePower: Float,
         frequencyKHz: Float
     ) -> Float {
-        let distance =
-        max(
+        let distance = max(
             distanceM,
             refDistanceM
         )
@@ -35,33 +27,24 @@ final class EchoCalc {
         let spreadDb =
         40
         * logValue(
-            distance
-            / refDistanceM
+            distance / refDistanceM
         )
         
         let airDb =
         2
-        * airLoss(
-            frequencyKHz
-        )
+        * airLoss(frequencyKHz)
         * distance
         
         let rayDb =
         -20
         * logValue(
-            max(
-                rayPower,
-                0.001
-            )
+            max(rayPower, 0.001)
         )
         
         let angleDb =
         -20
         * logValue(
-            max(
-                anglePower,
-                0.05
-            )
+            max(anglePower, 0.05)
         )
         
         return startDb
@@ -80,11 +63,9 @@ final class EchoCalc {
     ) -> Bool {
         distanceM
         >= setting.minRange(
-            soundSpeed:
-                soundSpeed
+            soundSpeed: soundSpeed
         )
-        && levelDb
-        >= hearDb
+        && levelDb >= hearDb
     }
     
     func power(
@@ -92,8 +73,7 @@ final class EchoCalc {
     ) -> Float {
         min(
             max(
-                (levelDb - 15)
-                / 55,
+                (levelDb - 15) / 55,
                 0.05
             ),
             1
@@ -103,21 +83,15 @@ final class EchoCalc {
     private func airLoss(
         _ frequencyKHz: Float
     ) -> Float {
-        let frequency =
-        min(
-            max(
-                frequencyKHz,
-                20
-            ),
+        let frequency = min(
+            max(frequencyKHz, 20),
             80
         )
         
         let amount =
-        (frequency - 20)
-        / 60
+        (frequency - 20) / 60
         
-        return 0.35
-        + (amount * 1.65)
+        return 0.35 + (amount * 1.65)
     }
     
     private func logValue(

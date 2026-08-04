@@ -2,7 +2,7 @@
 //  ObjectPart.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
 //
 
 import RealityKit

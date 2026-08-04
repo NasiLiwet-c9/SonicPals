@@ -4,7 +4,7 @@
 //
 //  Created by Shanon Newcastle on 30/07/26.
 //  Updated by Asaryun on 02/08/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import Observation
@@ -21,38 +21,76 @@ final class ARVM {
     any SceneControlling
     
     init() {
-        let shape =
+        let waveShape =
         WaveShape()
         
-        let draw =
-        WaveDraw(
-            shape: shape
+        let coneShape =
+        FPConeShape()
+        
+        let meshRead =
+        FPMeshRead()
+        
+        let meshPack = FPMeshPack(
+            liftM: 0.018
         )
         
-        let ctrl =
-        SceneCtrl(
+        let meshFact =
+        FPMeshFact()
+        
+        let meshBuild = FPMeshBuild(
+            read: meshRead,
+            pack: meshPack,
+            fact: meshFact
+        )
+        
+        let objectMaker = ObjectMaker(
+            asset: TPAssetSvc(
+                name: "Bat3",
+                targetSpanM: 0.34
+            )
+        )
+        
+        let ctrl = SceneCtrl(
             sess: ARSessSvc(),
-            placeSvc: PlaceSvc(),
-            objectMaker: ObjectMaker(),
-            waveSim: WaveSim(),
-            waveDraw: draw
+            
+            objectMaker:
+                objectMaker,
+            
+            tpSpawn: TPSpawn(
+                frontM: 0.85,
+                downM: 0.18
+            ),
+            
+            waveSim:
+                WaveSim(),
+            
+            fpCone: FPConeDraw(
+                shape: coneShape
+            ),
+            
+            fpMesh:
+                meshBuild,
+            
+            waveDraw: WaveDraw(
+                shape: waveShape
+            )
         )
         
-        self.ctrl =
-        ctrl
+        self.ctrl = ctrl
         
         ctrl.onState = {
             [weak self] state in
             
-            self?.state =
-            state
+            self?.state = state
         }
     }
     
     func setup(
         _ view: ARView
     ) {
-        ctrl.setup(view)
+        ctrl.setup(
+            view
+        )
     }
     
     func place() {
@@ -66,7 +104,9 @@ final class ARVM {
     func turn(
         _ deg: Float
     ) {
-        ctrl.turn(deg)
+        ctrl.turn(
+            deg
+        )
     }
     
     func toggleMesh() {
@@ -83,5 +123,9 @@ final class ARVM {
     
     func clear() {
         ctrl.clear()
+    }
+    
+    func handleMemoryWarning() {
+        ctrl.handleMemoryWarning()
     }
 }

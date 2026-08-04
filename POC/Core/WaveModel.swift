@@ -2,7 +2,8 @@
 //  WaveModel.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import simd
@@ -33,9 +34,7 @@ struct WaveSetting {
     func minRange(
         soundSpeed: Float
     ) -> Float {
-        soundSpeed
-        * (durationMs / 1000)
-        / 2
+        soundSpeed * (durationMs / 1_000) / 2
     }
 }
 
@@ -44,7 +43,6 @@ struct WaveSet {
     let near: WaveSetting
     let close: WaveSetting
     let check: WaveSetting
-    
     let closeMaxM: Float
     let nearMaxM: Float
     
@@ -157,6 +155,12 @@ struct WaveData {
         }
     }
     
+    var farthestHit: WaveHit? {
+        hits.max {
+            $0.distanceM < $1.distanceM
+        }
+    }
+    
     var nearestEcho: WaveHit? {
         hits
             .filter(\.heard)
@@ -175,9 +179,7 @@ struct WaveData {
     
     var strongestMiss: WaveHit? {
         hits
-            .filter {
-                !$0.heard
-            }
+            .filter { !$0.heard }
             .max {
                 $0.levelDb < $1.levelDb
             }
@@ -191,17 +193,29 @@ struct WaveData {
         return nearestEcho.distanceM
         * 2
         / soundSpeed
-        * 1000
+        * 1_000
     }
     
     var viewDistance: Float {
         let distance =
-        nearestHit?.distanceM
+        nearestEcho?.distanceM
+        ?? nearestHit?.distanceM
         ?? maxDistance
         
         return min(
             max(distance, 0.4),
             1.35
+        )
+    }
+    
+    var fpRange: Float {
+        let distance =
+        farthestHit?.distanceM
+        ?? min(maxDistance, 3)
+        
+        return min(
+            max(distance, 1.2),
+            maxDistance
         )
     }
 }

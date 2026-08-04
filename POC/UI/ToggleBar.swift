@@ -2,22 +2,17 @@
 //  ToggleBar.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import SwiftUI
 
-struct ToggleBar:
-    View {
+struct ToggleBar: View {
+    let vm: ARVM
     
-    let vm:
-    ARVM
-    
-    var body:
-    some View {
-        HStack(
-            spacing: 10
-        ) {
+    var body: some View {
+        HStack(spacing: 10) {
             Spacer()
             
             iconButton(
@@ -25,12 +20,9 @@ struct ToggleBar:
                     vm.state.viewMode == .first
                 ? "person.crop.circle.fill"
                 : "cube.transparent",
-                tint:
-                        .indigo,
-                isOn:
-                    vm.state.viewMode == .first,
-                disabled:
-                    !vm.state.lidarOK,
+                tint: .indigo,
+                isOn: vm.state.viewMode == .first,
+                disabled: !vm.state.lidarOK,
                 label:
                     vm.state.viewMode == .first
                 ? "Switch to third person"
@@ -44,12 +36,11 @@ struct ToggleBar:
                     vm.state.pointsOn
                 ? "circle.grid.3x3.fill"
                 : "circle.grid.3x3",
-                tint:
-                        .purple,
-                isOn:
-                    vm.state.pointsOn,
+                tint: .purple,
+                isOn: vm.state.pointsOn,
                 disabled:
-                    !vm.state.hasWave,
+                    !vm.state.hasWave
+                || vm.state.viewMode == .first,
                 label:
                     vm.state.pointsOn
                 ? "Hide all points"
@@ -63,12 +54,11 @@ struct ToggleBar:
                     vm.state.meshOn
                 ? "eye"
                 : "eye.slash",
-                tint:
-                        .blue,
-                isOn:
-                    vm.state.meshOn,
+                tint: .blue,
+                isOn: vm.state.meshOn,
                 disabled:
-                    !vm.state.lidarOK,
+                    !vm.state.lidarOK
+                || vm.state.viewMode == .first,
                 label:
                     vm.state.meshOn
                 ? "Hide mesh"
@@ -87,51 +77,32 @@ struct ToggleBar:
         label: String,
         action: @escaping () -> Void
     ) -> some View {
-        Button(
-            action:
-                action
-        ) {
-            Image(
-                systemName:
-                    icon
-            )
-            .font(
-                .system(
-                    size:
-                        15,
-                    weight:
-                            .medium
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(
+                    .system(
+                        size: 15,
+                        weight: .medium
+                    )
                 )
-            )
-            .foregroundStyle(
-                isOn
-                ? Color.white
-                : tint
-            )
-            .frame(
-                width:
-                    44,
-                height:
-                    44
-            )
-            .background(
-                isOn
-                ? tint
-                : Color.clear,
-                in:
-                    Circle()
-            )
-            .background(
-                .ultraThinMaterial,
-                in:
-                    Circle()
-            )
+                .foregroundStyle(
+                    isOn
+                    ? Color.white
+                    : tint
+                )
+                .frame(width: 44, height: 44)
+                .background(
+                    isOn
+                    ? tint
+                    : Color.clear,
+                    in: Circle()
+                )
+                .background(
+                    .ultraThinMaterial,
+                    in: Circle()
+                )
         }
-        .disabled(
-            disabled
-        )
-        .accessibilityLabel(
-            label
-        )
+        .disabled(disabled)
+        .accessibilityLabel(label)
     }
 }

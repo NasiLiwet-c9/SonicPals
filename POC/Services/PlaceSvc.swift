@@ -10,33 +10,25 @@ import RealityKit
 import UIKit
 
 @MainActor
-final class PlaceSvc:
-    PlaceServing {
-    
+final class PlaceSvc: PlaceServing {
     func hit(
         in view: ARView,
         at point: CGPoint
     ) -> ARRaycastResult? {
-        let planes =
-        view.raycast(
+        let planeHits = view.raycast(
             from: point,
-            allowing:
-                    .existingPlaneGeometry,
-            alignment:
-                    .horizontal
+            allowing: .existingPlaneGeometry,
+            alignment: .horizontal
         )
         
-        if let first =
-            planes.first {
+        if let first = planeHits.first {
             return first
         }
         
         return view.raycast(
             from: point,
-            allowing:
-                    .estimatedPlane,
-            alignment:
-                    .horizontal
+            allowing: .estimatedPlane,
+            alignment: .horizontal
         )
         .first
     }

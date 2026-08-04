@@ -2,53 +2,35 @@
 //  RayMaker.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 03/08/26.
+//  Created by Shanon Newcastle on 03/08/26.
 //
 
 import Foundation
 import simd
 
 final class RayMaker {
-    private let rings =
-    3
-    
-    private let beamPower:
-    Float = 8
+    private let rings = 3
+    private let beamPower: Float = 8
     
     func make(
         for setting: WaveSetting,
         ringCount: Int? = nil
     ) -> [WaveRay] {
-        let total =
-        ringCount
-        ?? rings
+        let total = ringCount ?? rings
         
-        let hScale =
-        tan(
-            toRad(
-                setting.hAngleDeg
-            )
+        let hScale = tan(
+            toRad(setting.hAngleDeg)
         )
         
-        let vScale =
-        tan(
-            toRad(
-                setting.vAngleDeg
-            )
+        let vScale = tan(
+            toRad(setting.vAngleDeg)
         )
         
         var rays = [
             WaveRay(
-                dir:
-                    SIMD3<Float>(
-                        0,
-                        0,
-                        1
-                    ),
-                power:
-                    1,
-                sideDeg:
-                    0
+                dir: SIMD3<Float>(0, 0, 1),
+                power: 1,
+                sideDeg: 0
             )
         ]
         
@@ -58,11 +40,9 @@ final class RayMaker {
         
         for ring in 1...total {
             let radius =
-            Float(ring)
-            / Float(total)
+            Float(ring) / Float(total)
             
-            let count =
-            ring * 8
+            let count = ring * 8
             
             for index in 0..<count {
                 let angle =
@@ -81,40 +61,24 @@ final class RayMaker {
                 * vScale
                 * radius
                 
-                let dir =
-                simd_normalize(
-                    SIMD3<Float>(
-                        x,
-                        y,
-                        1
-                    )
+                let dir = simd_normalize(
+                    SIMD3<Float>(x, y, 1)
                 )
                 
-                let offAxis =
-                acos(
+                let offAxis = acos(
                     min(
-                        max(
-                            dir.z,
-                            -1
-                        ),
+                        max(dir.z, -1),
                         1
                     )
                 )
                 
-                let power =
-                pow(
-                    max(
-                        cos(offAxis),
-                        0
-                    ),
+                let power = pow(
+                    max(cos(offAxis), 0),
                     beamPower
                 )
                 
                 let sideDeg =
-                atan2(
-                    dir.x,
-                    dir.z
-                )
+                atan2(dir.x, dir.z)
                 * 180
                 / Float.pi
                 
@@ -132,10 +96,8 @@ final class RayMaker {
     }
     
     private func toRad(
-        _ deg: Float
+        _ degrees: Float
     ) -> Float {
-        deg
-        * Float.pi
-        / 180
+        degrees * Float.pi / 180
     }
 }

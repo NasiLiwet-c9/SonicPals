@@ -3,46 +3,33 @@
 //  POC
 //
 //  Created by Asaryun on 02/08/26.
-//  Updated by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
 //
 
 import SwiftUI
 
-struct ControlsView:
-    View {
+struct ControlsView: View {
+    let vm: ARVM
     
-    let vm:
-    ARVM
-    
-    var body:
-    some View {
-        VStack(
-            spacing: 10
-        ) {
-            HStack(
-                spacing: 8
-            ) {
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
                 controlButton(
-                    title:
-                        "Place",
-                    icon:
-                        "hand.tap.fill",
-                    tint:
-                            .blue,
+                    title: "Place",
+                    icon: "hand.tap.fill",
+                    tint: .blue,
                     disabled:
                         !vm.state.lidarOK
-                    || vm.state.viewMode == .first
+                    || vm.state.viewMode
+                    == .first
                 ) {
                     vm.place()
                 }
                 
                 controlButton(
-                    title:
-                        "Wave",
-                    icon:
-                        "waveform",
-                    tint:
-                            .cyan,
+                    title: "Wave",
+                    icon: "waveform",
+                    tint: .cyan,
                     disabled:
                         !vm.state.canWave
                 ) {
@@ -50,12 +37,9 @@ struct ControlsView:
                 }
                 
                 controlButton(
-                    title:
-                        "Clear",
-                    icon:
-                        "trash",
-                    tint:
-                            .red,
+                    title: "Clear",
+                    icon: "trash",
+                    tint: .red,
                     disabled:
                         !vm.state.hasObject
                 ) {
@@ -63,42 +47,35 @@ struct ControlsView:
                 }
             }
             
-            Text(
-                helpText
-            )
-            .font(
-                .caption
-            )
-            .foregroundStyle(
-                .secondary
-            )
+            Text(helpText)
+                .font(.caption)
+                .foregroundStyle(
+                    .secondary
+                )
         }
-        .padding(
-            12
-        )
+        .padding(12)
         .background(
             .ultraThinMaterial,
-            in:
-                RoundedRectangle(
-                    cornerRadius:
-                        18,
-                    style:
-                            .continuous
-                )
+            in: RoundedRectangle(
+                cornerRadius: 18,
+                style: .continuous
+            )
         )
     }
     
-    private var helpText:
-    String {
+    private var helpText: String {
         if vm.state.viewMode == .first {
-            return "FIRST POV · move phone to aim · tap Wave"
+            return
+            "FIRST POV · move phone to aim · tap Wave"
         }
         
         if vm.state.hasObject {
-            return "THIRD POV · drag to move · twist to rotate"
+            return
+            "THIRD POV · Place recenters · drag moves · twist rotates"
         }
         
-        return "THIRD POV · aim at floor / table · tap Place"
+        return
+        "THIRD POV · tap Place to float Bat3 in front"
     }
     
     private func controlButton(
@@ -109,54 +86,34 @@ struct ControlsView:
         action: @escaping () -> Void
     ) -> some View {
         Button(
-            action:
-                action
+            action: action
         ) {
-            VStack(
-                spacing: 4
-            ) {
+            VStack(spacing: 4) {
                 Image(
-                    systemName:
-                        icon
+                    systemName: icon
                 )
                 .font(
-                    .system(
-                        size: 17
-                    )
+                    .system(size: 17)
                 )
                 
-                Text(
-                    title
-                )
-                .font(
-                    .caption2
-                        .weight(
-                            .medium
-                        )
-                )
+                Text(title)
+                    .font(
+                        .caption2
+                            .weight(.medium)
+                    )
             }
             .frame(
-                maxWidth:
-                        .infinity
+                maxWidth: .infinity
             )
-            .frame(
-                height:
-                    48
-            )
+            .frame(height: 48)
         }
         .buttonStyle(
             .borderedProminent
         )
         .tint(
-            tint.opacity(
-                0.22
-            )
+            tint.opacity(0.22)
         )
-        .foregroundStyle(
-            tint
-        )
-        .disabled(
-            disabled
-        )
+        .foregroundStyle(tint)
+        .disabled(disabled)
     }
 }

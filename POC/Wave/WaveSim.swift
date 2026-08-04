@@ -2,8 +2,14 @@
 //  WaveSim.swift
 //  POC
 //
+<<<<<<< HEAD
 //  Created by Shanon Giuly Istanto on 03/08/26.
 //  Updated by Asaryun on 03/08/26.
+=======
+//  Created by Shanon Newcastle on 03/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
+//
+>>>>>>> shan_POC
 
 import RealityKit
 import simd
@@ -12,12 +18,20 @@ import simd
 final class WaveSim:
     WaveSimulating {
     
-    private let set: WaveSet
-    private let rayMaker: RayMaker
-    private let echoCalc: EchoCalc
+    private let set:
+    WaveSet
     
-    private let maxDistance: Float
-    private let soundSpeed: Float
+    private let rayMaker:
+    RayMaker
+    
+    private let echoCalc:
+    EchoCalc
+    
+    private let maxDistance:
+    Float
+    
+    private let soundSpeed:
+    Float
     
     init(
         set: WaveSet? = nil,
@@ -81,7 +95,7 @@ final class WaveSim:
         var nearest: Float?
         
         for ray in rays {
-            let dir = worldDir(
+            let direction = worldDir(
                 ray.dir,
                 from: start
             )
@@ -89,7 +103,7 @@ final class WaveSim:
             guard let hit = firstHit(
                 in: view,
                 start: start.pos,
-                dir: dir
+                direction: direction
             ) else {
                 continue
             }
@@ -111,8 +125,12 @@ final class WaveSim:
     ) -> [WaveHit] {
         var hits: [WaveHit] = []
         
+        hits.reserveCapacity(
+            rays.count
+        )
+        
         for ray in rays {
-            let dir = worldDir(
+            let direction = worldDir(
                 ray.dir,
                 from: start
             )
@@ -120,7 +138,7 @@ final class WaveSim:
             guard let hit = firstHit(
                 in: view,
                 start: start.pos,
-                dir: dir
+                direction: direction
             ) else {
                 continue
             }
@@ -130,7 +148,7 @@ final class WaveSim:
             )
             
             if simd_dot(
-                dir,
+                direction,
                 normal
             ) > 0 {
                 normal = -normal
@@ -138,7 +156,7 @@ final class WaveSim:
             
             let anglePower = max(
                 simd_dot(
-                    -dir,
+                    -direction,
                      normal
                 ),
                 0.05
@@ -148,7 +166,8 @@ final class WaveSim:
                 distanceM: hit.distance,
                 rayPower: ray.power,
                 anglePower: anglePower,
-                frequencyKHz: setting.midKHz
+                frequencyKHz:
+                    setting.midKHz
             )
             
             let heard = echoCalc.heard(
@@ -159,11 +178,11 @@ final class WaveSim:
             )
             
             let bounceDir = simd_normalize(
-                dir
+                direction
                 - (
                     2
                     * simd_dot(
-                        dir,
+                        direction,
                         normal
                     )
                     * normal
@@ -193,11 +212,11 @@ final class WaveSim:
     private func firstHit(
         in view: ARView,
         start: SIMD3<Float>,
-        dir: SIMD3<Float>
+        direction: SIMD3<Float>
     ) -> CollisionCastHit? {
         view.scene.raycast(
             origin: start,
-            direction: dir,
+            direction: direction,
             length: maxDistance,
             query: .nearest,
             mask: .sceneUnderstanding,
@@ -207,13 +226,13 @@ final class WaveSim:
     }
     
     private func worldDir(
-        _ dir: SIMD3<Float>,
+        _ direction: SIMD3<Float>,
         from start: WaveStart
     ) -> SIMD3<Float> {
         simd_normalize(
-            (start.right * dir.x)
-            + (start.up * dir.y)
-            + (start.forward * dir.z)
+            (start.right * direction.x)
+            + (start.up * direction.y)
+            + (start.forward * direction.z)
         )
     }
 }
