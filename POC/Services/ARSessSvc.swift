@@ -1,55 +1,63 @@
+//
+//  ARSessSvc.swift
+//  POC
+//
+//  Created by Shanon Newcastle on 30/07/26.
+//  Updated by Shanon Newcastle on 04/08/26.
+//
+
 import ARKit
 import RealityKit
 import UIKit
 
 @MainActor
-final class ARSessSvc:
-    ARSessionServing {
-
+final class ARSessSvc: ARSessionServing {
     func start(
         _ view: ARView
     ) -> Bool {
-        let cfg =
-            ARWorldTrackingConfiguration()
-
-        cfg.planeDetection = [  // detect flat surfaces
+        let config = ARWorldTrackingConfiguration()
+        
+        config.planeDetection = [
             .horizontal,
             .vertical
         ]
-
+        
+        config.environmentTexturing = .none
+        config.videoHDRAllowed = false
+        
+        if let format = balancedFormat() {
+            config.videoFormat = format
+        }
+        
         let supported =
-            ARWorldTrackingConfiguration
-                .supportsSceneReconstruction(
-                    .mesh
-                )
-
+        ARWorldTrackingConfiguration
+            .supportsSceneReconstruction(.mesh)
+        
         if supported {
-            cfg.sceneReconstruction = .mesh
-
+            config.sceneReconstruction = .mesh
+            
             view.environment
                 .sceneUnderstanding
                 .options = [
                     .collision,
                     .occlusion
                 ]
-
-            showMesh(
-                true,
-                in: view
-            )
         }
-
+        
+        reduceCost(in: view)
+        showMesh(false, in: view)
+        
         view.session.run(
-            cfg,
+            config,
             options: [
                 .resetTracking,
                 .removeExistingAnchors
             ]
         )
-
+        
         return supported
     }
-
+    
     func showMesh(
         _ show: Bool,
         in view: ARView
@@ -64,22 +72,19 @@ final class ARSessSvc:
             )
         }
     }
-
+    
     func addCoach(
         to view: ARView
     ) {
-        let coach =
-            ARCoachingOverlayView()
-
+        let coach = ARCoachingOverlayView()
+        
         coach.session = view.session
         coach.goal = .horizontalPlane
         coach.activatesAutomatically = true
-
-        coach.translatesAutoresizingMaskIntoConstraints =
-            false
-
+        coach.translatesAutoresizingMaskIntoConstraints = false
+        
         view.addSubview(coach)
-
+        
         NSLayoutConstraint.activate([
             coach.topAnchor.constraint(
                 equalTo: view.topAnchor
@@ -94,5 +99,47 @@ final class ARSessSvc:
                 equalTo: view.trailingAnchor
             )
         ])
+    }
+    
+    private func balancedFormat()
+    -> ARConfiguration.VideoFormat? {
+        
+        let formats =
+        ARWorldTrackingConfiguration
+            .supportedVideoFormats
+            .filter {
+                $0.framesPerSecond == 30
+            }
+            .sorted {
+                let first =
+                $0.imageResolution.width
+                * $0.imageResolution.height
+                
+                let second =
+                $1.imageResolution.width
+                * $1.imageResolution.height
+                
+                return first < second
+            }
+        
+        return formats.first {
+            $0.imageResolution.width >= 1_280
+        } ?? formats.first
+    }
+    
+    private func reduceCost(
+        in view: ARView
+    ) {
+        view.renderOptions.insert(
+            .disableCameraGrain
+        )
+        
+        view.renderOptions.insert(
+            .disableMotionBlur
+        )
+        
+        view.renderOptions.insert(
+            .disableHDR
+        )
     }
 }

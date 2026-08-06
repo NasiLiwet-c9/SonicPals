@@ -1,31 +1,35 @@
+//
+//  PlaceSvc.swift
+//  POC
+//
+//  Created by Shanon Newcastle on 30/07/26.
+//
+
 import ARKit
 import RealityKit
 import UIKit
 
 @MainActor
-final class PlaceSvc:
-    PlaceServing {
-
+final class PlaceSvc: PlaceServing {
     func hit(
         in view: ARView,
         at point: CGPoint
     ) -> ARRaycastResult? {
-        let planes = view.raycast(
+        let planeHits = view.raycast(
             from: point,
             allowing: .existingPlaneGeometry,
             alignment: .horizontal
         )
-
-        if let first = planes.first {
+        
+        if let first = planeHits.first {
             return first
         }
-
-        let estimates = view.raycast(
+        
+        return view.raycast(
             from: point,
             allowing: .estimatedPlane,
             alignment: .horizontal
         )
-
-        return estimates.first
+        .first
     }
 }

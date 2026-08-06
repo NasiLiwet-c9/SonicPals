@@ -6,17 +6,108 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileReference section */
-		747491C8301BE3CD0012A049 /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = POC.app; sourceTree = BUILT_PRODUCTS_DIR; };
-/* End PBXFileReference section */
+/* Begin PBXBuildFile section */
+		207A4D003024961500F660DA /* WaveShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CFA3024961500F660DA /* WaveShape.swift */; };
+		207A4D013024961500F660DA /* FPSampleSvc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CDD3024961500F660DA /* FPSampleSvc.swift */; };
+		207A4D023024961500F660DA /* ObjectPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CCE3024961500F660DA /* ObjectPart.swift */; };
+		207A4D033024961500F660DA /* ARMeshGeo+Read.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD43024961500F660DA /* ARMeshGeo+Read.swift */; };
+		207A4D043024961500F660DA /* EchoCalc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF83024961500F660DA /* EchoCalc.swift */; };
+		207A4D053024961500F660DA /* ECSWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC43024961500F660DA /* ECSWorld.swift */; };
+		207A4D063024961500F660DA /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC23024961500F660DA /* Command.swift */; };
+		207A4D073024961500F660DA /* FPMeshBuild.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD53024961500F660DA /* FPMeshBuild.swift */; };
+		207A4D083024961500F660DA /* SimdExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF53024961500F660DA /* SimdExt.swift */; };
+		207A4D093024961500F660DA /* WaveSim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CFB3024961500F660DA /* WaveSim.swift */; };
+		207A4D0A3024961500F660DA /* TPPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CED3024961500F660DA /* TPPort.swift */; };
+		207A4D0B3024961500F660DA /* FPConeScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CDB3024961500F660DA /* FPConeScan.swift */; };
+		207A4D0C3024961500F660DA /* ECSWorld+Placement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC63024961500F660DA /* ECSWorld+Placement.swift */; };
+		207A4D0D3024961500F660DA /* FPShade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CDF3024961500F660DA /* FPShade.swift */; };
+		207A4D0E3024961500F660DA /* FPRevealSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC93024961500F660DA /* FPRevealSystem.swift */; };
+		207A4D0F3024961500F660DA /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC33024961500F660DA /* Components.swift */; };
+		207A4D103024961500F660DA /* WaveModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CCF3024961500F660DA /* WaveModel.swift */; };
+		207A4D113024961500F660DA /* TPAssetSvc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE93024961500F660DA /* TPAssetSvc.swift */; };
+		207A4D123024961500F660DA /* ControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF13024961500F660DA /* ControlsView.swift */; };
+		207A4D133024961500F660DA /* ARViewBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF03024961500F660DA /* ARViewBox.swift */; };
+		207A4D143024961500F660DA /* FPConeShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD23024961500F660DA /* FPConeShape.swift */; };
+		207A4D153024961500F660DA /* FPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE13024961500F660DA /* FPModel.swift */; };
+		207A4D163024961500F660DA /* ObjectMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE83024961500F660DA /* ObjectMaker.swift */; };
+		207A4D173024961500F660DA /* TPSpawn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CEB3024961500F660DA /* TPSpawn.swift */; };
+		207A4D183024961500F660DA /* POCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC03024961500F660DA /* POCApp.swift */; };
+		207A4D193024961500F660DA /* ARState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CCD3024961500F660DA /* ARState.swift */; };
+		207A4D1A3024961500F660DA /* ARPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CCC3024961500F660DA /* ARPort.swift */; };
+		207A4D1B3024961500F660DA /* FPMeshFact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD63024961500F660DA /* FPMeshFact.swift */; };
+		207A4D1C3024961500F660DA /* FPMeshRead.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD83024961500F660DA /* FPMeshRead.swift */; };
+		207A4D1D3024961500F660DA /* ECSWorld+FP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC53024961500F660DA /* ECSWorld+FP.swift */; };
+		207A4D1E3024961500F660DA /* FPClassify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CDA3024961500F660DA /* FPClassify.swift */; };
+		207A4D1F3024961500F660DA /* FPPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE23024961500F660DA /* FPPort.swift */; };
+		207A4D203024961500F660DA /* RayMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF93024961500F660DA /* RayMaker.swift */; };
+		207A4D213024961500F660DA /* TPBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CEA3024961500F660DA /* TPBody.swift */; };
+		207A4D223024961500F660DA /* WaveDraw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CEE3024961500F660DA /* WaveDraw.swift */; };
+		207A4D233024961500F660DA /* PlaceSvc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE63024961500F660DA /* PlaceSvc.swift */; };
+		207A4D243024961500F660DA /* FPMeshPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD73024961500F660DA /* FPMeshPack.swift */; };
+		207A4D253024961500F660DA /* FPConeDraw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CD13024961500F660DA /* FPConeDraw.swift */; };
+		207A4D263024961500F660DA /* FPStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE33024961500F660DA /* FPStyle.swift */; };
+		207A4D273024961500F660DA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF23024961500F660DA /* MainView.swift */; };
+		207A4D283024961500F660DA /* ARSessSvc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CE53024961500F660DA /* ARSessSvc.swift */; };
+		207A4D293024961500F660DA /* FPHitScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CDC3024961500F660DA /* FPHitScan.swift */; };
+		207A4D2A3024961500F660DA /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CCB3024961500F660DA /* AppModel.swift */; };
+		207A4D2B3024961500F660DA /* ToggleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CF33024961500F660DA /* ToggleBar.swift */; };
+		207A4D2C3024961500F660DA /* ECSWorld+Wave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC83024961500F660DA /* ECSWorld+Wave.swift */; };
+		207A4D2D3024961500F660DA /* ECSWorld+TP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC73024961500F660DA /* ECSWorld+TP.swift */; };
+		207A4D2E3024961500F660DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 207A4CFD3024961500F660DA /* Assets.xcassets */; };
+		207A4D2F3024961500F660DA /* Bat3.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 207A4CFE3024961500F660DA /* Bat3.usdz */; };
+/* End PBXBuildFile section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		747491CA301BE3CD0012A049 /* POC */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = POC;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
+/* Begin PBXFileReference section */
+		207A4CBF302493EC00F660DA /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = POC.app; path = "/Users/asaryun/Documents/GitHub/ARUltrasonic/build/Debug-iphoneos/POC.app"; sourceTree = "<absolute>"; };
+		207A4CC03024961500F660DA /* POCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POCApp.swift; sourceTree = "<group>"; };
+		207A4CC23024961500F660DA /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
+		207A4CC33024961500F660DA /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		207A4CC43024961500F660DA /* ECSWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECSWorld.swift; sourceTree = "<group>"; };
+		207A4CC53024961500F660DA /* ECSWorld+FP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECSWorld+FP.swift"; sourceTree = "<group>"; };
+		207A4CC63024961500F660DA /* ECSWorld+Placement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECSWorld+Placement.swift"; sourceTree = "<group>"; };
+		207A4CC73024961500F660DA /* ECSWorld+TP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECSWorld+TP.swift"; sourceTree = "<group>"; };
+		207A4CC83024961500F660DA /* ECSWorld+Wave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ECSWorld+Wave.swift"; sourceTree = "<group>"; };
+		207A4CC93024961500F660DA /* FPRevealSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPRevealSystem.swift; sourceTree = "<group>"; };
+		207A4CCB3024961500F660DA /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		207A4CCC3024961500F660DA /* ARPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPort.swift; sourceTree = "<group>"; };
+		207A4CCD3024961500F660DA /* ARState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARState.swift; sourceTree = "<group>"; };
+		207A4CCE3024961500F660DA /* ObjectPart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPart.swift; sourceTree = "<group>"; };
+		207A4CCF3024961500F660DA /* WaveModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveModel.swift; sourceTree = "<group>"; };
+		207A4CD13024961500F660DA /* FPConeDraw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPConeDraw.swift; sourceTree = "<group>"; };
+		207A4CD23024961500F660DA /* FPConeShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPConeShape.swift; sourceTree = "<group>"; };
+		207A4CD43024961500F660DA /* ARMeshGeo+Read.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARMeshGeo+Read.swift"; sourceTree = "<group>"; };
+		207A4CD53024961500F660DA /* FPMeshBuild.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPMeshBuild.swift; sourceTree = "<group>"; };
+		207A4CD63024961500F660DA /* FPMeshFact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPMeshFact.swift; sourceTree = "<group>"; };
+		207A4CD73024961500F660DA /* FPMeshPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPMeshPack.swift; sourceTree = "<group>"; };
+		207A4CD83024961500F660DA /* FPMeshRead.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPMeshRead.swift; sourceTree = "<group>"; };
+		207A4CDA3024961500F660DA /* FPClassify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPClassify.swift; sourceTree = "<group>"; };
+		207A4CDB3024961500F660DA /* FPConeScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPConeScan.swift; sourceTree = "<group>"; };
+		207A4CDC3024961500F660DA /* FPHitScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPHitScan.swift; sourceTree = "<group>"; };
+		207A4CDD3024961500F660DA /* FPSampleSvc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPSampleSvc.swift; sourceTree = "<group>"; };
+		207A4CDF3024961500F660DA /* FPShade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPShade.swift; sourceTree = "<group>"; };
+		207A4CE13024961500F660DA /* FPModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPModel.swift; sourceTree = "<group>"; };
+		207A4CE23024961500F660DA /* FPPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPPort.swift; sourceTree = "<group>"; };
+		207A4CE33024961500F660DA /* FPStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPStyle.swift; sourceTree = "<group>"; };
+		207A4CE53024961500F660DA /* ARSessSvc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSessSvc.swift; sourceTree = "<group>"; };
+		207A4CE63024961500F660DA /* PlaceSvc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSvc.swift; sourceTree = "<group>"; };
+		207A4CE83024961500F660DA /* ObjectMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectMaker.swift; sourceTree = "<group>"; };
+		207A4CE93024961500F660DA /* TPAssetSvc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPAssetSvc.swift; sourceTree = "<group>"; };
+		207A4CEA3024961500F660DA /* TPBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPBody.swift; sourceTree = "<group>"; };
+		207A4CEB3024961500F660DA /* TPSpawn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPSpawn.swift; sourceTree = "<group>"; };
+		207A4CED3024961500F660DA /* TPPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPPort.swift; sourceTree = "<group>"; };
+		207A4CEE3024961500F660DA /* WaveDraw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveDraw.swift; sourceTree = "<group>"; };
+		207A4CF03024961500F660DA /* ARViewBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewBox.swift; sourceTree = "<group>"; };
+		207A4CF13024961500F660DA /* ControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlsView.swift; sourceTree = "<group>"; };
+		207A4CF23024961500F660DA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		207A4CF33024961500F660DA /* ToggleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleBar.swift; sourceTree = "<group>"; };
+		207A4CF53024961500F660DA /* SimdExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimdExt.swift; sourceTree = "<group>"; };
+		207A4CF83024961500F660DA /* EchoCalc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoCalc.swift; sourceTree = "<group>"; };
+		207A4CF93024961500F660DA /* RayMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RayMaker.swift; sourceTree = "<group>"; };
+		207A4CFA3024961500F660DA /* WaveShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveShape.swift; sourceTree = "<group>"; };
+		207A4CFB3024961500F660DA /* WaveSim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveSim.swift; sourceTree = "<group>"; };
+		207A4CFD3024961500F660DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		207A4CFE3024961500F660DA /* Bat3.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Bat3.usdz; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		747491C5301BE3CD0012A049 /* Frameworks */ = {
@@ -29,20 +120,186 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		207A4CC13024961500F660DA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CC03024961500F660DA /* POCApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		207A4CCA3024961500F660DA /* ECS */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CC23024961500F660DA /* Command.swift */,
+				207A4CC33024961500F660DA /* Components.swift */,
+				207A4CC43024961500F660DA /* ECSWorld.swift */,
+				207A4CC53024961500F660DA /* ECSWorld+FP.swift */,
+				207A4CC63024961500F660DA /* ECSWorld+Placement.swift */,
+				207A4CC73024961500F660DA /* ECSWorld+TP.swift */,
+				207A4CC83024961500F660DA /* ECSWorld+Wave.swift */,
+				207A4CC93024961500F660DA /* FPRevealSystem.swift */,
+			);
+			path = ECS;
+			sourceTree = "<group>";
+		};
+		207A4CD03024961500F660DA /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CCA3024961500F660DA /* ECS */,
+				207A4CCB3024961500F660DA /* AppModel.swift */,
+				207A4CCC3024961500F660DA /* ARPort.swift */,
+				207A4CCD3024961500F660DA /* ARState.swift */,
+				207A4CCE3024961500F660DA /* ObjectPart.swift */,
+				207A4CCF3024961500F660DA /* WaveModel.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		207A4CD33024961500F660DA /* Cone */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CD13024961500F660DA /* FPConeDraw.swift */,
+				207A4CD23024961500F660DA /* FPConeShape.swift */,
+			);
+			path = Cone;
+			sourceTree = "<group>";
+		};
+		207A4CD93024961500F660DA /* Mesh */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CD43024961500F660DA /* ARMeshGeo+Read.swift */,
+				207A4CD53024961500F660DA /* FPMeshBuild.swift */,
+				207A4CD63024961500F660DA /* FPMeshFact.swift */,
+				207A4CD73024961500F660DA /* FPMeshPack.swift */,
+				207A4CD83024961500F660DA /* FPMeshRead.swift */,
+			);
+			path = Mesh;
+			sourceTree = "<group>";
+		};
+		207A4CDE3024961500F660DA /* Scan */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CDA3024961500F660DA /* FPClassify.swift */,
+				207A4CDB3024961500F660DA /* FPConeScan.swift */,
+				207A4CDC3024961500F660DA /* FPHitScan.swift */,
+				207A4CDD3024961500F660DA /* FPSampleSvc.swift */,
+			);
+			path = Scan;
+			sourceTree = "<group>";
+		};
+		207A4CE03024961500F660DA /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CDF3024961500F660DA /* FPShade.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		207A4CE43024961500F660DA /* FP */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CD33024961500F660DA /* Cone */,
+				207A4CD93024961500F660DA /* Mesh */,
+				207A4CDE3024961500F660DA /* Scan */,
+				207A4CE03024961500F660DA /* UI */,
+				207A4CE13024961500F660DA /* FPModel.swift */,
+				207A4CE23024961500F660DA /* FPPort.swift */,
+				207A4CE33024961500F660DA /* FPStyle.swift */,
+			);
+			path = FP;
+			sourceTree = "<group>";
+		};
+		207A4CE73024961500F660DA /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CE53024961500F660DA /* ARSessSvc.swift */,
+				207A4CE63024961500F660DA /* PlaceSvc.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		207A4CEC3024961500F660DA /* Object */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CE83024961500F660DA /* ObjectMaker.swift */,
+				207A4CE93024961500F660DA /* TPAssetSvc.swift */,
+				207A4CEA3024961500F660DA /* TPBody.swift */,
+				207A4CEB3024961500F660DA /* TPSpawn.swift */,
+			);
+			path = Object;
+			sourceTree = "<group>";
+		};
+		207A4CEF3024961500F660DA /* TP */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CEC3024961500F660DA /* Object */,
+				207A4CED3024961500F660DA /* TPPort.swift */,
+				207A4CEE3024961500F660DA /* WaveDraw.swift */,
+			);
+			path = TP;
+			sourceTree = "<group>";
+		};
+		207A4CF43024961500F660DA /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CF03024961500F660DA /* ARViewBox.swift */,
+				207A4CF13024961500F660DA /* ControlsView.swift */,
+				207A4CF23024961500F660DA /* MainView.swift */,
+				207A4CF33024961500F660DA /* ToggleBar.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		207A4CF63024961500F660DA /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CF53024961500F660DA /* SimdExt.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		207A4CF73024961500F660DA /* VM */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = VM;
+			sourceTree = "<group>";
+		};
+		207A4CFC3024961500F660DA /* Wave */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CF83024961500F660DA /* EchoCalc.swift */,
+				207A4CF93024961500F660DA /* RayMaker.swift */,
+				207A4CFA3024961500F660DA /* WaveShape.swift */,
+				207A4CFB3024961500F660DA /* WaveSim.swift */,
+			);
+			path = Wave;
+			sourceTree = "<group>";
+		};
+		207A4CFF3024961500F660DA /* POC */ = {
+			isa = PBXGroup;
+			children = (
+				207A4CC13024961500F660DA /* App */,
+				207A4CD03024961500F660DA /* Core */,
+				207A4CE43024961500F660DA /* FP */,
+				207A4CE73024961500F660DA /* Services */,
+				207A4CEF3024961500F660DA /* TP */,
+				207A4CF43024961500F660DA /* UI */,
+				207A4CF63024961500F660DA /* Utils */,
+				207A4CF73024961500F660DA /* VM */,
+				207A4CFC3024961500F660DA /* Wave */,
+				207A4CFD3024961500F660DA /* Assets.xcassets */,
+				207A4CFE3024961500F660DA /* Bat3.usdz */,
+			);
+			path = POC;
+			sourceTree = "<group>";
+		};
 		747491BF301BE3CD0012A049 = {
 			isa = PBXGroup;
 			children = (
-				747491CA301BE3CD0012A049 /* POC */,
-				747491C9301BE3CD0012A049 /* Products */,
+				207A4CFF3024961500F660DA /* POC */,
 			);
-			sourceTree = "<group>";
-		};
-		747491C9301BE3CD0012A049 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				747491C8301BE3CD0012A049 /* POC.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -60,14 +317,11 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				747491CA301BE3CD0012A049 /* POC */,
-			);
 			name = POC;
 			packageProductDependencies = (
 			);
 			productName = POC;
-			productReference = 747491C8301BE3CD0012A049 /* POC.app */;
+			productReference = 207A4CBF302493EC00F660DA /* POC.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +349,7 @@
 			mainGroup = 747491BF301BE3CD0012A049;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 747491C9301BE3CD0012A049 /* Products */;
+			productRefGroup = 747491BF301BE3CD0012A049;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -109,6 +363,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				207A4D2E3024961500F660DA /* Assets.xcassets in Resources */,
+				207A4D2F3024961500F660DA /* Bat3.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +375,52 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				207A4D003024961500F660DA /* WaveShape.swift in Sources */,
+				207A4D013024961500F660DA /* FPSampleSvc.swift in Sources */,
+				207A4D023024961500F660DA /* ObjectPart.swift in Sources */,
+				207A4D033024961500F660DA /* ARMeshGeo+Read.swift in Sources */,
+				207A4D043024961500F660DA /* EchoCalc.swift in Sources */,
+				207A4D053024961500F660DA /* ECSWorld.swift in Sources */,
+				207A4D063024961500F660DA /* Command.swift in Sources */,
+				207A4D073024961500F660DA /* FPMeshBuild.swift in Sources */,
+				207A4D083024961500F660DA /* SimdExt.swift in Sources */,
+				207A4D093024961500F660DA /* WaveSim.swift in Sources */,
+				207A4D0A3024961500F660DA /* TPPort.swift in Sources */,
+				207A4D0B3024961500F660DA /* FPConeScan.swift in Sources */,
+				207A4D0C3024961500F660DA /* ECSWorld+Placement.swift in Sources */,
+				207A4D0D3024961500F660DA /* FPShade.swift in Sources */,
+				207A4D0E3024961500F660DA /* FPRevealSystem.swift in Sources */,
+				207A4D0F3024961500F660DA /* Components.swift in Sources */,
+				207A4D103024961500F660DA /* WaveModel.swift in Sources */,
+				207A4D113024961500F660DA /* TPAssetSvc.swift in Sources */,
+				207A4D123024961500F660DA /* ControlsView.swift in Sources */,
+				207A4D133024961500F660DA /* ARViewBox.swift in Sources */,
+				207A4D143024961500F660DA /* FPConeShape.swift in Sources */,
+				207A4D153024961500F660DA /* FPModel.swift in Sources */,
+				207A4D163024961500F660DA /* ObjectMaker.swift in Sources */,
+				207A4D173024961500F660DA /* TPSpawn.swift in Sources */,
+				207A4D183024961500F660DA /* POCApp.swift in Sources */,
+				207A4D193024961500F660DA /* ARState.swift in Sources */,
+				207A4D1A3024961500F660DA /* ARPort.swift in Sources */,
+				207A4D1B3024961500F660DA /* FPMeshFact.swift in Sources */,
+				207A4D1C3024961500F660DA /* FPMeshRead.swift in Sources */,
+				207A4D1D3024961500F660DA /* ECSWorld+FP.swift in Sources */,
+				207A4D1E3024961500F660DA /* FPClassify.swift in Sources */,
+				207A4D1F3024961500F660DA /* FPPort.swift in Sources */,
+				207A4D203024961500F660DA /* RayMaker.swift in Sources */,
+				207A4D213024961500F660DA /* TPBody.swift in Sources */,
+				207A4D223024961500F660DA /* WaveDraw.swift in Sources */,
+				207A4D233024961500F660DA /* PlaceSvc.swift in Sources */,
+				207A4D243024961500F660DA /* FPMeshPack.swift in Sources */,
+				207A4D253024961500F660DA /* FPConeDraw.swift in Sources */,
+				207A4D263024961500F660DA /* FPStyle.swift in Sources */,
+				207A4D273024961500F660DA /* MainView.swift in Sources */,
+				207A4D283024961500F660DA /* ARSessSvc.swift in Sources */,
+				207A4D293024961500F660DA /* FPHitScan.swift in Sources */,
+				207A4D2A3024961500F660DA /* AppModel.swift in Sources */,
+				207A4D2B3024961500F660DA /* ToggleBar.swift in Sources */,
+				207A4D2C3024961500F660DA /* ECSWorld+Wave.swift in Sources */,
+				207A4D2D3024961500F660DA /* ECSWorld+TP.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,7 +555,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X7WUH4Z65U;
+				DEVELOPMENT_TEAM = 6B6XY7FB95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
@@ -288,7 +590,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X7WUH4Z65U;
+				DEVELOPMENT_TEAM = 6B6XY7FB95;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";

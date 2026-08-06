@@ -1,19 +1,31 @@
+//
+//  MainView.swift
+//  POC
+//
+//  Created by Shanon Newcastle on 30/07/26.
+//  Updated by Asaryun on 02/08/26.
+//  Updated by Shanon Newcastle on 04/08/26.
+//
+
+import Foundation
 import SwiftUI
+import UIKit
 
 @MainActor
 struct MainView: View {
-    @StateObject private var vm: ARVM
+    @State
+    private var world = ECSWorld()
 
-    init() {
-        _vm = StateObject(
-            wrappedValue: ARVM()
-        )
-    }
+    @GestureState
+    private var rotationDelta: Angle = .zero
 
     var body: some View {
         ZStack {
-            ARViewBox(vm: vm)
+            ARViewBox(world: world)
                 .ignoresSafeArea()
+                .simultaneousGesture(rotationGesture)
+
+            FPShade(mode: world.model.viewMode)
 
             crosshair
 
@@ -22,105 +34,53 @@ struct MainView: View {
 
                 Spacer()
 
-                controls
+                ToggleBar(world: world)
+                ControlsView(world: world)
             }
             .padding()
         }
         .preferredColorScheme(.dark)
+        .task {
+            for await _ in
+                NotificationCenter.default
+                    .notifications(named: UIApplication.didReceiveMemoryWarningNotification) {
+                world.perform(.memoryWarning)
+            }
+        }
     }
 
     private var status: some View {
-        Text(vm.state.msg)
+        Text(world.model.msg)
             .font(.subheadline)
             .multilineTextAlignment(.center)
             .padding(10)
             .frame(maxWidth: .infinity)
-            .background(
-                Color.black.opacity(0.6)
-            )
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 10
-                )
-            )
+            .background(Color.black.opacity(0.6))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     private var crosshair: some View {
         Image(systemName: "plus")
-            .font(
-                .system(
-                    size: 26,
-                    weight: .bold
-                )
-            )
+            .font(.system(size: 26, weight: .bold))
             .foregroundStyle(.white)
             .shadow(radius: 3)
             .allowsHitTesting(false)
     }
 
-    private var controls: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Button("Place") {
-                    vm.spawn()
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!vm.state.lidarOK)
+    private var rotationGesture: some Gesture {
+        RotationGesture()
+            .updating($rotationDelta) { value, state, _ in
+                let delta = value - state
+                state = value
 
-                Button("Wave") {
-                    vm.pulse()
+                guard
+                    world.model.viewMode == .third,
+                    world.model.hasObject
+                else {
+                    return
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.cyan)
-                .disabled(!vm.state.hasBot)
 
-                Button("Clear") {
-                    vm.clear()
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
+                world.perform(.turn(Float(-delta.degrees)))
             }
-
-            HStack {
-                Button("<-") {
-                    vm.turn(15)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
-
-                Button("->") {
-                    vm.turn(-15)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
-
-                Button(
-                    vm.state.meshOn
-                        ? "Hide Mesh"
-                        : "Show Mesh"
-                ) {
-                    vm.toggleMesh()
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.lidarOK)
-            }
-
-            Text(
-                vm.state.hasBot
-                    ? "drag to move the robot"
-                    : "aim at floor / table"
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
-        }
-        .padding(10)
-        .background(
-            Color.black.opacity(0.65)
-        )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 12
-            )
-        )
     }
 }
