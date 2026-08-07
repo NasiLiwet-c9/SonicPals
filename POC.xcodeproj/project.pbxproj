@@ -55,10 +55,15 @@
 		207A4D2D3024961500F660DA /* ECSWorld+TP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 207A4CC73024961500F660DA /* ECSWorld+TP.swift */; };
 		207A4D2E3024961500F660DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 207A4CFD3024961500F660DA /* Assets.xcassets */; };
 		207A4D2F3024961500F660DA /* Bat3.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 207A4CFE3024961500F660DA /* Bat3.usdz */; };
+		20AB8A023025B67D00F7D41C /* Tasty_Green_Apple.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A013025B67D00F7D41C /* Tasty_Green_Apple.usdz */; };
+		20AB8A043025B68C00F7D41C /* Stylized_Tree.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A033025B68C00F7D41C /* Stylized_Tree.usdz */; };
+		20AB8A063025B69500F7D41C /* Mango.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A053025B69500F7D41C /* Mango.usdz */; };
+		20AB8A083025B6A500F7D41C /* Mango-2.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A073025B6A500F7D41C /* Mango-2.usdz */; };
+		20AB8A0A3025B7BF00F7D41C /* Bat_Dark_Bad_Cartoon_Monster.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A093025B7BF00F7D41C /* Bat_Dark_Bad_Cartoon_Monster.usdz */; };
+		20AB8A0C3025B7CD00F7D41C /* Bat.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 20AB8A0B3025B7CD00F7D41C /* Bat.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		207A4CBF302493EC00F660DA /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = POC.app; path = "/Users/asaryun/Documents/GitHub/ARUltrasonic/build/Debug-iphoneos/POC.app"; sourceTree = "<absolute>"; };
 		207A4CC03024961500F660DA /* POCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POCApp.swift; sourceTree = "<group>"; };
 		207A4CC23024961500F660DA /* Command.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
 		207A4CC33024961500F660DA /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
@@ -107,7 +112,22 @@
 		207A4CFB3024961500F660DA /* WaveSim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveSim.swift; sourceTree = "<group>"; };
 		207A4CFD3024961500F660DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		207A4CFE3024961500F660DA /* Bat3.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Bat3.usdz; sourceTree = "<group>"; };
+		20AB89FD3025B32100F7D41C /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = POC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		20AB8A013025B67D00F7D41C /* Tasty_Green_Apple.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Tasty_Green_Apple.usdz; sourceTree = "<group>"; };
+		20AB8A033025B68C00F7D41C /* Stylized_Tree.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Stylized_Tree.usdz; sourceTree = "<group>"; };
+		20AB8A053025B69500F7D41C /* Mango.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mango.usdz; sourceTree = "<group>"; };
+		20AB8A073025B6A500F7D41C /* Mango-2.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Mango-2.usdz"; sourceTree = "<group>"; };
+		20AB8A093025B7BF00F7D41C /* Bat_Dark_Bad_Cartoon_Monster.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Bat_Dark_Bad_Cartoon_Monster.usdz; sourceTree = "<group>"; };
+		20AB8A0B3025B7CD00F7D41C /* Bat.usdz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Bat.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		20AB89FE3025B46000F7D41C /* StoryLine */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StoryLine;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		747491C5301BE3CD0012A049 /* Frameworks */ = {
@@ -243,6 +263,7 @@
 		207A4CF43024961500F660DA /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				20AB89FE3025B46000F7D41C /* StoryLine */,
 				207A4CF03024961500F660DA /* ARViewBox.swift */,
 				207A4CF13024961500F660DA /* ControlsView.swift */,
 				207A4CF23024961500F660DA /* MainView.swift */,
@@ -291,6 +312,12 @@
 				207A4CFC3024961500F660DA /* Wave */,
 				207A4CFD3024961500F660DA /* Assets.xcassets */,
 				207A4CFE3024961500F660DA /* Bat3.usdz */,
+				20AB8A0B3025B7CD00F7D41C /* Bat.usdz */,
+				20AB8A093025B7BF00F7D41C /* Bat_Dark_Bad_Cartoon_Monster.usdz */,
+				20AB8A013025B67D00F7D41C /* Tasty_Green_Apple.usdz */,
+				20AB8A053025B69500F7D41C /* Mango.usdz */,
+				20AB8A073025B6A500F7D41C /* Mango-2.usdz */,
+				20AB8A033025B68C00F7D41C /* Stylized_Tree.usdz */,
 			);
 			path = POC;
 			sourceTree = "<group>";
@@ -299,6 +326,7 @@
 			isa = PBXGroup;
 			children = (
 				207A4CFF3024961500F660DA /* POC */,
+				20AB89FD3025B32100F7D41C /* POC.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -317,11 +345,14 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				20AB89FE3025B46000F7D41C /* StoryLine */,
+			);
 			name = POC;
 			packageProductDependencies = (
 			);
 			productName = POC;
-			productReference = 207A4CBF302493EC00F660DA /* POC.app */;
+			productReference = 20AB89FD3025B32100F7D41C /* POC.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -364,7 +395,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				207A4D2E3024961500F660DA /* Assets.xcassets in Resources */,
+				20AB8A083025B6A500F7D41C /* Mango-2.usdz in Resources */,
+				20AB8A0A3025B7BF00F7D41C /* Bat_Dark_Bad_Cartoon_Monster.usdz in Resources */,
+				20AB8A0C3025B7CD00F7D41C /* Bat.usdz in Resources */,
+				20AB8A043025B68C00F7D41C /* Stylized_Tree.usdz in Resources */,
+				20AB8A023025B67D00F7D41C /* Tasty_Green_Apple.usdz in Resources */,
 				207A4D2F3024961500F660DA /* Bat3.usdz in Resources */,
+				20AB8A063025B69500F7D41C /* Mango.usdz in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,7 +602,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -600,7 +637,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
