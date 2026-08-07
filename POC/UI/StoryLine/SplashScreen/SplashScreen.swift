@@ -65,7 +65,7 @@ struct SplashScreen: View {
                 phase = .taglineIn
             }
 
-            try? await Task.sleep(for: .seconds(1.4))
+            try? await Task.sleep(for: .seconds(1))
 
             onFinished()
         }

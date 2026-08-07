@@ -14,16 +14,16 @@ struct ControlsView: View {
     var body: some View {
         VStack(spacing: 10) {
             HStack(spacing: 8) {
-                controlButton(
-                    title: "Place",
-                    icon: "hand.tap.fill",
-                    tint: .blue,
-                    disabled:
-                        !world.model.lidarOK
-                        || world.model.viewMode == .first
-                ) {
-                    world.perform(.place)
-                }
+//                controlButton(
+//                    title: "Place",
+//                    icon: "hand.tap.fill",
+//                    tint: .blue,
+//                    disabled:
+//                        !world.model.lidarOK
+//                        || world.model.viewMode == .first
+//                ) {
+//                    world.perform(.place)
+//                }
 
                 controlButton(
                     title: "Wave",
@@ -34,14 +34,14 @@ struct ControlsView: View {
                     world.perform(.sendWave)
                 }
 
-                controlButton(
-                    title: "Clear",
-                    icon: "trash",
-                    tint: .red,
-                    disabled: !world.model.hasObject
-                ) {
-                    world.perform(.clear)
-                }
+//                controlButton(
+//                    title: "Clear",
+//                    icon: "trash",
+//                    tint: .red,
+//                    disabled: !world.model.hasObject
+//                ) {
+//                    world.perform(.clear)
+//                }
             }
 
             Text(helpText)

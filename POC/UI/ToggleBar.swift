@@ -45,7 +45,8 @@ struct ToggleBar: View {
                     world.model.pointsOn
                     ? "Hide all points"
                     : "Show all points"
-            ) {
+            )
+            {
                 world.perform(.togglePoints)
             }
 
@@ -63,7 +64,8 @@ struct ToggleBar: View {
                     world.model.meshOn
                     ? "Hide mesh"
                     : "Show mesh"
-            ) {
+            )
+            {
                 world.perform(.toggleMesh)
             }
         }

@@ -34,7 +34,7 @@ struct MainView: View {
 
                 Spacer()
 
-                ToggleBar(world: world)
+//                ToggleBar(world: world)
                 ControlsView(world: world)
             }
             .padding()
