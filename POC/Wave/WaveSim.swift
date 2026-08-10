@@ -2,7 +2,7 @@
 //  WaveSim.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 10/08/26.
+//  Created by Shan Newcastle on 10/08/26.
 //
 
 import RealityKit
@@ -26,15 +26,15 @@ final class WaveSim: WaveSimulating {
     private let soundSpeed: Float
 
     init(
-        set: WaveSet = .standard,
-        rayMaker: RayMaker = RayMaker(),
-        echoCalc: EchoCalc = EchoCalc(),
+        set: WaveSet? = nil,
+        rayMaker: RayMaker? = nil,
+        echoCalc: EchoCalc? = nil,
         maxDistance: Float = 1.5,
         soundSpeed: Float = 343
     ) {
-        self.set = set
-        self.rayMaker = rayMaker
-        self.echoCalc = echoCalc
+        self.set = set ?? .standard
+        self.rayMaker = rayMaker ?? RayMaker()
+        self.echoCalc = echoCalc ?? EchoCalc()
         self.maxDistance = maxDistance
         self.soundSpeed = soundSpeed
     }
@@ -43,11 +43,10 @@ final class WaveSim: WaveSimulating {
         in view: ARView,
         from start: WaveStart
     ) -> WaveData {
-        let checkRays =
-            rayMaker.make(
-                for: set.check,
-                ringCount: 2
-            )
+        let checkRays = rayMaker.make(
+            for: set.check,
+            ringCount: 2
+        )
 
         let nearest = nearestDistance(
             in: view,
@@ -57,10 +56,9 @@ final class WaveSim: WaveSimulating {
 
         let setting = set.pick(nearest)
 
-        let rays =
-            rayMaker.make(
-                for: setting
-            )
+        let rays = rayMaker.make(
+            for: setting
+        )
 
         let hits = scan(
             in: view,
@@ -135,23 +133,21 @@ final class WaveSim: WaveSimulating {
                 continue
             }
 
-            var normal =
-                simd_normalize(
-                    hit.normal
-                )
+            var normal = simd_normalize(
+                hit.normal
+            )
 
             if simd_dot(dir, normal) > 0 {
                 normal = -normal
             }
 
-            let anglePower =
-                max(
-                    simd_dot(
-                        -dir,
-                        normal
-                    ),
-                    0.05
-                )
+            let anglePower = max(
+                simd_dot(
+                    -dir,
+                    normal
+                ),
+                0.05
+            )
 
             let levelDb = echoCalc.level(
                 distanceM: hit.distance,
@@ -167,18 +163,17 @@ final class WaveSim: WaveSimulating {
                 soundSpeed: soundSpeed
             )
 
-            let bounceDir =
-                simd_normalize(
-                    dir
-                    - (
-                        2
-                        * simd_dot(
-                            dir,
-                            normal
-                        )
-                        * normal
+            let bounceDir = simd_normalize(
+                dir
+                - (
+                    2
+                    * simd_dot(
+                        dir,
+                        normal
                     )
+                    * normal
                 )
+            )
 
             hits.append(
                 WaveHit(

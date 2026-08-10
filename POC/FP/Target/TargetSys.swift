@@ -2,7 +2,7 @@
 //  TargetSys.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 10/08/26.
+//  Created by Shan Newcastle on 10/08/26.
 //
 
 import Foundation
@@ -23,9 +23,18 @@ final class TargetSys: System {
         HapticSvc()
 
     private let foundM: Float = 0.72
-    private let nearStepM: Float = 0.20
-    private let dirDeg: Float = 14
-    private let dirMaxM: Float = 2.60
+
+    private let nearStepM: Float = 0.12
+
+    private let dirDeg: Float = 18
+
+    private let dirMaxM: Float = 3.4
+
+    private let nearCooldown:
+        TimeInterval = 0.35
+
+    private let dirCooldown:
+        TimeInterval = 0.70
 
     required init(scene: Scene) {}
 
@@ -37,6 +46,7 @@ final class TargetSys: System {
 
         for entity in
             context.scene.performQuery(Self.query) {
+
             guard entity.isEnabled,
                   var comp =
                     entity.components[
@@ -57,7 +67,8 @@ final class TargetSys: System {
             let camM =
                 view.cameraTransform.matrix
 
-            let cam = camM.pos3
+            let cam =
+                camM.pos3
 
             let target =
                 entity.position(
@@ -72,6 +83,7 @@ final class TargetSys: System {
 
             if comp.seen,
                dist <= foundM {
+
                 comp.found = true
 
                 hideEcho(comp)
@@ -154,7 +166,9 @@ final class TargetSys: System {
         dist: Float,
         now: TimeInterval
     ) {
-        guard let best = comp.bestM else {
+        guard let best =
+            comp.bestM
+        else {
             comp.bestM = dist
             return
         }
@@ -166,7 +180,7 @@ final class TargetSys: System {
         comp.bestM = dist
 
         guard now - comp.lastNearAt
-            >= 0.45
+            >= nearCooldown
         else {
             return
         }
@@ -186,30 +200,30 @@ final class TargetSys: System {
         dist: Float,
         now: TimeInterval
     ) {
-        guard
-            (
-                dist <= dirMaxM
-                || comp.seen
-            ),
-            now - comp.lastDirAt >= 0.90
+        guard dist <= dirMaxM,
+              now - comp.lastDirAt
+                >= dirCooldown
         else {
             return
         }
 
-        var forward = SIMD3<Float>(
-            -camM.columns.2.x,
-            0,
-            -camM.columns.2.z
-        )
+        var forward =
+            SIMD3<Float>(
+                -camM.columns.2.x,
+                0,
+                -camM.columns.2.z
+            )
 
-        var toTarget = SIMD3<Float>(
-            target.x - cam.x,
-            0,
-            target.z - cam.z
-        )
+        var toTarget =
+            SIMD3<Float>(
+                target.x - cam.x,
+                0,
+                target.z - cam.z
+            )
 
         guard simd_length(forward) > 0.001,
-              simd_length(toTarget) > 0.001 else {
+              simd_length(toTarget) > 0.001
+        else {
             return
         }
 

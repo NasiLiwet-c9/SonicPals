@@ -2,55 +2,80 @@
 //  HapticSvc.swift
 //  POC
 //
-//  Created by Shanon Giuly Istanto on 10/08/26.
+//  Created by Shan Newcastle on 10/08/26.
 //
 
+import CoreHaptics
 import UIKit
 
 @MainActor
 final class HapticSvc {
-    private let light =
+    let supported: Bool
+
+    private let dir =
         UIImpactFeedbackGenerator(
             style: .light
         )
 
-    private let medium =
+    private let near =
         UIImpactFeedbackGenerator(
             style: .medium
+        )
+
+    private let strong =
+        UIImpactFeedbackGenerator(
+            style: .heavy
         )
 
     private let success =
         UINotificationFeedbackGenerator()
 
     init() {
+        supported =
+            CHHapticEngine
+                .capabilitiesForHardware()
+                .supportsHaptics
+
         prepare()
     }
 
     func direction() {
-        light.impactOccurred(
-            intensity: 0.55
+        guard supported else {
+            return
+        }
+
+        dir.impactOccurred(
+            intensity: 0.65
         )
 
-        light.prepare()
+        dir.prepare()
     }
 
-    func closer(strong: Bool) {
-        if strong {
-            medium.impactOccurred(
-                intensity: 0.8
+    func closer(strong isStrong: Bool) {
+        guard supported else {
+            return
+        }
+
+        if isStrong {
+            strong.impactOccurred(
+                intensity: 0.85
             )
 
-            medium.prepare()
+            strong.prepare()
         } else {
-            light.impactOccurred(
-                intensity: 0.8
+            near.impactOccurred(
+                intensity: 0.70
             )
 
-            light.prepare()
+            near.prepare()
         }
     }
 
     func found() {
+        guard supported else {
+            return
+        }
+
         success.notificationOccurred(
             .success
         )
@@ -59,8 +84,13 @@ final class HapticSvc {
     }
 
     private func prepare() {
-        light.prepare()
-        medium.prepare()
+        guard supported else {
+            return
+        }
+
+        dir.prepare()
+        near.prepare()
+        strong.prepare()
         success.prepare()
     }
 }
