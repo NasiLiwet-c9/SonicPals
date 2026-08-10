@@ -1,9 +1,17 @@
+//
+//  ARViewBox.swift
+//  POC
+//
+//  Created by Shanon Giuly Istanto on 10/08/26.
+//
+
+import ARKit
 import RealityKit
 import SwiftUI
 
 @MainActor
 struct ARViewBox: UIViewRepresentable {
-    @ObservedObject var vm: ARVM
+    let world: ECSWorld
 
     func makeUIView(
         context: Context
@@ -14,7 +22,7 @@ struct ARViewBox: UIViewRepresentable {
             automaticallyConfigureSession: false
         )
 
-        vm.setup(view)
+        world.setup(view)
 
         return view
     }
@@ -22,7 +30,19 @@ struct ARViewBox: UIViewRepresentable {
     func updateUIView(
         _ uiView: ARView,
         context: Context
+    ) {}
+
+    static func dismantleUIView(
+        _ uiView: ARView,
+        coordinator: Void
     ) {
-        // SceneCtrl manages the ARView.
+        uiView.session.pause()
+        uiView.debugOptions = []
+
+        for anchor in Array(
+            uiView.scene.anchors
+        ) {
+            anchor.removeFromParent()
+        }
     }
 }

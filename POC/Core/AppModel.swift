@@ -1,0 +1,27 @@
+//
+//  AppModel.swift
+//  POC
+//
+//  Created by Shanon Giuly Istanto on 10/08/26.
+//
+
+import Observation
+
+@MainActor
+@Observable
+final class AppModel {
+    var msg = ""
+    var lidarOK = false
+    var hasTarget = false
+    var targetFound = false
+    var dimOn = true
+    var waveSeq = 0
+
+    var canWave: Bool {
+        lidarOK
+    }
+
+    var canSpawn: Bool {
+        lidarOK
+    }
+}
