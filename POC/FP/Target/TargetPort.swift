@@ -18,6 +18,8 @@ struct TargetEchoPart {
     let center: SIMD3<Float>
     let half: SIMD3<Float>
     let radius: Float
+    
+    let isMango: Bool
 }
 
 struct TargetPart {

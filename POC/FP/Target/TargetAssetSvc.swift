@@ -128,6 +128,8 @@ final class TargetAssetSvc: TargetMaking {
                 recursive: true
             )
 
+        mango.name = "MangoTarget"
+
         guard placeMango(
             mango,
             treeSize: treeSize
@@ -162,6 +164,16 @@ final class TargetAssetSvc: TargetMaking {
         setEchoMat(
             on: trace,
             alpha: 0.05
+        )
+        
+        setMangoEchoMat(
+            on: pulse,
+            alpha: 1.0
+        )
+
+        setMangoEchoMat(
+            on: trace,
+            alpha: 0.25
         )
 
         disableGroundShadow(on: real)
@@ -203,7 +215,96 @@ final class TargetAssetSvc: TargetMaking {
             height: treeSize.y
         )
     }
+    
+    private func setMangoEchoMat(
+        on entity: Entity,
+        alpha: Float
+    ) {
+        if entity.name == "MangoTarget" {
+            setYellowEchoMat(
+                on: entity,
+                alpha: alpha
+            )
+            return
+        }
 
+        for child in entity.children {
+            setMangoEchoMat(
+                on: child,
+                alpha: alpha
+            )
+        }
+    }
+    
+    private func setYellowEchoMat(
+        on entity: Entity,
+        alpha: Float
+    ) {
+        if var model =
+            entity.components[
+                ModelComponent.self
+            ] {
+            
+            let count =
+                max(
+                    model.materials.count,
+                    1
+                )
+
+            let mat =
+                yellowEchoMat(
+                    alpha: alpha
+                )
+
+            model.materials =
+                (0..<count).map { _ in
+                    mat
+                }
+
+            entity.components[
+                ModelComponent.self
+            ] = model
+        }
+
+        for child in entity.children {
+            setYellowEchoMat(
+                on: child,
+                alpha: alpha
+            )
+        }
+    }
+    
+    private func yellowEchoMat(
+        alpha: Float
+    ) -> UnlitMaterial {
+        var mat = UnlitMaterial(
+            color: UIColor(
+                red: 1.0,
+                green: 0.9,
+                blue: 0.05,
+                alpha: 1
+            )
+        )
+
+        mat.triangleFillMode = .lines
+        mat.faceCulling = .none
+        mat.readsDepth = true
+        mat.writesDepth = false
+
+        mat.blending = .transparent(
+            opacity:
+                .init(
+                    floatLiteral:
+                        min(
+                            max(alpha, 0),
+                            1
+                        )
+                )
+        )
+
+        return mat
+    }
+    
     private func makeParts(
         pulse: Entity,
         trace: Entity
@@ -259,6 +360,9 @@ final class TargetAssetSvc: TargetMaking {
                     in:
                         .whitespacesAndNewlines
                 )
+            
+            let isMango =
+                isInsideMango(p)
 
             parts.append(
                 TargetEchoPart(
@@ -271,7 +375,8 @@ final class TargetAssetSvc: TargetMaking {
                     center: bounds.center,
                     half:
                         bounds.extents * 0.5,
-                    radius: radius
+                    radius: radius,
+                    isMango: isMango
                 )
             )
         }
@@ -279,6 +384,22 @@ final class TargetAssetSvc: TargetMaking {
         return parts
     }
 
+    private func isInsideMango(
+        _ entity: Entity
+    ) -> Bool {
+        var current: Entity? = entity
+
+        while let node = current {
+            if node.name == "MangoTarget" {
+                return true
+            }
+
+            current = node.parent
+        }
+
+        return false
+    }
+    
     private func modelEntities(
         in root: Entity
     ) -> [Entity] {

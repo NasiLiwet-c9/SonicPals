@@ -68,8 +68,7 @@ extension ECSWorld {
         in scene: Scene
     ) {
         guard let targetEntity,
-              var comp = targetEntity.components[TargetComp.self],
-              !comp.found
+              var comp = targetEntity.components[TargetComp.self]
         else {
             return
         }
@@ -84,21 +83,117 @@ extension ECSWorld {
         guard !hits.isEmpty else {
             return
         }
+        
+        let now =
+            Date().timeIntervalSinceReferenceDate
 
-        let now = Date().timeIntervalSinceReferenceDate
+        // ─────────────────────────────
+        // PHASE 1: FIND THE TREE
+        // ─────────────────────────────
 
-        for index in hits
-        where comp.parts.indices.contains(index) {
-            comp.seenParts.insert(index)
-            comp.pulseUntil[index] = now + 1.25
+        if !comp.found {
 
-            comp.parts[index].pulse.isEnabled = true
-            comp.parts[index].trace.isEnabled = true
+            let treeHits = hits.filter {
+                !comp.parts[$0].isMango
+            }
+            
+            if !treeHits.isEmpty {
+                setMsg("Tree hit!")
+            }
+            
+            for index in treeHits
+            where comp.parts.indices.contains(index) {
+
+                comp.seenParts.insert(index)
+
+                comp.pulseUntil[index] =
+                    now + 1.25
+
+                comp.parts[index]
+                    .pulse
+                    .isEnabled = true
+
+                comp.parts[index]
+                    .trace
+                    .isEnabled = true
+            }
         }
 
-        targetEntity.components[TargetComp.self] = comp
+        // ─────────────────────────────
+        // PHASE 2: FIND THE MANGO
+        // ─────────────────────────────
+
+        else {
+
+            let mangoHits = hits.filter {
+                comp.parts[$0].isMango
+            }
+
+            guard !mangoHits.isEmpty else {
+                targetEntity.components[
+                    TargetComp.self
+                ] = comp
+                setMsg(
+                    "Mango hit! \(comp.mangoScanCount + 1)/\(comp.requiredMangoScans)"
+                )
+                return
+            }
+
+            // Reveal the mango parts hit by this PING.
+            for index in mangoHits
+            where comp.parts.indices.contains(index) {
+
+                comp.pulseUntil[index] =
+                    now + 1.25
+
+                comp.parts[index]
+                    .pulse
+                    .isEnabled = true
+
+                comp.parts[index]
+                    .trace
+                    .isEnabled = true
+            }
+
+            // One successful PING = one scan.
+            comp.mangoScanCount += 1
+
+            print(
+                "Mango scan: \(comp.mangoScanCount)/\(comp.requiredMangoScans)"
+            )
+
+            if comp.mangoFound {
+                finishMangoScan(
+                    target: targetEntity,
+                    comp: &comp
+                )
+            }
+        }
+
+        targetEntity.components[
+            TargetComp.self
+        ] = comp
     }
 
+    private func finishMangoScan(
+        target: Entity,
+        comp: inout TargetComp
+    ) {
+        print("MANGO FOUND!")
+        setMsg("MANGO FOUND!")
+
+        for part in comp.parts
+        where part.isMango {
+            part.pulse.isEnabled = false
+            part.trace.isEnabled = false
+        }
+        
+        NotificationCenter.default.post(
+            name: .mangoFound,
+            object: target
+        )
+    }
+    
     private func installTarget(
         _ part: TargetPart,
         pose: TargetPose

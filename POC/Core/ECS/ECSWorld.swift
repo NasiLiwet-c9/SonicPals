@@ -167,7 +167,7 @@ final class ECSWorld {
                 }
                 
                 model.targetFound = true
-                setMsg("Found it!")
+                setMsg("Tree Found!")
             }
         }
     }
