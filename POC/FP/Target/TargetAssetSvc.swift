@@ -7,6 +7,7 @@
 
 import Foundation
 import RealityKit
+import RealityKitContent
 import UIKit
 import simd
 
@@ -49,26 +50,6 @@ final class TargetAssetSvc: TargetMaking {
             return await finish(task)
         }
 
-        guard Bundle.main.url(
-            forResource: treeName,
-            withExtension: "usdz"
-        ) != nil else {
-            loadError =
-                "\(treeName).usdz is missing"
-
-            return false
-        }
-
-        guard Bundle.main.url(
-            forResource: mangoName,
-            withExtension: "usdz"
-        ) != nil else {
-            loadError =
-                "\(mangoName).usdz is missing"
-
-            return false
-        }
-
         let treeName = treeName
         let mangoName = mangoName
 
@@ -77,13 +58,13 @@ final class TargetAssetSvc: TargetMaking {
                 async let tree =
                     Entity(
                         named: treeName,
-                        in: Bundle.main
+                        in: realityKitContentBundle
                     )
 
                 async let mango =
                     Entity(
                         named: mangoName,
-                        in: Bundle.main
+                        in: realityKitContentBundle
                     )
 
                 return try await (
