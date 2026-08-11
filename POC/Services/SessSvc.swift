@@ -6,130 +6,194 @@
 //
 
 import ARKit
+import AVFoundation
 import RealityKit
-import UIKit
 
 @MainActor
-protocol SessServing {
-    func start(_ view: ARView) -> Bool
-    func addCoach(to view: ARView)
+protocol SessServing: AnyObject {
+    var session: ARSession { get }
+    
+    func start() async -> Bool
+    func stop() async
 }
 
 @MainActor
 final class SessSvc: SessServing {
-    func start(_ view: ARView) -> Bool {
-        let config = ARWorldTrackingConfiguration()
-
-        config.planeDetection = [
-            .horizontal,
-            .vertical
-        ]
-
-        config.environmentTexturing = .none
-        config.videoHDRAllowed = false
-
-        if let format = balancedFormat() {
-            config.videoFormat = format
+    let session = ARSession()
+    
+    private let spatial = SpatialTrackingSession()
+    private var running = false
+    
+    func start() async -> Bool {
+        guard !running else {
+            return true
         }
-
-        let classified =
-            ARWorldTrackingConfiguration
-                .supportsSceneReconstruction(
-                    .meshWithClassification
-                )
-
-        let plain =
-            ARWorldTrackingConfiguration
-                .supportsSceneReconstruction(
-                    .mesh
-                )
-
-        if classified {
-            config.sceneReconstruction = .meshWithClassification
-        } else if plain {
-            config.sceneReconstruction = .mesh
+        
+        guard await cameraAccess() else {
+            print("CAMERA: permission denied")
+            return false
         }
-
-        let supported = classified || plain
-
-        if supported {
-            view.environment.sceneUnderstanding.options = [
-                .collision,
-                .occlusion
-            ]
-        }
-
-        view.debugOptions.remove(
-            .showSceneUnderstanding
+        
+        let classified = ARWorldTrackingConfiguration.supportsSceneReconstruction(
+            .meshWithClassification
         )
-
-        reduceCost(in: view)
-
-        view.session.run(
-            config,
+        
+        let plain = ARWorldTrackingConfiguration.supportsSceneReconstruction(
+            .mesh
+        )
+        
+        guard classified || plain else {
+            print("LIDAR: scene reconstruction unsupported")
+            return false
+        }
+        
+        let arConfig = makeARConfig(
+            classified: classified,
+            plain: plain
+        )
+        
+        let spatialConfig = SpatialTrackingSession.Configuration(
+            tracking: [
+                .camera,
+                .world,
+                .plane
+            ],
+            sceneUnderstanding: [
+                .collision
+            ],
+            camera: .back
+        )
+        
+        session.run(
+            arConfig,
             options: [
                 .resetTracking,
                 .removeExistingAnchors
             ]
         )
-
-        return supported
-    }
-
-    func addCoach(to view: ARView) {
-        let coach = ARCoachingOverlayView()
-
-        coach.session = view.session
-        coach.goal = .horizontalPlane
-        coach.activatesAutomatically = true
-        coach.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(coach)
-
-        NSLayoutConstraint.activate([
-            coach.topAnchor.constraint(
-                equalTo: view.topAnchor
-            ),
-            coach.bottomAnchor.constraint(
-                equalTo: view.bottomAnchor
-            ),
-            coach.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor
-            ),
-            coach.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor
-            )
-        ])
-    }
-
-    private func balancedFormat() -> ARConfiguration.VideoFormat? {
-        let formats =
-            ARWorldTrackingConfiguration
-                .supportedVideoFormats
-                .filter {
-                    $0.framesPerSecond == 30
-                }
-                .sorted {
-                    let a =
-                        $0.imageResolution.width
-                        * $0.imageResolution.height
-
-                    let b =
-                        $1.imageResolution.width
-                        * $1.imageResolution.height
-
-                    return a < b
-                }
-
-        return formats.first {
-            $0.imageResolution.width >= 1_280
+        
+        let unavailable = await spatial.run(
+            spatialConfig,
+            session: session,
+            arConfiguration: arConfig
+        )
+        
+        if let unavailable {
+            print("SPATIAL: \(unavailable.debugDescription)")
+            
+            if unavailable.missingCameraAuthorization == true {
+                print("SPATIAL: camera authorization missing")
+                session.pause()
+                return false
+            }
+            
+            if unavailable.anchor.contains(.camera) {
+                print("SPATIAL: camera capability unavailable")
+                session.pause()
+                return false
+            }
+            
+            if unavailable.anchor.contains(.world) {
+                print("SPATIAL: world tracking unavailable")
+                session.pause()
+                return false
+            }
+            
+            if unavailable.anchor.contains(.plane) {
+                print("SPATIAL: plane tracking unavailable")
+            }
+            
+            if !unavailable.sceneUnderstanding.isEmpty {
+                print(
+                    "SPATIAL scene understanding unavailable:",
+                    unavailable.sceneUnderstanding
+                )
+            }
         }
-        ?? formats.first
+        
+        running = true
+        
+        print("CAMERA: authorized")
+        print("ARSession: running")
+        print("SpatialTrackingSession: running")
+        
+        return true
     }
-
-    private func reduceCost(in view: ARView) {
-        view.renderOptions.insert(.disableCameraGrain)
-        view.renderOptions.insert(.disableMotionBlur)
-        view.renderOptions.insert(.disableHDR)
+    
+    func stop() async {
+        guard running else {
+            return
+        }
+        
+        running = false
+        
+        await spatial.stop()
+        session.pause()
+        
+        print("SpatialTrackingSession: stopped")
+        print("ARSession: stopped")
+    }
+    
+    private func cameraAccess() async -> Bool {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            print("CAMERA status: authorized")
+            return true
+            
+        case .notDetermined:
+            print("CAMERA status: requesting")
+            
+            let granted = await withCheckedContinuation { continuation in
+                AVCaptureDevice.requestAccess(for: .video) { granted in
+                    continuation.resume(returning: granted)
+                }
+            }
+            
+            print(
+                granted
+                ? "CAMERA permission: granted"
+                : "CAMERA permission: denied"
+            )
+            
+            return granted
+            
+        case .denied:
+            print("CAMERA status: denied")
+            return false
+            
+        case .restricted:
+            print("CAMERA status: restricted")
+            return false
+            
+        @unknown default:
+            print("CAMERA status: unknown")
+            return false
+        }
+    }
+    
+    private func makeARConfig(
+        classified: Bool,
+        plain: Bool
+    ) -> ARWorldTrackingConfiguration {
+        let config = ARWorldTrackingConfiguration()
+        
+        config.worldAlignment = .gravity
+        
+        config.planeDetection = [
+            .horizontal,
+            .vertical
+        ]
+        
+        config.environmentTexturing = .none
+        config.videoHDRAllowed = false
+        config.providesAudioData = false
+        
+        if classified {
+            config.sceneReconstruction = .meshWithClassification
+        } else if plain {
+            config.sceneReconstruction = .mesh
+        }
+        
+        return config
     }
 }

@@ -10,9 +10,22 @@
 		747491C8301BE3CD0012A049 /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = POC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		748F536D302B543600E791A9 /* Exceptions for "POC" folder in "POC" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 747491C7301BE3CD0012A049 /* POC */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		747491CA301BE3CD0012A049 /* POC */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				748F536D302B543600E791A9 /* Exceptions for "POC" folder in "POC" target */,
+			);
 			path = POC;
 			sourceTree = "<group>";
 		};
@@ -258,8 +271,11 @@
 				DEVELOPMENT_TEAM = X7WUH4Z65U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = POC/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = UltrasonicAR;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
+				INFOPLIST_KEY_NSWorldSensingUsageDescription = "LiDAR and world sensing are used to detect surfaces and reconstruct nearby geometry for ultrasonic visualization.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -295,8 +311,11 @@
 				DEVELOPMENT_TEAM = X7WUH4Z65U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = POC/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = UltrasonicAR;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
+				INFOPLIST_KEY_NSWorldSensingUsageDescription = "LiDAR and world sensing are used to detect surfaces and reconstruct nearby geometry for ultrasonic visualization.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

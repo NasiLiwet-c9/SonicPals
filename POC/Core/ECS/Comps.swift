@@ -9,15 +9,16 @@ import ARKit
 import Foundation
 import RealityKit
 
-final class ARViewRef {
-    weak var value: ARView?
+final class ARSessionRef {
+    weak var value: ARSession?
 
-    init(_ value: ARView) {
+    init(_ value: ARSession) {
         self.value = value
     }
 }
 
 struct SessComp: Component {
+    let session: ARSessionRef
     var lidarOK = false
     var spawning = false
 }
@@ -36,12 +37,6 @@ struct RevealComp: Component {
     }
 
     let data: WaveData
-    let view: ARViewRef
-
     var layers: [FPMeshLayer] = []
-
-    var stage: Stage = .waiting(
-        attempt: 0,
-        nextAt: 0
-    )
+    var stage: Stage = .waiting(attempt: 0, nextAt: 0)
 }

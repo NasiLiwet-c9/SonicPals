@@ -5,15 +5,16 @@
 //  Created by Shan Newcastle on 10/08/26.
 //
 
+import ARKit
 import RealityKit
 import simd
 
 struct TargetEchoPart {
     let name: String
-
+    
     let pulse: Entity
     let trace: Entity
-
+    
     let center: SIMD3<Float>
     let half: SIMD3<Float>
     let radius: Float
@@ -22,9 +23,8 @@ struct TargetEchoPart {
 struct TargetPart {
     let root: Entity
     let real: Entity
-
+    
     let parts: [TargetEchoPart]
-
     let height: Float
 }
 
@@ -36,7 +36,7 @@ struct TargetPose {
 @MainActor
 protocol TargetMaking: AnyObject {
     var loadError: String? { get }
-
+    
     func prepare() async -> Bool
     func make() -> TargetPart?
 }
@@ -44,7 +44,8 @@ protocol TargetMaking: AnyObject {
 @MainActor
 protocol TargetSpawning {
     func pose(
-        in view: ARView,
+        session: ARSession,
+        scene: Scene,
         height: Float
     ) -> TargetPose?
 }
@@ -55,6 +56,6 @@ protocol TargetWaveChecking {
         target: Entity,
         comp: TargetComp,
         data: WaveData,
-        in view: ARView
+        in scene: Scene
     ) -> [Int]
 }

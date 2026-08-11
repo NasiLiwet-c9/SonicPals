@@ -12,15 +12,12 @@ import UIKit
 struct MainView: View {
     let onBack: () -> Void
 
-    @State private var world =
-        ECSWorld()
-
-    @State private var showInfo =
-        false
+    @State private var world = ECSWorld()
+    @State private var showInfo = false
 
     var body: some View {
         ZStack {
-            ARViewBox(world: world)
+            RealitySceneView(world: world)
                 .ignoresSafeArea()
 
             FPShade(
@@ -50,16 +47,10 @@ struct MainView: View {
             }
         }
         .task {
-            for await _ in
-                NotificationCenter.default
-                    .notifications(
-                        named:
-                            UIApplication
-                                .didReceiveMemoryWarningNotification
-                    ) {
-                world.perform(
-                    .memoryWarning
-                )
+            for await _ in NotificationCenter.default.notifications(
+                named: UIApplication.didReceiveMemoryWarningNotification
+            ) {
+                world.perform(.memoryWarning)
             }
         }
     }

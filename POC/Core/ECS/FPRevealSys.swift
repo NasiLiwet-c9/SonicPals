@@ -5,15 +5,19 @@
 //  Created by Shan Newcastle on 10/08/26.
 //
 
+import ARKit
 import Foundation
 import RealityKit
 
 @MainActor
 final class FPRevealSys: System {
-    static let query =
-        EntityQuery(
-            where: .has(RevealComp.self)
-        )
+    static let query = EntityQuery(
+        where: .has(RevealComp.self)
+    )
+
+    static let sessQuery = EntityQuery(
+        where: .has(SessComp.self)
+    )
 
     private let mesh: any FPMeshBuilding
 
@@ -37,15 +41,14 @@ final class FPRevealSys: System {
         )
     }
 
-    func update(context: SceneUpdateContext) {
-        let now =
-            Date().timeIntervalSinceReferenceDate
+    func update(
+        context: SceneUpdateContext
+    ) {
+        let now = Date().timeIntervalSinceReferenceDate
+        let session = session(in: context.scene)
 
-        for entity in
-            context.scene.performQuery(Self.query) {
-            guard var comp =
-                entity.components[RevealComp.self]
-            else {
+        for entity in context.scene.performQuery(Self.query) {
+            guard var comp = entity.components[RevealComp.self] else {
                 continue
             }
 
@@ -54,6 +57,7 @@ final class FPRevealSys: System {
                 wait(
                     entity: entity,
                     comp: &comp,
+                    session: session,
                     attempt: attempt,
                     nextAt: nextAt,
                     now: now
@@ -91,28 +95,42 @@ final class FPRevealSys: System {
                 }
             }
 
-            if entity.components.has(
-                RevealComp.self
-            ) {
+            if entity.components.has(RevealComp.self) {
                 entity.components[RevealComp.self] = comp
             }
         }
     }
 
+    private func session(
+        in scene: Scene
+    ) -> ARSession? {
+        for entity in scene.performQuery(Self.sessQuery) {
+            guard let comp = entity.components[SessComp.self] else {
+                continue
+            }
+
+            return comp.session.value
+        }
+
+        return nil
+    }
+
     private func wait(
         entity: Entity,
         comp: inout RevealComp,
+        session: ARSession?,
         attempt: Int,
         nextAt: TimeInterval,
         now: TimeInterval
     ) {
         guard now >= nextAt,
-              let view = comp.view.value else {
+              let session
+        else {
             return
         }
 
         let layers = mesh.make(
-            in: view,
+            session: session,
             from: comp.data
         )
 
@@ -121,14 +139,12 @@ final class FPRevealSys: System {
                 layer.root.isEnabled = false
                 layer.pulse.isEnabled = true
                 layer.trace.isEnabled = false
-
                 entity.addChild(layer.root)
             }
 
-            comp.layers =
-                layers.sorted {
-                    $0.delayMs < $1.delayMs
-                }
+            comp.layers = layers.sorted {
+                $0.delayMs < $1.delayMs
+            }
 
             comp.stage = .revealing(
                 index: 0,
@@ -142,6 +158,7 @@ final class FPRevealSys: System {
             comp.stage = .empty(
                 until: now + emptyS
             )
+
             return
         }
 
@@ -157,10 +174,9 @@ final class FPRevealSys: System {
         startedAt: TimeInterval,
         now: TimeInterval
     ) {
-        let elapsed =
-            Int64(
-                (now - startedAt) * 1_000
-            )
+        let elapsed = Int64(
+            (now - startedAt) * 1_000
+        )
 
         var next = index
 
@@ -198,10 +214,7 @@ final class FPRevealSys: System {
                 createdAt: now
             )
 
-            entity.components.remove(
-                RevealComp.self
-            )
-
+            entity.components.remove(RevealComp.self)
             return
         }
 

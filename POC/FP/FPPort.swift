@@ -5,13 +5,14 @@
 //  Created by Shan Newcastle on 10/08/26.
 //
 
+import ARKit
 import RealityKit
 import simd
 
 @MainActor
 protocol FPMeshBuilding {
     func make(
-        in view: ARView,
+        session: ARSession,
         from data: WaveData
     ) -> [FPMeshLayer]
 }
@@ -19,7 +20,7 @@ protocol FPMeshBuilding {
 @MainActor
 protocol FPMeshReadPort {
     func read(
-        in view: ARView,
+        session: ARSession,
         cone: FPConeScan,
         limit: Int
     ) -> [FPTri]

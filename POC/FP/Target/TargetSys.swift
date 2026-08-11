@@ -5,111 +5,92 @@
 //  Created by Shan Newcastle on 10/08/26.
 //
 
+import ARKit
 import Foundation
 import RealityKit
 import simd
 
 @MainActor
 final class TargetSys: System {
-    static let query =
-        EntityQuery(
-            where:
-                .has(
-                    TargetComp.self
-                )
-        )
-
-    private let haptic =
-        HapticSvc()
-
+    static let query = EntityQuery(
+        where: .has(TargetComp.self)
+    )
+    
+    static let sessQuery = EntityQuery(
+        where: .has(SessComp.self)
+    )
+    
+    private let haptic = HapticSvc()
+    
     private let foundM: Float = 0.72
-
     private let nearStepM: Float = 0.12
-
     private let dirDeg: Float = 18
-
     private let dirMaxM: Float = 3.4
-
-    private let nearCooldown:
-        TimeInterval = 0.35
-
-    private let dirCooldown:
-        TimeInterval = 0.70
-
+    private let nearCooldown: TimeInterval = 0.35
+    private let dirCooldown: TimeInterval = 0.70
+    
     required init(scene: Scene) {}
-
+    
     func update(
         context: SceneUpdateContext
     ) {
-        let now =
-            Date().timeIntervalSinceReferenceDate
-
-        for entity in
-            context.scene.performQuery(Self.query) {
-
+        guard let camM = cameraMatrix(
+            in: context.scene
+        ) else {
+            return
+        }
+        
+        let now = Date().timeIntervalSinceReferenceDate
+        let cam = camM.pos3
+        
+        for entity in context.scene.performQuery(Self.query) {
             guard entity.isEnabled,
-                  var comp =
-                    entity.components[
-                        TargetComp.self
-                    ],
-                  !comp.found,
-                  let view =
-                    comp.view.value
+                  var comp = entity.components[TargetComp.self],
+                  !comp.found
             else {
                 continue
             }
-
+            
             fadePulses(
                 comp: &comp,
                 now: now
             )
-
-            let camM =
-                view.cameraTransform.matrix
-
-            let cam =
-                camM.pos3
-
-            let target =
-                entity.position(
-                    relativeTo: nil
-                )
-
-            let dist =
-                horizontalDistance(
-                    cam,
-                    target
-                )
-
+            
+            let target = entity.position(
+                relativeTo: nil
+            )
+            
+            let dist = horizontalDistance(
+                cam,
+                target
+            )
+            
             if comp.seen,
                dist <= foundM {
-
                 comp.found = true
-
+                
                 hideEcho(comp)
-
+                
                 comp.real.isEnabled = true
-
+                
                 haptic.found()
-
-                entity.components[
-                    TargetComp.self
-                ] = comp
-
+                
+                entity.components[TargetComp.self] = comp
+                
                 NotificationCenter.default.post(
                     name: .targetFound,
                     object: entity
                 )
-
+                
                 continue
             }
-
+            
             guideCloser(
                 comp: &comp,
                 dist: dist,
                 now: now
             )
-
+            
             guideDirection(
                 comp: &comp,
                 camM: camM,
@@ -118,40 +99,48 @@ final class TargetSys: System {
                 dist: dist,
                 now: now
             )
-
-            entity.components[
-                TargetComp.self
-            ] = comp
+            
+            entity.components[TargetComp.self] = comp
         }
     }
-
+    
+    private func cameraMatrix(
+        in scene: Scene
+    ) -> simd_float4x4? {
+        for entity in scene.performQuery(Self.sessQuery) {
+            guard let comp = entity.components[SessComp.self],
+                  let frame = comp.session.value?.currentFrame
+            else {
+                continue
+            }
+            
+            return frame.camera.transform
+        }
+        
+        return nil
+    }
+    
     private func fadePulses(
         comp: inout TargetComp,
         now: TimeInterval
     ) {
-        let expired =
-            comp.pulseUntil
-                .filter {
-                    now >= $0.value
-                }
-                .map(\.key)
-
+        let expired = comp.pulseUntil
+            .filter {
+                now >= $0.value
+            }
+            .map(\.key)
+        
         for index in expired {
-            guard comp.parts.indices
-                .contains(index)
-            else {
+            guard comp.parts.indices.contains(index) else {
                 comp.pulseUntil[index] = nil
                 continue
             }
-
-            comp.parts[index]
-                .pulse
-                .isEnabled = false
-
+            
+            comp.parts[index].pulse.isEnabled = false
             comp.pulseUntil[index] = nil
         }
     }
-
+    
     private func hideEcho(
         _ comp: TargetComp
     ) {
@@ -160,38 +149,34 @@ final class TargetSys: System {
             part.trace.isEnabled = false
         }
     }
-
+    
     private func guideCloser(
         comp: inout TargetComp,
         dist: Float,
         now: TimeInterval
     ) {
-        guard let best =
-            comp.bestM
-        else {
+        guard let best = comp.bestM else {
             comp.bestM = dist
             return
         }
-
+        
         guard dist <= best - nearStepM else {
             return
         }
-
+        
         comp.bestM = dist
-
-        guard now - comp.lastNearAt
-            >= nearCooldown
-        else {
+        
+        guard now - comp.lastNearAt >= nearCooldown else {
             return
         }
-
+        
         comp.lastNearAt = now
-
+        
         haptic.closer(
             strong: comp.seen
         )
     }
-
+    
     private func guideDirection(
         comp: inout TargetComp,
         camM: simd_float4x4,
@@ -201,64 +186,53 @@ final class TargetSys: System {
         now: TimeInterval
     ) {
         guard dist <= dirMaxM,
-              now - comp.lastDirAt
-                >= dirCooldown
+              now - comp.lastDirAt >= dirCooldown
         else {
             return
         }
-
-        var forward =
-            SIMD3<Float>(
-                -camM.columns.2.x,
-                0,
-                -camM.columns.2.z
-            )
-
-        var toTarget =
-            SIMD3<Float>(
-                target.x - cam.x,
-                0,
-                target.z - cam.z
-            )
-
+        
+        var forward = SIMD3<Float>(
+            -camM.columns.2.x,
+             0,
+             -camM.columns.2.z
+        )
+        
+        var toTarget = SIMD3<Float>(
+            target.x - cam.x,
+            0,
+            target.z - cam.z
+        )
+        
         guard simd_length(forward) > 0.001,
               simd_length(toTarget) > 0.001
         else {
             return
         }
-
-        forward =
-            simd_normalize(forward)
-
-        toTarget =
-            simd_normalize(toTarget)
-
-        let dot =
-            min(
-                max(
-                    simd_dot(
-                        forward,
-                        toTarget
-                    ),
-                    -1
+        
+        forward = simd_normalize(forward)
+        toTarget = simd_normalize(toTarget)
+        
+        let dot = min(
+            max(
+                simd_dot(
+                    forward,
+                    toTarget
                 ),
-                1
-            )
-
-        let deg =
-            acos(dot)
-            * 180
-            / Float.pi
-
+                -1
+            ),
+            1
+        )
+        
+        let deg = acos(dot) * 180 / Float.pi
+        
         guard deg <= dirDeg else {
             return
         }
-
+        
         comp.lastDirAt = now
-
         haptic.direction()
     }
-
+    
     private func horizontalDistance(
         _ a: SIMD3<Float>,
         _ b: SIMD3<Float>

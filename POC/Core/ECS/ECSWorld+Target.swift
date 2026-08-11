@@ -11,15 +11,11 @@ import simd
 
 extension ECSWorld {
     func spawnTarget() {
-        guard let ar, model.lidarOK else {
-            return
-        }
-
-        var sessComp =
-            sessEntity.components[SessComp.self]
-            ?? SessComp()
-
-        guard !sessComp.spawning else {
+        guard model.lidarOK,
+              let scene = anchor.scene,
+              var sessComp = sessEntity.components[SessComp.self],
+              !sessComp.spawning
+        else {
             return
         }
 
@@ -33,50 +29,48 @@ extension ECSWorld {
                 return
             }
 
-            let ready = await self.targetMaker.prepare()
+            let ready = await targetMaker.prepare()
 
-            var comp =
-                self.sessEntity.components[SessComp.self]
-                ?? SessComp()
+            guard var comp = sessEntity.components[SessComp.self] else {
+                return
+            }
 
             defer {
                 comp.spawning = false
-                self.sessEntity.components[SessComp.self] = comp
+                sessEntity.components[SessComp.self] = comp
             }
 
             guard ready,
-                  let part = self.targetMaker.make() else {
-                self.setMsg(
-                    self.targetMaker.loadError
-                    ?? "Target could not load"
-                )
+                  let part = targetMaker.make()
+            else {
+                setMsg(targetMaker.loadError ?? "Target could not load")
                 return
             }
 
-            guard let pose = self.targetSpawn.pose(
-                in: ar,
+            guard let pose = targetSpawn.pose(
+                session: sess.session,
+                scene: scene,
                 height: part.height
             ) else {
-                self.setMsg("Scan more floor first")
+                setMsg("Scan more floor first")
                 return
             }
 
-            self.installTarget(
+            installTarget(
                 part,
-                pose: pose,
-                in: ar
+                pose: pose
             )
         }
     }
 
     func scanTarget(
         with data: WaveData,
-        in view: ARView
+        in scene: Scene
     ) {
         guard let targetEntity,
-              var comp =
-                targetEntity.components[TargetComp.self],
-              !comp.found else {
+              var comp = targetEntity.components[TargetComp.self],
+              !comp.found
+        else {
             return
         }
 
@@ -84,15 +78,14 @@ extension ECSWorld {
             target: targetEntity,
             comp: comp,
             data: data,
-            in: view
+            in: scene
         )
 
         guard !hits.isEmpty else {
             return
         }
 
-        let now =
-            Date().timeIntervalSinceReferenceDate
+        let now = Date().timeIntervalSinceReferenceDate
 
         for index in hits
         where comp.parts.indices.contains(index) {
@@ -108,8 +101,7 @@ extension ECSWorld {
 
     private func installTarget(
         _ part: TargetPart,
-        pose: TargetPose,
-        in view: ARView
+        pose: TargetPose
     ) {
         clearActiveWave()
         clearTraces()
@@ -131,8 +123,7 @@ extension ECSWorld {
 
         part.root.components[TargetComp.self] = TargetComp(
             real: part.real,
-            parts: part.parts,
-            view: ARViewRef(view)
+            parts: part.parts
         )
 
         anchor.addChild(part.root)
