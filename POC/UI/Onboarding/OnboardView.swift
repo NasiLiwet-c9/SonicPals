@@ -30,7 +30,7 @@ struct OnboardView: View {
         ),
         OnboardPage(
             id: 1,
-            modelName: "Stylized_Tree",
+            modelName: "Realistic_looking_Mango_Tree",
             title: "Search the room",
             text:
                 "Scan the floor, hide the virtual tree, then turn and move around the room to search for it."

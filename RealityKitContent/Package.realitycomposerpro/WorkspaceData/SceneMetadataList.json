@@ -10,5 +10,68 @@
         "isLocked" : false
       }
     ]
+  },
+  "E70C1572-9703-40D5-BFC9-327F1DC407C9" : {
+    "objectMetadataList" : [
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "Tree",
+        "Meshes",
+        "Sketchfab_model",
+        "Root",
+        "Plane"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "Realistic_looking_Mango_Tree",
+        "Meshes",
+        "Sketchfab_model",
+        "Root",
+        "Plane"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "TreeItem",
+        "Meshes",
+        "Sketchfab_model",
+        "Root",
+        "Plane"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "MangoItem"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      }
+    ]
   }
 }

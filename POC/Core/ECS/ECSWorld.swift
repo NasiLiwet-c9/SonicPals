@@ -39,10 +39,8 @@ final class ECSWorld {
         )
         
         targetMaker = TargetAssetSvc(
-            treeName: "Stylized_Tree",
-            mangoName: "Mango",
-            treeH: 1.80,
-            mangoSpan: 0.14
+            sceneName: "Mango+Tree",
+            treeH: 1.80
         )
         
         targetSpawn = TargetSpawnSvc(

@@ -13,36 +13,26 @@ import simd
 
 @MainActor
 final class TargetAssetSvc: TargetMaking {
-    private let treeName: String
-    private let mangoName: String
-
+    private let sceneName: String
     private let treeH: Float
-    private let mangoSpan: Float
 
-    private var treeTpl: Entity?
-    private var mangoTpl: Entity?
+    private var sceneTpl: Entity?
 
-    private var task:
-        Task<(Entity, Entity), Error>?
+    private var task: Task<Entity, Error>?
 
     private(set)
     var loadError: String?
 
     init(
-        treeName: String = "Stylized_Tree",
-        mangoName: String = "Mango",
-        treeH: Float = 1.55,
-        mangoSpan: Float = 0.14
+        sceneName: String = "Mango+Tree",
+        treeH: Float = 1.55
     ) {
-        self.treeName = treeName
-        self.mangoName = mangoName
+        self.sceneName = sceneName
         self.treeH = treeH
-        self.mangoSpan = mangoSpan
     }
 
     func prepare() async -> Bool {
-        if treeTpl != nil,
-           mangoTpl != nil {
+        if sceneTpl != nil {
             return true
         }
 
@@ -50,26 +40,13 @@ final class TargetAssetSvc: TargetMaking {
             return await finish(task)
         }
 
-        let treeName = treeName
-        let mangoName = mangoName
+        let sceneName = sceneName
 
         let newTask =
             Task { @MainActor in
-                async let tree =
-                    Entity(
-                        named: treeName,
-                        in: realityKitContentBundle
-                    )
-
-                async let mango =
-                    Entity(
-                        named: mangoName,
-                        in: realityKitContentBundle
-                    )
-
-                return try await (
-                    tree,
-                    mango
+                try await Entity(
+                    named: sceneName,
+                    in: realityKitContentBundle
                 )
             }
 
@@ -79,53 +56,37 @@ final class TargetAssetSvc: TargetMaking {
     }
 
     func make() -> TargetPart? {
-        guard let treeTpl,
-              let mangoTpl else {
+        guard let sceneTpl else {
             loadError =
                 "Target assets are not ready"
 
             return nil
         }
 
-        let real = Entity()
+        let real =
+            sceneTpl.clone(
+                recursive: true
+            )
+
         real.name = "targetReal"
 
-        let tree =
-            treeTpl.clone(
-                recursive: true
-            )
-
         guard let treeSize =
-            placeTree(tree)
+            placeScene(real)
         else {
             loadError =
-                "Tree bounds are empty"
+                "Scene bounds are empty"
 
             return nil
         }
 
-        let mango =
-            mangoTpl.clone(
-                recursive: true
-            )
-
-        mango.name = "MangoTarget"
-
-        guard placeMango(
-            mango,
-            treeSize: treeSize
-        ) else {
+        guard markMangoTarget(in: real) else {
             loadError =
-                "Mango bounds are empty"
+                "Mango entity not found in scene"
 
             return nil
         }
 
-        disableGroundShadow(on: tree)
-        disableGroundShadow(on: mango)
-
-        real.addChild(tree)
-        real.addChild(mango)
+        disableGroundShadow(on: real)
 
         let pulse =
             real.clone(
@@ -146,7 +107,7 @@ final class TargetAssetSvc: TargetMaking {
             on: trace,
             alpha: 0.05
         )
-        
+
         setMangoEchoMat(
             on: pulse,
             alpha: 1.0
@@ -157,7 +118,6 @@ final class TargetAssetSvc: TargetMaking {
             alpha: 0.25
         )
 
-        disableGroundShadow(on: real)
         disableGroundShadow(on: pulse)
         disableGroundShadow(on: trace)
 
@@ -196,7 +156,27 @@ final class TargetAssetSvc: TargetMaking {
             height: treeSize.y
         )
     }
-    
+
+    /// Finds the mango node authored in the composed scene and
+    /// renames it to "MangoTarget", the marker the rest of this
+    /// service (isInsideMango / setMangoEchoMat) already looks for.
+    private func markMangoTarget(
+        in root: Entity
+    ) -> Bool {
+        for child in root.children {
+            if child.name == "MangoItem" {
+                child.name = "MangoTarget"
+                return true
+            }
+
+            if markMangoTarget(in: child) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     private func setMangoEchoMat(
         on entity: Entity,
         alpha: Float
@@ -403,13 +383,16 @@ final class TargetAssetSvc: TargetMaking {
         return result
     }
 
-    private func placeTree(
-        _ tree: Entity
+    /// Scales and grounds the whole composed scene (tree + mango,
+    /// with their relative placement already authored in RCP) so
+    /// its overall height matches treeH.
+    private func placeScene(
+        _ scene: Entity
     ) -> SIMD3<Float>? {
         let bounds =
-            tree.visualBounds(
+            scene.visualBounds(
                 recursive: true,
-                relativeTo: tree,
+                relativeTo: scene,
                 excludeInactive: false
             )
 
@@ -426,73 +409,18 @@ final class TargetAssetSvc: TargetMaking {
         let center =
             bounds.center * scale
 
-        tree.scale =
+        scene.scale =
             SIMD3<Float>(
                 repeating: scale
             )
 
-        tree.position = SIMD3<Float>(
+        scene.position = SIMD3<Float>(
             -center.x,
             (size.y * 0.5) - center.y,
             -center.z
         )
 
         return size
-    }
-
-    private func placeMango(
-        _ mango: Entity,
-        treeSize: SIMD3<Float>
-    ) -> Bool {
-        let bounds =
-            mango.visualBounds(
-                recursive: true,
-                relativeTo: mango,
-                excludeInactive: false
-            )
-
-        let largest =
-            max(
-                bounds.extents.x,
-                max(
-                    bounds.extents.y,
-                    bounds.extents.z
-                )
-            )
-
-        guard largest > 0.001 else {
-            return false
-        }
-
-        let scale =
-            mangoSpan / largest
-
-        let center =
-            bounds.center * scale
-
-        mango.scale =
-            SIMD3<Float>(
-                repeating: scale
-            )
-
-        mango.position = SIMD3<Float>(
-            max(
-                treeSize.x * 0.23,
-                0.16
-            )
-            - center.x,
-
-            (treeSize.y * 0.69)
-            - center.y,
-
-            max(
-                treeSize.z * 0.10,
-                0.04
-            )
-            - center.z
-        )
-
-        return true
     }
 
     private func setEchoMat(
@@ -581,14 +509,13 @@ final class TargetAssetSvc: TargetMaking {
 
     private func finish(
         _ task:
-            Task<(Entity, Entity), Error>
+            Task<Entity, Error>
     ) async -> Bool {
         do {
-            let pair =
+            let scene =
                 try await task.value
 
-            treeTpl = pair.0
-            mangoTpl = pair.1
+            sceneTpl = scene
 
             self.task = nil
             loadError = nil
