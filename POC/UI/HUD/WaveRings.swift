@@ -3,7 +3,7 @@
 //  POC
 //
 //  Created by Shan Newcastle on 10/08/26.
-//
+//  Updated by Asaryun 13/08/26
 
 import SwiftUI
 
@@ -62,7 +62,7 @@ struct WaveRings: View {
                 )
                 .position(
                     x: proxy.size.width / 2,
-                    y: proxy.size.height * 0.46
+                    y: proxy.size.height * 0.516
                 )
             }
         }

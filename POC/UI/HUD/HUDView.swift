@@ -3,7 +3,7 @@
 //  POC
 //
 //  Created by Shan Newcastle on 10/08/26.
-//
+//  Updated by Asaryun on 13/08/26
 
 import SwiftUI
 
@@ -34,6 +34,8 @@ struct HUDView: View {
 
     private var topBar: some View {
         HStack {
+            
+            // for debugging purposes
             circleButton(
                 icon: "chevron.left",
                 size: 58,
@@ -43,12 +45,22 @@ struct HUDView: View {
 
             Spacer()
 
+//            circleButton(
+//                icon: "info",
+//                size: 58,
+//                iconSize: 24,
+//                action: onInfo
+//            )
             circleButton(
-                icon: "info",
-                size: 58,
-                iconSize: 24,
-                action: onInfo
-            )
+                icon:
+                    world.model.dimOn
+                    ? "moon.stars.fill"
+                    : "sun.max.fill",
+                size: 64,
+                iconSize: 25
+            ) {
+                world.perform(.toggleDim)
+            }.glassEffect()
         }
     }
 
@@ -73,26 +85,27 @@ struct HUDView: View {
             alignment: .bottom,
             spacing: 36
         ) {
-            circleButton(
-                icon:
-                    world.model.dimOn
-                    ? "lightbulb.fill"
-                    : "lightbulb",
-                size: 68,
-                iconSize: 25
-            ) {
-                world.perform(.toggleDim)
-            }
+//            circleButton(
+//                icon:
+//                    world.model.dimOn
+//                    ? "lightbulb.fill"
+//                    : "lightbulb",
+//                size: 68,
+//                iconSize: 25
+//            ) {
+//                world.perform(.toggleDim)
+//            }
 
             waveButton
 
+            //for debugging purposes
             circleButton(
                 icon: "tree",
                 size: 68,
                 iconSize: 27
             ) {
                 world.perform(.spawnTarget)
-            }
+            }.glassEffect()
             .disabled(
                 !world.model.canSpawn
             )
@@ -109,11 +122,11 @@ struct HUDView: View {
             world.perform(.sendWave)
         } label: {
             Image(
-                systemName: "waveform"
+                systemName: "target"
             )
             .font(
                 .system(
-                    size: 36,
+                    size: 52,
                     weight: .medium
                 )
             )
@@ -133,6 +146,7 @@ struct HUDView: View {
                         lineWidth: 1
                     )
             }
+            .glassEffect()
         }
         .buttonStyle(.plain)
         .disabled(
