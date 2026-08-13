@@ -12,8 +12,11 @@ extension Notification.Name {
     static let targetFound =
         Notification.Name("targetFound")
     
-    static let mangoFound =
-        Notification.Name("mangoFound")
+    static let mangoEatReady =
+        Notification.Name("mangoEatReady")
+
+    static let mangoEatLost =
+        Notification.Name("mangoEatLost")
 }
 
 struct TargetComp: Component {
@@ -29,13 +32,6 @@ struct TargetComp: Component {
     var lastNearAt: TimeInterval = 0
     var lastDirAt: TimeInterval = 0
     
-    // Mango phase
-    var mangoScanCount: Int = 0
-    let requiredMangoScans: Int = 3
-    
-    var mangoFound: Bool {
-        mangoScanCount >= requiredMangoScans
-    }
     var seen: Bool {
         !seenParts.isEmpty
     }

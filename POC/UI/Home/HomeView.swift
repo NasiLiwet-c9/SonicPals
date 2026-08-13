@@ -69,14 +69,14 @@ struct HomeView: View {
             ZStack {
                 Color(red: 0.90, green: 0.89, blue: 0.98)
     
-                Image("BG main page")
+                Image("MainPageBackground")
                     .resizable()
                     .ignoresSafeArea()
             }
         
             //debug
             .onAppear {
-                print("Asset found:", UIImage(named: "BG main page") != nil)
+                print("Asset found:", UIImage(named: "MainPageBackground") != nil)
             }
             .ignoresSafeArea()
         }

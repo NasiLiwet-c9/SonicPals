@@ -11,10 +11,10 @@
       }
     ]
   },
-  "E70C1572-9703-40D5-BFC9-327F1DC407C9" : {
+  "B7F69422-ACBA-4D3D-8979-933C4A8D5C13" : {
     "objectMetadataList" : [
       [
-        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
         "Root"
       ],
       {
@@ -22,19 +22,39 @@
         "isLocked" : false
       },
       [
-        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
         "Root",
-        "Tree",
-        "Meshes",
-        "Sketchfab_model",
-        "Root",
-        "Plane"
+        "TreeItem"
       ],
       {
-        "disallowsFraming" : true,
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
+        "Root",
+        "MangoItem"
+      ],
+      {
+        "disallowsFraming" : false,
         "isExpanded" : false,
         "isLocked" : false
       },
+      [
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
+        "Root",
+        "MangoItem",
+        "Materials",
+        "Material_003"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      }
+    ]
+  },
+  "E70C1572-9703-40D5-BFC9-327F1DC407C9" : {
+    "objectMetadataList" : [
       [
         "E70C1572-9703-40D5-BFC9-327F1DC407C9",
         "Root",
@@ -47,6 +67,23 @@
       {
         "disallowsFraming" : true,
         "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root"
+      ],
+      {
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "MangoItem"
+      ],
+      {
+        "isExpanded" : true,
         "isLocked" : false
       },
       [
@@ -66,10 +103,15 @@
       [
         "E70C1572-9703-40D5-BFC9-327F1DC407C9",
         "Root",
-        "MangoItem"
+        "Tree",
+        "Meshes",
+        "Sketchfab_model",
+        "Root",
+        "Plane"
       ],
       {
-        "isExpanded" : true,
+        "disallowsFraming" : true,
+        "isExpanded" : false,
         "isLocked" : false
       }
     ]

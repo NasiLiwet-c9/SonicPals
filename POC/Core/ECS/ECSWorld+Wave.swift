@@ -22,6 +22,8 @@ extension ECSWorld {
         clearActiveWave()
         trimTraces(max: 3)
 
+        sfx.sonar()
+
         let start = camStart(from: frame.camera.transform)
         let data = waveSim.run(in: scene, from: start)
 

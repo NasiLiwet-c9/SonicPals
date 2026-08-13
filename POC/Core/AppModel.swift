@@ -17,6 +17,9 @@ final class AppModel {
     var dimOn = true
     var waveSeq = 0
 
+    var mangoEatReady = false
+    var mangoEatenCount = 0
+
     var canWave: Bool {
         lidarOK
     }

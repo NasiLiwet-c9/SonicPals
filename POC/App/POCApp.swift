@@ -18,6 +18,7 @@ struct POCApp: App {
 
         FPRevealSys.registerSystem()
         TargetSys.registerSystem()
+        MangoEatSys.registerSystem()
     }
 
     var body: some SwiftUI.Scene {

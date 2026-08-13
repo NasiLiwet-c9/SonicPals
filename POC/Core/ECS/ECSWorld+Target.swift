@@ -88,110 +88,67 @@ extension ECSWorld {
             Date().timeIntervalSinceReferenceDate
 
         // ─────────────────────────────
-        // PHASE 1: FIND THE TREE
+        // FIND THE TREE
         // ─────────────────────────────
+        //
+        // Once the tree is found, `real.isEnabled` flips on (see
+        // TargetSys) and the mango becomes eatable via proximity +
+        // aim alone (see MangoEatSys) — no separate mango-scanning
+        // step is required.
 
-        if !comp.found {
-
-            let treeHits = hits.filter {
-                !comp.parts[$0].isMango
-            }
-            
-            if !treeHits.isEmpty {
-                setMsg("Tree hit!")
-            }
-            
-            for index in treeHits
-            where comp.parts.indices.contains(index) {
-
-                comp.seenParts.insert(index)
-
-                comp.pulseUntil[index] =
-                    now + 1.25
-
-                comp.parts[index]
-                    .pulse
-                    .isEnabled = true
-
-                comp.parts[index]
-                    .trace
-                    .isEnabled = true
-            }
+        guard !comp.found else {
+            targetEntity.components[
+                TargetComp.self
+            ] = comp
+            return
         }
 
-        // ─────────────────────────────
-        // PHASE 2: FIND THE MANGO
-        // ─────────────────────────────
+        let treeHits = hits.filter {
+            !comp.parts[$0].isMango
+        }
 
-        else {
+        if !treeHits.isEmpty {
+            setMsg("Tree hit!")
+        }
 
-            let mangoHits = hits.filter {
-                comp.parts[$0].isMango
-            }
+        for index in treeHits
+        where comp.parts.indices.contains(index) {
 
-            guard !mangoHits.isEmpty else {
-                targetEntity.components[
-                    TargetComp.self
-                ] = comp
-                setMsg(
-                    "Mango hit! \(comp.mangoScanCount + 1)/\(comp.requiredMangoScans)"
-                )
-                return
-            }
+            comp.seenParts.insert(index)
 
-            // Reveal the mango parts hit by this PING.
-            for index in mangoHits
-            where comp.parts.indices.contains(index) {
+            comp.pulseUntil[index] =
+                now + 1.25
 
-                comp.pulseUntil[index] =
-                    now + 1.25
+            comp.parts[index]
+                .pulse
+                .isEnabled = true
 
-                comp.parts[index]
-                    .pulse
-                    .isEnabled = true
-
-                comp.parts[index]
-                    .trace
-                    .isEnabled = true
-            }
-
-            // One successful PING = one scan.
-            comp.mangoScanCount += 1
-
-            print(
-                "Mango scan: \(comp.mangoScanCount)/\(comp.requiredMangoScans)"
-            )
-
-            if comp.mangoFound {
-                finishMangoScan(
-                    target: targetEntity,
-                    comp: &comp
-                )
-            }
+            comp.parts[index]
+                .trace
+                .isEnabled = true
         }
 
         targetEntity.components[
             TargetComp.self
         ] = comp
     }
-
-    private func finishMangoScan(
-        target: Entity,
-        comp: inout TargetComp
-    ) {
-        print("MANGO FOUND!")
-        setMsg("MANGO FOUND!")
-
-        for part in comp.parts
-        where part.isMango {
-            part.pulse.isEnabled = false
-            part.trace.isEnabled = false
+    
+    /// Called when the "eat" button is pressed while `eatCandidate`
+    /// (the real, visible mango entity) is within reach and in view,
+    /// per `MangoEatSys`.
+    func eatMango() {
+        guard let mango = eatCandidate else {
+            return
         }
-        
-        NotificationCenter.default.post(
-            name: .mangoFound,
-            object: target
-        )
+
+        mango.removeFromParent()
+
+        model.mangoEatenCount += 1
+        model.mangoEatReady = false
+
+        eatCandidate = nil
+
+        setMsg("Mango eaten!")
     }
     
     private func installTarget(

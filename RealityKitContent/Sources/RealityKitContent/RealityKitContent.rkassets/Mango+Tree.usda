@@ -10,38 +10,7 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["TreeItem", "MangoItem"]
-    def "TreeItem" (
-        active = true
-        references = @Realistic_looking_Mango_Tree.usdz@
-    )
-    {
-        float3 xformOp:scale = (0.01, 0.01, 0.01)
-        float3 xformOp:translate = (0.0011751316, 0, 0.0061166286)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-
-        over "Materials"
-        {
-            over "Steam_color"
-            {
-                token outputs:mtlx:surface
-                token outputs:realitykit:vertex
-            }
-
-            over "Material_001"
-            {
-                token outputs:mtlx:surface
-                token outputs:realitykit:vertex
-            }
-
-            over "Leaf"
-            {
-                token outputs:mtlx:surface
-                token outputs:realitykit:vertex
-            }
-        }
-    }
-
+    reorder nameChildren = ["MangoItem", "ProximityTreeMaterial", "TreeItem", "MangoSpawnPoint1", "MangoSpawnPoint2", "MangoSpawnPoint3", "MangoSpawnPoint4", "MangoSpawnPoint5"]
     def "MangoItem" (
         customData = {
             float3 rotationEulerHint = (0, 0, 0)
@@ -49,9 +18,169 @@ def Xform "Root"
         references = @Mango.usdz@
     )
     {
+        reorder nameChildren = ["Materials", "Meshes"]
         quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (0.0030895493, 0.0030895493, 0.0030895493)
-        float3 xformOp:translate = (-0.7349935, 1.0912825, -0.31635478)
+        float3 xformOp:scale = (0.014948546, 0.014948546, 0.014948546)
+        float3 xformOp:translate = (4.033201, 2.0821085, 4.4146843)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Materials"
+        {
+            over "Material_005"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "Material_003"
+            {
+                reorder nameChildren = ["pbr_shader", "uvset0", "tex_base"]
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+            }
+
+            over "Material_001"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+        }
+    }
+
+    def "TreeItem" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+        references = @Giant_Low_Poly_Tree.usdz@
+    )
+    {
+        rel material:binding = </Root/ProximityTreeMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        float3 xformOp:scale = (0.005, 0.005, 0.005)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Materials"
+        {
+            over "leaf_green_003"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "leaf_green_004"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "leaf_green_001"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "leaf_green"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "tree_wood"
+            {
+                token outputs:mtlx:surface.connect = </Root/TreeItem/Materials/tree_wood/PreviewSurface.outputs:out>
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/TreeItem/Materials/tree_wood/pbr_shader.outputs:surface>
+                float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+
+                over "pbr_shader" (
+                    active = true
+                )
+                {
+                }
+
+                def Shader "PreviewSurface" (
+                    active = false
+                )
+                {
+                    uniform token info:id = "ND_UsdPreviewSurface_surfaceshader"
+                    token outputs:out
+                    float2 ui:nodegraph:node:pos = (-255, 105)
+                }
+            }
+
+            over "leaf_green_002"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "leaf_green_005"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+            }
+        }
+    }
+
+    def Xform "MangoSpawnPoint1" (
+        active = true
+    )
+    {
+        float3 xformOp:translate = (8.9779496e-7, 3.0500205, 2.2288623)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint2" (
+        active = true
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 3.5177639, 0.2547574)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint3" (
+        active = true
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 2.8607516, -2.6373477)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint4" (
+        active = true
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (-2.5727966, 2.0152535, 0.6170454)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint5" (
+        active = true
+        customData = {
+            float3 rotationEulerHint = (0, 0, 0)
+        }
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (2.9186506, 3.7399373, -0.29817295)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 }

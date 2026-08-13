@@ -96,7 +96,13 @@ struct HUDView: View {
 //                world.perform(.toggleDim)
 //            }
 
-            waveButton
+            if world.model.mangoEatReady {
+                eatButton
+                    .transition(.scale.combined(with: .opacity))
+            } else {
+                waveButton
+                    .transition(.scale.combined(with: .opacity))
+            }
 
             //for debugging purposes
             circleButton(
@@ -115,6 +121,10 @@ struct HUDView: View {
                 : 0.4
             )
         }
+        .animation(
+            .easeInOut(duration: 0.2),
+            value: world.model.mangoEatReady
+        )
     }
 
     private var waveButton: some View {
@@ -159,6 +169,43 @@ struct HUDView: View {
         )
         .accessibilityLabel(
             "Send ultrasonic wave"
+        )
+    }
+
+    private var eatButton: some View {
+        Button {
+            world.perform(.eatMango)
+        } label: {
+            Image(
+                systemName: "fork.knife"
+            )
+            .font(
+                .system(
+                    size: 44,
+                    weight: .medium
+                )
+            )
+            .foregroundStyle(.primary)
+            .frame(
+                width: 108,
+                height: 108
+            )
+            .background(
+                .ultraThinMaterial,
+                in: Circle()
+            )
+            .overlay {
+                Circle()
+                    .stroke(
+                        .primary.opacity(0.15),
+                        lineWidth: 1
+                    )
+            }
+            .glassEffect()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(
+            "Eat mango"
         )
     }
 

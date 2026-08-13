@@ -18,11 +18,15 @@ final class ECSWorld {
     let sessEntity = Entity()
     
     var targetEntity: Entity?
+    var eatCandidate: Entity?
     
     private var started = false
     private var foundTask: Task<Void, Never>?
+    private var eatReadyTask: Task<Void, Never>?
+    private var eatLostTask: Task<Void, Never>?
     
     let sess: any SessServing
+    let sfx = SfxSvc()
     let waveSim: any WaveSimulating
     
     let targetMaker: any TargetMaking
@@ -59,6 +63,7 @@ final class ECSWorld {
         anchor.addChild(sessEntity)
         
         watchTarget()
+        watchMangoEat()
     }
     
     func start() async {
@@ -80,6 +85,7 @@ final class ECSWorld {
         if supported {
             started = true
             model.msg = ""
+            sfx.startAmbience()
             _ = await targetMaker.prepare()
         } else {
             started = false
@@ -93,6 +99,7 @@ final class ECSWorld {
         }
         
         started = false
+        sfx.stopAmbience()
         await sess.stop()
     }
     
@@ -113,6 +120,9 @@ final class ECSWorld {
         case .memoryWarning:
             clearActiveWave()
             clearTraces()
+            
+        case .eatMango:
+            eatMango()
         }
     }
     
@@ -146,9 +156,11 @@ final class ECSWorld {
         
         targetEntity?.removeFromParent()
         targetEntity = nil
+        eatCandidate = nil
         
         model.hasTarget = false
         model.targetFound = false
+        model.mangoEatReady = false
         model.msg = ""
     }
     
@@ -166,6 +178,36 @@ final class ECSWorld {
                 
                 model.targetFound = true
                 setMsg("Tree Found!")
+            }
+        }
+    }
+    
+    private func watchMangoEat() {
+        eatReadyTask = Task { @MainActor [weak self] in
+            for await note in NotificationCenter.default.notifications(
+                named: .mangoEatReady
+            ) {
+                guard let self,
+                      let mango = note.object as? Entity
+                else {
+                    continue
+                }
+                
+                eatCandidate = mango
+                model.mangoEatReady = true
+            }
+        }
+        
+        eatLostTask = Task { @MainActor [weak self] in
+            for await _ in NotificationCenter.default.notifications(
+                named: .mangoEatLost
+            ) {
+                guard let self else {
+                    continue
+                }
+                
+                eatCandidate = nil
+                model.mangoEatReady = false
             }
         }
     }

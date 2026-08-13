@@ -11,4 +11,5 @@ enum ECSCmd {
     case toggleDim
     case clear
     case memoryWarning
+    case eatMango
 }
