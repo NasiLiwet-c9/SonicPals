@@ -30,6 +30,11 @@ struct HUDView: View {
             .padding(.top, 10)
             .padding(.bottom, 24)
         }
+        //debug
+//        .onAppear {
+//            print("ping-btn found:", UIImage(named: "ping-btn") != nil)
+//            print("eat-btn found:", UIImage(named: "eat-btn") != nil)
+//        }
     }
 
     private var topBar: some View {
@@ -51,16 +56,16 @@ struct HUDView: View {
 //                iconSize: 24,
 //                action: onInfo
 //            )
-            circleButton(
-                icon:
-                    world.model.dimOn
-                    ? "moon.stars.fill"
-                    : "sun.max.fill",
-                size: 64,
-                iconSize: 25
-            ) {
-                world.perform(.toggleDim)
-            }.glassEffect()
+//            circleButton(
+//                icon:
+//                    world.model.dimOn
+//                    ? "moon.stars.fill"
+//                    : "sun.max.fill",
+//                size: 64,
+//                iconSize: 25
+//            ) {
+//                world.perform(.toggleDim)
+//            }.glassEffect()
         }
     }
 
@@ -131,84 +136,33 @@ struct HUDView: View {
         Button {
             world.perform(.sendWave)
         } label: {
-            Image(
-                systemName: "target"
-            )
-            .font(
-                .system(
-                    size: 52,
-                    weight: .medium
-                )
-            )
-            .foregroundStyle(.primary)
-            .frame(
-                width: 108,
-                height: 108
-            )
-            .background(
-                .ultraThinMaterial,
-                in: Circle()
-            )
-            .overlay {
-                Circle()
-                    .stroke(
-                        .primary.opacity(0.15),
-                        lineWidth: 1
-                    )
-            }
-            .glassEffect()
+            Image("ping-btn")
+                .renderingMode(.original)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 108, height: 108)
         }
         .buttonStyle(.plain)
-        .disabled(
-            !world.model.canWave
-        )
-        .opacity(
-            world.model.canWave
-            ? 1
-            : 0.4
-        )
-        .accessibilityLabel(
-            "Send ultrasonic wave"
-        )
+        .disabled(!world.model.canWave)
+        .opacity(world.model.canWave ? 1 : 0.4)
+        .accessibilityLabel("Send ultrasonic wave")
     }
 
     private var eatButton: some View {
         Button {
             world.perform(.eatMango)
         } label: {
-            Image(
-                systemName: "fork.knife"
-            )
-            .font(
-                .system(
-                    size: 44,
-                    weight: .medium
-                )
-            )
-            .foregroundStyle(.primary)
-            .frame(
-                width: 108,
-                height: 108
-            )
-            .background(
-                .ultraThinMaterial,
-                in: Circle()
-            )
-            .overlay {
-                Circle()
-                    .stroke(
-                        .primary.opacity(0.15),
-                        lineWidth: 1
-                    )
-            }
-            .glassEffect()
+            Image("eat-btn")
+                .renderingMode(.original)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 108, height: 108)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(
-            "Eat mango"
-        )
+        .glassEffect()
+        .accessibilityLabel("Eat mango")
     }
-
+    
     private var reticle: some View {
         ZStack {
             Circle()

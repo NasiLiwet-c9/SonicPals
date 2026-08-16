@@ -154,11 +154,11 @@ struct DialogueBubbleView: View {
                 Text(controller.visibleText)
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.leading)
-                    .lineLimit(isCurrentLineShort ? 1 : 3)
+                    .lineLimit(isCurrentLineShort ? 1 : 4)
                     .minimumScaleFactor(0.75)
                     .foregroundStyle(.black)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, isCurrentLineShort ? 14 : 20)
+                    .padding(.bottom, isCurrentLineShort ? 18 : 20)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
             }
             // Same fix as before — explicit height computed from each PNG's
