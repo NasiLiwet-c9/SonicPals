@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SplashView: View {
     var mascotGifName = "for loading page"
-    var guidanceText = "jangan lupa scan seluruh ruangan dulu ya sebelum main...."
+//    var guidanceText = "jangan lupa scan seluruh ruangan dulu ya sebelum main...."
 
     let onFinished: () -> Void
 
@@ -34,12 +34,12 @@ struct SplashView: View {
 
                 Spacer()
 
-                Text(guidanceText)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .padding(.bottom, 48)
+//                Text(guidanceText)
+//                    .font(.system(size: 13, weight: .medium))
+//                    .foregroundStyle(.white.opacity(0.85))
+//                    .multilineTextAlignment(.center)
+//                    .padding(.horizontal, 40)
+//                    .padding(.bottom, 48)
             }
         }
         .preferredColorScheme(.dark)

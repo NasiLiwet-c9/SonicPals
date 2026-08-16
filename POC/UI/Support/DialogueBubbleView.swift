@@ -128,7 +128,7 @@ struct DialogueBubbleView: View {
     var body: some View {
             HStack(alignment: .top, spacing: isCurrentLineShort ? -50 : -50) {
                 bubble
-                    .offset(y: isCurrentLineShort ? -15 : -90)
+                    .offset(y: isCurrentLineShort ? -15 : -88)
             
                 Model3DView(name: mascotName)
                     .frame(width: 240, height: 240)
@@ -152,13 +152,13 @@ struct DialogueBubbleView: View {
                     .aspectRatio(contentMode: .fit)
 
                 Text(controller.visibleText)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.leading)
                     .lineLimit(isCurrentLineShort ? 1 : 3)
                     .minimumScaleFactor(0.75)
                     .foregroundStyle(.black)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, isCurrentLineShort ? 12 : 20)
+                    .padding(.bottom, isCurrentLineShort ? 14 : 20)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
             }
             // Same fix as before — explicit height computed from each PNG's

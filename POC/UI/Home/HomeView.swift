@@ -12,9 +12,9 @@ struct HomeView: View {
     var speechText = "Your eyes might not be able to see in the dark, but my sonar can!"
     var dialogueLines: [String] = [
         "Hi.... i'm Battiw",
-        "I'm hungry, help me finding something to eat tonight...!"
+        "I'm hungry, help me find something to eat tonight...!"
     ]
-    var primaryButtonText = "Let's Explore"
+    var primaryButtonText = "Fly and Find"
     var onStart: () -> Void = {}
     var onSelectMode: () -> Void = {}
 
@@ -27,14 +27,14 @@ struct HomeView: View {
 
                 DialogueBubbleView(lines: dialogueLines, mascotName: mascotName)
                 
-                Spacer()
+//                Spacer()
 
                 VStack(spacing: 14) {
                     Button(action: onStart) {
                         Text(primaryButtonText.uppercased())
                             .font(.system(size: 17, weight: .heavy, design: .rounded))
                             .foregroundStyle(Color.black)
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: 200)
                             .frame(height: 56)
                             .background(Color.yellow, in: Capsule())
                             .overlay(
@@ -45,7 +45,7 @@ struct HomeView: View {
                     .padding(.horizontal, 32)
                     .buttonStyle(.plain)
                 }
-                .padding(.bottom, 44)
+                .padding(.bottom, 300)
             }
             .padding(.horizontal, 20)
         }
