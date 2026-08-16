@@ -10,9 +10,11 @@ import SwiftUI
 struct HomeView: View {
     var mascotName = "fly"
     var speechText = "Your eyes might not be able to see in the dark, but my sonar can!"
+    var dialogueLines: [String] = [
+        "Hi.... i'm Battiw",
+        "I'm hungry, help me finding something to eat tonight...!"
+    ]
     var primaryButtonText = "Let's Explore"
-    var secondaryButtonText = "Select Mode"
-
     var onStart: () -> Void = {}
     var onSelectMode: () -> Void = {}
 
@@ -20,14 +22,11 @@ struct HomeView: View {
         ZStack {
             background
 
-            VStack(spacing: 24) {
+            VStack {
                 Spacer()
 
-                Model3DView(name: mascotName)
-                    .frame(width: 160, height: 160)
-
-                SpeechBubble(text: speechText)
-
+                DialogueBubbleView(lines: dialogueLines, mascotName: mascotName)
+                
                 Spacer()
 
                 VStack(spacing: 14) {
@@ -44,17 +43,6 @@ struct HomeView: View {
                             )
                     }
                     .padding(.horizontal, 32)
-
-                    Button(action: onSelectMode) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "chevron.left")
-                            Text(secondaryButtonText.uppercased())
-                                .underline()
-                            Image(systemName: "chevron.right")
-                        }
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.yellow)
-                    }
                     .buttonStyle(.plain)
                 }
                 .padding(.bottom, 44)
@@ -67,42 +55,15 @@ struct HomeView: View {
     //Background
     private var background: some View {
             ZStack {
-                Color(red: 0.90, green: 0.89, blue: 0.98)
-    
-                Image("MainPageBackground")
-                    .resizable()
+                Image("Onboarding full")
                     .ignoresSafeArea()
             }
-        
             //debug
-            .onAppear {
-                print("Asset found:", UIImage(named: "MainPageBackground") != nil)
-            }
+//            .onAppear {
+//                print("Asset found:", UIImage(named: "Onboarding full") != nil)
+//            }
             .ignoresSafeArea()
         }
-}
-
-private struct SpeechBubble: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(.system(size: 20, weight: .semibold))
-            .multilineTextAlignment(.center)
-            .lineLimit(3)
-            .foregroundStyle(.black)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .frame(maxWidth: 300)
-            .background(
-                Color.white,
-                in: RoundedRectangle(cornerRadius: 20, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color.black, lineWidth: 2)
-            )
-    }
 }
 
 #Preview {
