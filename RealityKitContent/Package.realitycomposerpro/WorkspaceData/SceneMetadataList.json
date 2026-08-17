@@ -15,7 +15,10 @@
     "objectMetadataList" : [
       [
         "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
-        "Root"
+        "Root",
+        "MangoItem",
+        "Materials",
+        "Material_003"
       ],
       {
         "isExpanded" : true,
@@ -23,8 +26,7 @@
       },
       [
         "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
-        "Root",
-        "TreeItem"
+        "Root"
       ],
       {
         "isExpanded" : true,
@@ -39,22 +41,25 @@
         "disallowsFraming" : false,
         "isExpanded" : false,
         "isLocked" : false
-      },
-      [
-        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
-        "Root",
-        "MangoItem",
-        "Materials",
-        "Material_003"
-      ],
-      {
-        "isExpanded" : true,
-        "isLocked" : false
       }
     ]
   },
   "E70C1572-9703-40D5-BFC9-327F1DC407C9" : {
     "objectMetadataList" : [
+      [
+        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
+        "Root",
+        "TreeItem",
+        "Meshes",
+        "Sketchfab_model",
+        "Root",
+        "Plane"
+      ],
+      {
+        "disallowsFraming" : true,
+        "isExpanded" : false,
+        "isLocked" : false
+      },
       [
         "E70C1572-9703-40D5-BFC9-327F1DC407C9",
         "Root",
@@ -84,20 +89,6 @@
       ],
       {
         "isExpanded" : true,
-        "isLocked" : false
-      },
-      [
-        "E70C1572-9703-40D5-BFC9-327F1DC407C9",
-        "Root",
-        "TreeItem",
-        "Meshes",
-        "Sketchfab_model",
-        "Root",
-        "Plane"
-      ],
-      {
-        "disallowsFraming" : true,
-        "isExpanded" : false,
         "isLocked" : false
       },
       [
