@@ -25,7 +25,7 @@ struct HUDView: View {
             case .scanCompletePrompt:
                 ScanDialogueBubbleView(
                     lines: [
-                        "Scan the surrounding area first to start the game....."
+                        "Scan the surrounding area first to start the game..."
                     ],
                     mascotName: "fly",
                     bubbleImageName: "long-bubble-card",
@@ -86,15 +86,15 @@ struct HUDView: View {
 
     private var topBar: some View {
         HStack {
-            if world.model.hudStage != .mission {
-                // for debugging purposes — remove entirely once mission flow is verified
-                circleButton(
-                    icon: "chevron.left",
-                    size: 58,
-                    iconSize: 24,
-                    action: onBack
-                )
-            }
+//            if world.model.hudStage != .mission {
+//                // for debugging purposes — remove entirely once mission flow is verified
+//                circleButton(
+//                    icon: "chevron.left",
+//                    size: 58,
+//                    iconSize: 24,
+//                    action: onBack
+//                )
+//            }
 
             if world.model.hudStage == .mission {
                 MangoCounterView(

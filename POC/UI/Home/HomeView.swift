@@ -55,7 +55,7 @@ struct HomeView: View {
     //Background
     private var background: some View {
             ZStack {
-                Image("Onboarding full")
+                Image("onboarding-with-star")
                     .ignoresSafeArea()
             }
             //debug

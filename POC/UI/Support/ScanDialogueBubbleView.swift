@@ -36,7 +36,7 @@ struct ScanDialogueBubbleView: View {
         VStack {
             HStack(
                 alignment: .top,
-                spacing: -8
+                spacing: -108
             ) {
                 bubble
 
@@ -46,8 +46,8 @@ struct ScanDialogueBubbleView: View {
                         height: 110
                     )
                     .offset(
-                        x: -12,
-                        y: 38
+                        x: 45,
+                        y: 15
                     )
             }
             .frame(
@@ -57,7 +57,7 @@ struct ScanDialogueBubbleView: View {
 
             Spacer()
         }
-        .padding(.top, 70)
+        .padding(.top, 10)
         .padding(.horizontal, 24)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -92,7 +92,7 @@ struct ScanDialogueBubbleView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.75)
                 .padding(.horizontal, 18)
-                .padding(.bottom, 14)
+                .padding(.top, 18)
                 .frame(
                     maxWidth: .infinity,
                     maxHeight: .infinity,
