@@ -15,15 +15,57 @@ struct HUDView: View {
 
     var body: some View {
         ZStack {
+            
             reticle
+            
+            switch world.model.hudStage {
+            case .scanning:
+                EmptyView()
 
+            case .scanCompletePrompt:
+                ScanDialogueBubbleView(
+                    lines: [
+                        "Scan the surrounding area first to start the game....."
+                    ],
+                    mascotName: "fly",
+                    bubbleImageName: "long-bubble-card",
+                    onFinishedAllLines: {
+                        withAnimation {
+                            world.model.hudStage = .transitioning
+                        }
+                    }
+                )
+                .transition(.opacity)
+
+            case .transitioning:
+                GIFImageView(name: "light-to-dark-transition")
+                    .ignoresSafeArea()
+                    .task {
+                        // Estimate — adjust to the gif's real frame-count x delay
+                        // if it should sync exactly with the animation's end.
+                        try? await Task.sleep(for: .seconds(1.4))
+                        withAnimation { world.model.hudStage = .mission }
+                    }
+                    .transition(.opacity)
+
+            case .mission:
+                EmptyView()
+            }
+            
             VStack {
                 topBar
 
                 Spacer()
 
                 status
-
+                
+                if world.model.hudStage == .mission {
+                    MissionChatBubbleView(
+                        lines: ["I sense there are \(world.model.missionMangoTarget) mango here, let's find them."]
+                    )
+                    .padding(.bottom, 8)
+                }
+                
                 controls
             }
             .padding(.horizontal, 28)
@@ -35,40 +77,36 @@ struct HUDView: View {
 //            print("ping-btn found:", UIImage(named: "ping-btn") != nil)
 //            print("eat-btn found:", UIImage(named: "eat-btn") != nil)
 //        }
+        .onChange(of: world.model.scanReady) { _, isReady in
+            if isReady {
+                withAnimation { world.model.hudStage = .scanCompletePrompt }
+            }
+        }
     }
 
     private var topBar: some View {
         HStack {
-            
-            // for debugging purposes
-            circleButton(
-                icon: "chevron.left",
-                size: 58,
-                iconSize: 24,
-                action: onBack
-            )
+            if world.model.hudStage != .mission {
+                // for debugging purposes — remove entirely once mission flow is verified
+                circleButton(
+                    icon: "chevron.left",
+                    size: 58,
+                    iconSize: 24,
+                    action: onBack
+                )
+            }
+
+            if world.model.hudStage == .mission {
+                MangoCounterView(
+                    eatenCount: world.model.mangoEatenCount,
+                    target: world.model.missionMangoTarget
+                )
+            }
 
             Spacer()
-
-//            circleButton(
-//                icon: "info",
-//                size: 58,
-//                iconSize: 24,
-//                action: onInfo
-//            )
-//            circleButton(
-//                icon:
-//                    world.model.dimOn
-//                    ? "moon.stars.fill"
-//                    : "sun.max.fill",
-//                size: 64,
-//                iconSize: 25
-//            ) {
-//                world.perform(.toggleDim)
-//            }.glassEffect()
         }
     }
-
+    
     @ViewBuilder
     private var status: some View {
         if !world.model.msg.isEmpty {
@@ -214,6 +252,7 @@ struct HUDView: View {
         }
         .allowsHitTesting(false)
     }
+    
 
     private func circleButton(
         icon: String,

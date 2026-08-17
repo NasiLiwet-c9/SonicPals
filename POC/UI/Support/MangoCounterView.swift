@@ -8,11 +8,22 @@
 import SwiftUI
 
 struct MangoCounterView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+    let eatenCount: Int
+    let target: Int
 
-#Preview {
-    MangoCounterView()
+    var body: some View {
+        HStack(spacing: 6) {
+            Image("mango-miniicon")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 22, height: 22)
+
+            Text("\(eatenCount)/\(target)")
+                .font(.system(size: 15, weight: .heavy, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial, in: Capsule())
+    }
 }

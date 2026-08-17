@@ -14,7 +14,7 @@ struct HomeView: View {
         "Hi.... i'm Battiw",
         "I'm hungry, help me find something to eat tonight...!"
     ]
-    var primaryButtonText = "Fly and Find"
+    var primaryButtonText = "Fly and Find!"
     var onStart: () -> Void = {}
     var onSelectMode: () -> Void = {}
 
@@ -31,16 +31,16 @@ struct HomeView: View {
 
                 VStack(spacing: 14) {
                     Button(action: onStart) {
-                        Text(primaryButtonText.uppercased())
-                            .font(.system(size: 17, weight: .heavy, design: .rounded))
-                            .foregroundStyle(Color.black)
-                            .frame(maxWidth: 200)
-                            .frame(height: 56)
-                            .background(Color.yellow, in: Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(Color.black, lineWidth: 2)
-                            )
+                        ZStack {
+                            Image("filled-button-border")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+
+                            Text(primaryButtonText.uppercased())
+                                .font(.system(size: 20, weight: .heavy, design: .rounded))
+                                .foregroundStyle(Color.black)
+                        }
+                        .frame(width: 220, height: 64)
                     }
                     .padding(.horizontal, 32)
                     .buttonStyle(.plain)

@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 @MainActor
-final class DialogueController: ObservableObject {
+final class DialogueViewModel: ObservableObject {
     @Published private(set) var visibleText: String = ""
     @Published private(set) var isLineFullyTyped = false
     @Published private(set) var currentLineIndex = 0

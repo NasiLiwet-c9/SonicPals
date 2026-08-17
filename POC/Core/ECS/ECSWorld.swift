@@ -91,6 +91,14 @@ final class ECSWorld {
             started = false
             model.msg = "Camera or LiDAR unavailable"
         }
+        
+        Task { @MainActor [weak self] in
+            // PLACEHOLDER: stands in for a real "enough of the room is
+            // scanned" signal. Swap this for actual mesh-coverage data
+            // once FPConeScan/FPMeshRead exposes one.
+            try? await Task.sleep(for: .seconds(4))
+            self?.model.scanReady = true
+        }
     }
     
     func stop() async {

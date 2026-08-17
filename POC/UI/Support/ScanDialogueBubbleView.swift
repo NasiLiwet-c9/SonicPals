@@ -2,7 +2,7 @@
 //  ScanDialogueBubbleView.swift
 //  POC
 //
-//  Scan prompt shown after the room scan is completed.
+//  Created by Asaryun on 17/08/26.
 //
 
 import SwiftUI

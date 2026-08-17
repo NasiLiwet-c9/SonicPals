@@ -27,4 +27,19 @@ final class AppModel {
     var canSpawn: Bool {
         lidarOK
     }
+    
+    enum HUDStage {
+        case scanning
+        case scanCompletePrompt
+        case transitioning
+        case mission
+    }
+
+    var hudStage: HUDStage = .scanning
+    var scanReady = false
+
+    let missionMangoTarget = 3
+
 }
+
+
