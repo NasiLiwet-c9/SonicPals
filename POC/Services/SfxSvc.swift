@@ -21,7 +21,7 @@ final class SfxSvc {
         sonarPlayer = makePlayer(named: "sonar-sfx", ext: "mp3")
         ambiencePlayer = makePlayer(named: "night ambience-sfx", ext: "mp3")
         ambiencePlayer?.numberOfLoops = -1
-        ambiencePlayer?.volume = 0.5
+        ambiencePlayer?.volume = 0.3
         eatPlayer = makePlayer(named: "eat-sfx", ext: "mp3")
     }
 
