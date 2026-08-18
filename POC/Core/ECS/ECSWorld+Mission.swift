@@ -53,13 +53,15 @@ extension ECSWorld {
         let eaten = model.mangoEatenCount
         let goal = model.missionMangoTarget
 
-        guard eaten < goal else {
+        // Check if final target was reached
+        if eaten >= goal {
             missionTask?.cancel()
             missionTask = nil
             model.missionComplete = true
 
             showMissionDialogue([
-                "Great job! You found all \(goal) mangoes!"
+                "Great job! You found all \(goal) mangoes!",
+                "I'm full now, it's time to go home...."
             ])
 
 #if DEBUG
@@ -68,6 +70,7 @@ extension ECSWorld {
             return
         }
 
+        // Progressing to next target
         showMissionDialogue(
             eaten == 1
                 ? ["Great! One mango down. Let's search for another tree!"]
@@ -80,7 +83,37 @@ extension ECSWorld {
 
         spawnNextTarget(delayMs: 450)
     }
+    
+    func restartMission() {
+            // 1. Cancel background tasks & clear entities
+            missionTask?.cancel()
+            missionTask = nil
+            clear()
 
+            // 2. Clear all completion & quiz flags so overlays dismiss
+            model.showMissionCompleteCard = false
+            model.showQuiz = false
+            model.quizAnswered = false
+            model.quizCorrect = false
+            model.missionDialogueVisible = false
+            model.missionComplete = false
+            model.missionStarted = false
+            model.mangoEatenCount = 0
+
+            // 3. Reset HUD back to scanning or initial state
+            model.hudStage = .scanning
+
+    #if DEBUG
+            print("[MISSION DEBUG] MISSION RESTARTED & OVERLAYS CLEARED")
+    #endif
+
+            // 4. Delay beginning the new mission slightly to let SwiftUI unmount QuestionCardView
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .milliseconds(300))
+                self?.beginMission()
+            }
+        }
+    
     private func showMissionDialogue(_ lines: [String]) {
         model.missionDialogueLines = lines
         model.missionDialogueID += 1

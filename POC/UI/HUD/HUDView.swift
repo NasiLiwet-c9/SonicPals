@@ -19,6 +19,59 @@ struct HUDView: View {
         ZStack {
             reticle
             
+//            #if DEBUG
+//            Button("SKIP TO COMPLETION") {
+//                world.model.missionComplete = true
+//                world.model.showMissionCompleteCard = true
+//                world.model.missionDialogueVisible = false
+//            }
+//            .buttonStyle(.borderedProminent)
+//            .position(x: 120, y: 100)
+//            .zIndex(100)
+//            #endif
+//            
+            if world.model.quizTransitionID > 0,
+               !world.model.showQuiz {
+                GIFImageView(
+                    name: "dark-to-light-transition"
+                )
+                .ignoresSafeArea()
+                .id(world.model.quizTransitionID)
+                .zIndex(15)
+                .allowsHitTesting(false)
+                .task(id: world.model.quizTransitionID) {
+                    try? await Task.sleep(
+                        for: .milliseconds(700)
+                    )
+
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        world.model.showQuiz = true
+                    }
+                }
+            }
+            
+            if world.model.showMissionCompleteCard {
+                MissionCompleteCardView {
+                        startQuizTransition()
+                    }
+                .transition(.opacity)
+                .zIndex(10)
+            }
+            
+            if world.model.showQuiz {
+                QuestionCardView(
+                    onPlayAgain: {
+                        restartMission()
+                    },
+                    onBackToMenu: {
+                        onBack()
+                    }
+                )
+                .id(world.model.quizTransitionID)
+                .transition(.opacity)
+                .zIndex(20)
+            }
+            
             if world.model.eatAnimationVisible {
                 GIFImageView(name: "eat-animation")
                     .aspectRatio(contentMode: .fill)
@@ -125,6 +178,9 @@ struct HUDView: View {
                         onFinishedAllLines: {
                             withAnimation {
                                 world.dismissMissionDialogue()
+                                        if world.model.missionComplete {
+                                            world.model.showMissionCompleteCard = true
+                                        }
                             }
                         }
                     )
@@ -372,5 +428,39 @@ struct HUDView: View {
         case .none:
             EmptyView()
         }
+    }
+    
+    private func startQuizTransition() {
+        world.model.showMissionCompleteCard = false
+        world.model.showQuiz = false
+
+        world.model.quizAnswered = false
+        world.model.quizCorrect = false
+
+        world.model.quizTransitionID += 1
+
+        withAnimation(.easeInOut(duration: 0.2)) {
+            world.model.missionDark = false
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(
+                for: .milliseconds(50)
+            )
+
+            world.model.missionDark = true
+
+            try? await Task.sleep(
+                for: .milliseconds(700)
+            )
+
+            world.model.showQuiz = true
+        }
+    }
+    private func restartMission() {
+        withAnimation {
+                    scanIntroDone = false
+                }
+        world.restartMission()
     }
 }

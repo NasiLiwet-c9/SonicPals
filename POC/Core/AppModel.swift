@@ -51,4 +51,12 @@ final class AppModel {
     
     var eatAnimationID = 0
     var eatAnimationVisible = false
+    
+    var showMissionCompleteCard = false
+    
+    var showQuiz = false
+    var quizTransitionID = 0
+
+    var quizAnswered = false
+    var quizCorrect = false
 }
