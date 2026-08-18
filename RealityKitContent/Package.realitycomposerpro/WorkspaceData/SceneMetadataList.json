@@ -15,10 +15,7 @@
     "objectMetadataList" : [
       [
         "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
-        "Root",
-        "MangoItem",
-        "Materials",
-        "Material_003"
+        "Root"
       ],
       {
         "isExpanded" : true,
@@ -26,7 +23,10 @@
       },
       [
         "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
-        "Root"
+        "Root",
+        "MangoItem",
+        "Materials",
+        "Material_003"
       ],
       {
         "isExpanded" : true,
@@ -39,7 +39,28 @@
       ],
       {
         "disallowsFraming" : false,
+        "isExpanded" : true,
+        "isLocked" : false
+      },
+      [
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
+        "Root",
+        "MangoItem",
+        "Meshes"
+      ],
+      {
+        "disallowsFraming" : false,
         "isExpanded" : false,
+        "isLocked" : false
+      },
+      [
+        "B7F69422-ACBA-4D3D-8979-933C4A8D5C13",
+        "Root",
+        "MangoItem",
+        "Materials"
+      ],
+      {
+        "isExpanded" : true,
         "isLocked" : false
       }
     ]

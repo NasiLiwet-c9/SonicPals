@@ -18,7 +18,7 @@ def Xform "Root"
         references = @Mango.usdz@
     )
     {
-        reorder nameChildren = ["Materials", "Meshes"]
+        reorder nameChildren = ["ParticleEmitter", "Materials", "Meshes"]
         quatf xformOp:orient = (1, 0, 0, 0)
         float3 xformOp:scale = (0.014948546, 0.014948546, 0.014948546)
         float3 xformOp:translate = (4.033201, 2.0821085, 4.4146843)
@@ -44,6 +44,54 @@ def Xform "Root"
             {
                 token outputs:mtlx:surface
                 token outputs:realitykit:vertex
+            }
+        }
+
+        def Xform "ParticleEmitter"
+        {
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (120, 120, 120)
+            float3 xformOp:translate = (6.7006216, 15.514219, 0.0003662109)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def RealityKitComponent "VFXEmitter"
+            {
+                token info:id = "RealityKit.VFXEmitter"
+
+                def RealityKitStruct "currentState"
+                {
+                    int64 burstCount = 0
+                    token emitterShape = "Sphere"
+                    bool isLocalFields = 1
+                    float particleSpeed = 0
+                    float3 shapeSize = (0.15, 0.15, 0.15)
+                    bool spawnInheritParentColor = 1
+                    token spawnOccasion = "OnBirth"
+                    float spawnVelocityFactor = 0
+
+                    def RealityKitStruct "mainEmitter"
+                    {
+                        float birthRate = 15
+                        float birthRateVariation = 5
+                        token blendMode = "Additive"
+                        float4 endColorA = (0.5072854, 0.03240655, 0.016743759, 1)
+                        float4 endColorB = (1, 1, 1, 1)
+                        token opacityOverLife = "QuickFadeInOut"
+                        asset particleImage = @@
+                        double particleLifeSpan = 0.8
+                        float particleSize = 0.018
+                        float sizeMultiplierAtEndOfLifespan = 0.1
+                        float4 startColorA = (0.53191257, 0.13993196, 0.0011883774, 1)
+                        float4 startColorB = (1, 1, 1, 1)
+                        bool useEndColor = 1
+                        bool useEndColorRange = 1
+                        bool useStartColorRange = 1
+                    }
+
+                    def RealityKitStruct "spawnedEmitter"
+                    {
+                    }
+                }
             }
         }
     }
