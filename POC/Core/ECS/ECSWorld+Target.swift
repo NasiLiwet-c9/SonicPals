@@ -7,6 +7,7 @@
 
 import Foundation
 import RealityKit
+import simd
 
 extension ECSWorld {
     func spawnTarget() {
@@ -141,6 +142,10 @@ extension ECSWorld {
             return
         }
         sfx.eat()
+
+        let mangoWorldPos = mango.position(relativeTo: nil)
+        playMangoFX(at: mangoWorldPos)
+
         mango.removeFromParent()
 
         model.mangoEatenCount += 1
@@ -166,5 +171,43 @@ extension ECSWorld {
     private func playEatAnimation() {
         model.eatAnimationID += 1
         model.eatAnimationVisible = true
+    }
+
+    /// Pulls the "MangoFX" entity out of the target tree that's about
+    /// to be torn down, drops it at the mango's last world position,
+    /// and (re)starts its particle emitter(s). It's reparented onto
+    /// `anchor` — rather than left where it is — so it survives the
+    /// `targetEntity?.removeFromParent()` that happens right after
+    /// this call, then gets cleaned up a couple seconds later.
+    private func playMangoFX(at worldPos: SIMD3<Float>) {
+        guard let fx = targetEntity?.findEntity(named: "MangoFX") else {
+#if DEBUG
+            print("[MANGO FX] NO \"MangoFX\" ENTITY FOUND UNDER targetEntity")
+#endif
+            return
+        }
+
+        fx.setParent(anchor, preservingWorldTransform: false)
+        fx.setPosition(worldPos, relativeTo: nil)
+        fx.isEnabled = true
+
+        restartParticles(on: fx)
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            fx.removeFromParent()
+        }
+    }
+
+    private func restartParticles(on entity: Entity) {
+        if var emitter = entity.components[ParticleEmitterComponent.self] {
+            emitter.isEmitting = true
+            emitter.restart()
+            entity.components[ParticleEmitterComponent.self] = emitter
+        }
+
+        for child in entity.children {
+            restartParticles(on: child)
+        }
     }
 }

@@ -10,7 +10,7 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["MangoItem", "MangoSpawnPoint1", "MangoSpawnPoint2", "MangoSpawnPoint3", "MangoSpawnPoint4", "MangoSpawnPoint5", "TreeItem"]
+    reorder nameChildren = ["MangoItem", "MangoSpawnPoint1", "MangoSpawnPoint2", "MangoSpawnPoint3", "MangoSpawnPoint4", "MangoSpawnPoint5", "TreeItem", "MangoFX"]
     def "MangoItem" (
         customData = {
             float3 rotationEulerHint = (0, 0, 0)
@@ -75,14 +75,14 @@ def Xform "Root"
                         float birthRateVariation = 5
                         token blendMode = "Additive"
                         float4 endColorA = (0.5072854, 0.03240655, 0.016743759, 1)
-                        float4 endColorB = (1, 1, 1, 1)
+                        float4 endColorB = (0.509961, 0.14690435, 0.007592777, 1)
                         token opacityOverLife = "QuickFadeInOut"
                         asset particleImage = @@
                         double particleLifeSpan = 0.8
                         float particleSize = 0.018
                         float sizeMultiplierAtEndOfLifespan = 0.1
                         float4 startColorA = (0.53191257, 0.13993196, 0.0011883774, 1)
-                        float4 startColorB = (1, 1, 1, 1)
+                        float4 startColorB = (0.6669336, 0.090331085, 0.025241388, 1)
                         bool useEndColor = 1
                         bool useEndColorRange = 1
                         bool useStartColorRange = 1
@@ -167,6 +167,53 @@ def Xform "Root"
         float3 xformOp:scale = (0.015238972, 0.015238972, 0.015238972)
         float3 xformOp:translate = (0.44356185, 0, -0.2783053)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoFX"
+    {
+        float3 xformOp:translate = (4.070792, 2.3340952, 4.4225893)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "VFXEmitter"
+        {
+            token info:id = "RealityKit.VFXEmitter"
+
+            def RealityKitStruct "currentState"
+            {
+                int64 burstCount = 25
+                int64 burstCountVariation = 5
+                double emissionDuration = 0.5
+                token emitterShape = "Sphere"
+                bool loops = 0
+                float3 shapeSize = (0.15, 0.15, 0.15)
+                token spawnOccasion = "OnBirth"
+
+                def RealityKitStruct "mainEmitter"
+                {
+                    float3 acceleration = (0, -3, 0)
+                    float birthRate = 20
+                    float dampingFactor = 4
+                    float4 endColorA = (0.5199851, 0.03846991, 0.029153612, 1)
+                    float4 endColorB = (0.5298721, 0.14938182, 0.014530703, 1)
+                    token opacityOverLife = "EaseFadeOut"
+                    float particleAngularVelocity = 5
+                    asset particleImage = @pixil-frame-0-2.png@
+                    double particleLifeSpan = 0.35
+                    double particleLifeSpanVariation = 0.15
+                    float particleSize = 0.06
+                    float spreadingAngle = 6.2831855
+                    float4 startColorA = (0.49411765, 0.12941177, 0.003921569, 1)
+                    float4 startColorB = (0.5464093, 0.040986948, 0.020220842, 1)
+                    bool useEndColor = 1
+                    bool useEndColorRange = 1
+                    bool useStartColorRange = 1
+                }
+
+                def RealityKitStruct "spawnedEmitter"
+                {
+                }
+            }
+        }
     }
 }
 
