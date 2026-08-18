@@ -21,9 +21,10 @@ extension ECSWorld {
         model.dimOn = true
         lastTargetPos = nil
 
-        showMissionDialogue(
-            "I sense there are \(model.missionMangoTarget) mango here, let's find them."
-        )
+        showMissionDialogue([
+            "I sense there are \(model.missionMangoTarget) mango here, let's find them.",
+            "Use the button below to help me find those mangoes."
+        ])
 
 #if DEBUG
         print("[MISSION DEBUG] MISSION STARTED")
@@ -39,9 +40,9 @@ extension ECSWorld {
     func showFoundTreeDialogue() {
         guard model.hudStage == .mission, !model.missionComplete else { return }
 
-        showMissionDialogue(
+        showMissionDialogue([
             "Great! You found the tree. Now find the mango!"
-        )
+        ])
 
 #if DEBUG
         print("[MISSION DEBUG] TREE FOUND — FIND MANGO")
@@ -57,9 +58,9 @@ extension ECSWorld {
             missionTask = nil
             model.missionComplete = true
 
-            showMissionDialogue(
+            showMissionDialogue([
                 "Great job! You found all \(goal) mangoes!"
-            )
+            ])
 
 #if DEBUG
             print("[MISSION DEBUG] MISSION COMPLETE \(eaten)/\(goal)")
@@ -67,15 +68,11 @@ extension ECSWorld {
             return
         }
 
-        if eaten == 1 {
-            showMissionDialogue(
-                "Great! One mango down. Let's search for another tree!"
-            )
-        } else {
-            showMissionDialogue(
-                "Nice! One more mango. Let's find the last tree!"
-            )
-        }
+        showMissionDialogue(
+            eaten == 1
+                ? ["Great! One mango down. Let's search for another tree!"]
+                : ["Nice! One more mango. Let's find the last tree!"]
+        )
 
 #if DEBUG
         print("[MISSION DEBUG] REQUESTING TREE \(eaten + 1)/\(goal)")
@@ -84,8 +81,8 @@ extension ECSWorld {
         spawnNextTarget(delayMs: 450)
     }
 
-    private func showMissionDialogue(_ text: String) {
-        model.missionDialogue = text
+    private func showMissionDialogue(_ lines: [String]) {
+        model.missionDialogueLines = lines
         model.missionDialogueID += 1
         model.missionDialogueVisible = true
     }

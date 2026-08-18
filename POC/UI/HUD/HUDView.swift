@@ -18,7 +18,21 @@ struct HUDView: View {
     var body: some View {
         ZStack {
             reticle
-
+            
+            if world.model.eatAnimationVisible {
+                GIFImageView(name: "eat-animation")
+                    .aspectRatio(contentMode: .fill)
+                    .ignoresSafeArea()
+                    .id(world.model.eatAnimationID)
+                    .allowsHitTesting(false)
+                    .task(id: world.model.eatAnimationID) {
+                        // Matches the gif's real loop length (5 frames x 100ms).
+                        try? await Task.sleep(for: .milliseconds(500))
+                        world.model.eatAnimationVisible = false
+                    }
+                    .transition(.opacity)
+            }
+            
             switch world.model.hudStage {
             case .scanning:
                 if !scanIntroDone {
@@ -107,9 +121,7 @@ struct HUDView: View {
                 if world.model.hudStage == .mission,
                    world.model.missionDialogueVisible {
                     MissionChatBubbleView(
-                        lines: [
-                            world.model.missionDialogue
-                        ],
+                        lines: world.model.missionDialogueLines,
                         onFinishedAllLines: {
                             withAnimation {
                                 world.dismissMissionDialogue()

@@ -157,7 +157,14 @@ extension ECSWorld {
         model.targetFound = false
 
         setMsg("")
+        
+        playEatAnimation()
 
         advanceMission()
+    }
+    
+    private func playEatAnimation() {
+        model.eatAnimationID += 1
+        model.eatAnimationVisible = true
     }
 }

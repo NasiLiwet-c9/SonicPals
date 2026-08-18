@@ -7,18 +7,17 @@
 
 import Foundation
 import SwiftUI
-
 struct MissionChatBubbleView: View {
     @StateObject private var viewModel: DialogueViewModel
 
-    let avatarName: String
-    let bubbleImageName: String
+    let rightBubbleImageName: String
+    let leftBubbleImageName: String
 
     init(
         lines: [String],
         typingSpeed: Double = 0.03,
-        avatarName: String = "happybattiw-with-eyeglass",
-        bubbleImageName: String = "long-bubble-card",
+        rightBubbleImageName: String = "long-bubble-card",
+        leftBubbleImageName: String = "long-bubble-card-left",
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         _viewModel = StateObject(
@@ -28,72 +27,48 @@ struct MissionChatBubbleView: View {
                 onFinishedAllLines: onFinishedAllLines
             )
         )
+        self.rightBubbleImageName = rightBubbleImageName
+        self.leftBubbleImageName = leftBubbleImageName
+    }
 
-        self.avatarName = avatarName
-        self.bubbleImageName = bubbleImageName
+    private var isEvenLine: Bool {
+        viewModel.currentLineIndex.isMultiple(of: 2)
     }
 
     var body: some View {
         HStack {
-            if viewModel.currentLineIndex.isMultiple(of: 2) {
-                // FIRST LINE → RIGHT
+            if isEvenLine {
                 Spacer(minLength: 0)
-
-                dialogueGroup
+                bubble(imageName: rightBubbleImageName)
             } else {
-                // SECOND LINE → LEFT
-                dialogueGroup
-
+                bubble(imageName: leftBubbleImageName)
                 Spacer(minLength: 0)
             }
         }
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-        .onTapGesture {
-            viewModel.advance()
-        }
-        .onAppear {
-            viewModel.start()
-        }
-        .onDisappear {
-            viewModel.stop()
-        }
+        .onTapGesture { viewModel.advance() }
+        .onAppear { viewModel.start() }
+        .onDisappear { viewModel.stop() }
     }
 
-    private var dialogueGroup: some View {
-        VStack(spacing: -4) {
-            bubble
-        }
-    }
-
-    private var bubble: some View {
+    private func bubble(imageName: String) -> some View {
         ZStack {
-            Image(bubbleImageName)
+            Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
 
             Text(viewModel.visibleText)
-                .font(
-                    .system(
-                        size: 13,
-                        weight: .bold,
-                        design: .rounded
-                    )
-                )
+                .font(.system(size: 16, weight: .bold, design: .rounded))
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
                 .foregroundStyle(.black)
-                .padding(.horizontal, 17)
-                .padding(.bottom, 16)
-                .frame(
-                    maxWidth: .infinity,
-                    alignment: .topLeading
-                )
+                .padding(.horizontal, 18)
+                .padding(.bottom, 18)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
         }
-        .frame(
-            width: 190,
-            height: 82
-        )
+        // long-bubble-card's real pixel ratio is 232x100.
+        .frame(width: 230, height: 230 * 100 / 232)
     }
 }

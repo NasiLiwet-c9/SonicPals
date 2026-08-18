@@ -43,9 +43,12 @@ final class AppModel {
     var missionStarted = false
     var missionComplete = false
     var missionDark = false
-    var missionDialogue = ""
+    var missionDialogueLines: [String] = []
     var missionDialogueID = 0
     var missionDialogueVisible = false
 
     let missionMangoTarget = 3
+    
+    var eatAnimationID = 0
+    var eatAnimationVisible = false
 }
