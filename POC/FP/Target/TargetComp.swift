@@ -27,6 +27,7 @@ struct TargetComp: Component {
     let lockYaw: Float
 
     var seenParts: Set<Int> = []
+    var pendingRevealAt: [Int: TimeInterval] = [:]
     var pulseUntil: [Int: TimeInterval] = [:]
 
     var found = false

@@ -15,19 +15,28 @@ struct TargetPartSvc {
         pulse: Entity,
         trace: Entity
     ) -> [TargetEchoPart]? {
-        let ps = TargetFind.models(
-            in: pulse
-        )
-
-        let ts = TargetFind.models(
-            in: trace
-        )
-
-        guard ps.count == ts.count else {
+        guard let space =
+            pulse.parent else {
             return nil
         }
 
-        var out: [TargetEchoPart] = []
+        let ps =
+            TargetFind.models(
+                in: pulse
+            )
+
+        let ts =
+            TargetFind.models(
+                in: trace
+            )
+
+        guard ps.count
+                == ts.count else {
+            return nil
+        }
+
+        var out:
+            [TargetEchoPart] = []
 
         out.reserveCapacity(
             ps.count
@@ -37,28 +46,33 @@ struct TargetPartSvc {
             let p = ps[i]
             let t = ts[i]
 
-            let b = p.visualBounds(
-                recursive: false,
-                relativeTo: pulse,
-                excludeInactive: false
-            )
+            let b =
+                p.visualBounds(
+                    recursive: false,
+                    relativeTo: space,
+                    excludeInactive: false
+                )
 
             guard b.extents.x > 0.001
-                || b.extents.y > 0.001
-                || b.extents.z > 0.001 else {
+                    || b.extents.y > 0.001
+                    || b.extents.z > 0.001 else {
                 continue
             }
 
+            let half =
+                b.extents * 0.5
+
             let r = max(
-                simd_length(
-                    b.extents
-                ) * 0.5,
-                0.04
+                simd_length(half),
+                0.02
             )
 
-            let n = p.name.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
+            let n =
+                p.name
+                .trimmingCharacters(
+                    in:
+                        .whitespacesAndNewlines
+                )
 
             out.append(
                 TargetEchoPart(
@@ -69,12 +83,14 @@ struct TargetPartSvc {
                     pulse: p,
                     trace: t,
                     center: b.center,
-                    half: b.extents * 0.5,
+                    half: half,
                     radius: r,
-                    isMango: TargetFind.inside(
-                        p,
-                        named: "MangoTarget"
-                    )
+                    isMango:
+                        TargetFind.inside(
+                            p,
+                            named:
+                                "MangoTarget"
+                        )
                 )
             )
         }

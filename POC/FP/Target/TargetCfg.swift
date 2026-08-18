@@ -7,9 +7,9 @@
 
 import Foundation
 
-enum TargetCfg {
+nonisolated enum TargetCfg {
     enum Tree {
-        static let height: Float = 1.35
+        static let height: Float = 1.40
     }
 
     enum Spawn {
@@ -37,6 +37,23 @@ enum TargetCfg {
         static let wallMaxRadius: Float = 0.64
         static let objectMinRadius: Float = 0.48
         static let objectMaxRadius: Float = 0.60
+        static let overheadRadius: Float = 0.38
+        static let overheadStartPadding: Float = 0.18
+        static let overheadBottomClearance: Float = 0.16
+    }
+
+    enum Echo {
+        static let waveTravelS: TimeInterval = 0.85
+        static let pulseHoldS: TimeInterval = 1.25
+
+        static let treePulseAlpha: Float = 1.0
+        static let treeTraceAlpha: Float = 0.14
+
+        static let mangoPulseAlpha: Float = 0.82
+        static let mangoTraceAlpha: Float = 0.50
+
+        static let mangoPulseScale: Float = 1.05
+        static let mangoTraceScale: Float = 1.08
     }
 
     enum Preflight {

@@ -6,30 +6,32 @@
 //
 
 struct FPClassify {
+    private let dangerMaxM: Float = 0.45
+    private let warningMaxM: Float = 0.85
+    private let semiSafeMaxM: Float = 1.20
+
     func key(
         distanceM: Float,
         fade: Float
     ) -> FPKey {
         FPKey(
-            band:
-                band(distanceM),
-            zone:
-                zone(fade)
+            band: band(distanceM),
+            zone: zone(fade)
         )
     }
 
     private func band(
         _ distanceM: Float
     ) -> FPBand {
-        if distanceM < 0.45 {
+        if distanceM < dangerMaxM {
             return .hot
         }
 
-        if distanceM < 0.85 {
+        if distanceM < warningMaxM {
             return .near
         }
 
-        if distanceM < 1.20 {
+        if distanceM < semiSafeMaxM {
             return .mid
         }
 

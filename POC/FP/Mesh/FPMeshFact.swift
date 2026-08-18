@@ -9,8 +9,10 @@ import RealityKit
 import UIKit
 
 @MainActor
-final class FPMeshFact: FPMeshMakePort {
-    private let waveMs: Float = 850
+final class FPMeshFact:
+    FPMeshMakePort {
+    private let waveMs:
+        Float = 850
 
     func make(
         from data: FPMeshData,
@@ -19,85 +21,129 @@ final class FPMeshFact: FPMeshMakePort {
     ) -> FPMeshLayer? {
         guard !data.pos.isEmpty,
               !data.idx.isEmpty,
-              let minM = data.minM else {
+              let minM =
+                data.minM else {
             return nil
         }
 
-        var desc = MeshDescriptor(
-            name:
-                "fp\(key.band.rawValue)\(key.zone.rawValue)"
-        )
+        var desc =
+            MeshDescriptor(
+                name:
+                    "fp\(key.band.rawValue)\(key.zone.rawValue)"
+            )
 
-        desc.positions = .init(data.pos)
+        desc.positions =
+            .init(
+                data.pos
+            )
 
         desc.primitives =
-            .triangles(data.idx)
+            .triangles(
+                data.idx
+            )
 
         guard let mesh =
-            try? MeshResource.generate(
-                from: [desc]
-            )
-        else {
+            try? MeshResource
+                .generate(
+                    from:
+                        [desc]
+                ) else {
             return nil
         }
 
-        let style = key.style
+        let style =
+            key.style
 
-        let root = Entity()
-        let pulse = Entity()
-        let trace = Entity()
+        let root =
+            Entity()
 
-        root.isEnabled = false
-        trace.isEnabled = false
+        let pulse =
+            Entity()
 
-        let fill = ModelEntity(
-            mesh: mesh,
-            materials: [
-                makeMat(
-                    color: style.color,
-                    alpha: style.fillA,
-                    lines: false
-                )
-            ]
+        let trace =
+            Entity()
+
+        root.isEnabled =
+            false
+
+        trace.isEnabled =
+            false
+
+        let fill =
+            ModelEntity(
+                mesh: mesh,
+                materials: [
+                    makeMat(
+                        color:
+                            style.color,
+                        alpha:
+                            style.fillA,
+                        lines:
+                            false
+                    )
+                ]
+            )
+
+        let wire =
+            ModelEntity(
+                mesh: mesh,
+                materials: [
+                    makeMat(
+                        color:
+                            style.color,
+                        alpha:
+                            style.wireA,
+                        lines:
+                            true
+                    )
+                ]
+            )
+
+        let traceWire =
+            ModelEntity(
+                mesh: mesh,
+                materials: [
+                    makeMat(
+                        color:
+                            style.color,
+                        alpha:
+                            traceAlpha(
+                                style.wireA
+                            ),
+                        lines:
+                            true
+                    )
+                ]
+            )
+
+        pulse.addChild(
+            fill
         )
 
-        let wire = ModelEntity(
-            mesh: mesh,
-            materials: [
-                makeMat(
-                    color: style.color,
-                    alpha: style.wireA,
-                    lines: true
-                )
-            ]
+        pulse.addChild(
+            wire
         )
 
-        let traceWire = ModelEntity(
-            mesh: mesh,
-            materials: [
-                makeMat(
-                    color: style.color,
-                    alpha:
-                        traceAlpha(
-                            style.wireA
-                        ),
-                    lines: true
-                )
-            ]
+        trace.addChild(
+            traceWire
         )
 
-        pulse.addChild(fill)
-        pulse.addChild(wire)
-        trace.addChild(traceWire)
+        root.addChild(
+            pulse
+        )
 
-        root.addChild(pulse)
-        root.addChild(trace)
+        root.addChild(
+            trace
+        )
 
         let amount =
             min(
                 max(
                     minM
-                    / max(range, 0.1),
+                    / max(
+                        range,
+                        0.1
+                    ),
                     0.03
                 ),
                 1
@@ -106,7 +152,8 @@ final class FPMeshFact: FPMeshMakePort {
         let travelMs =
             Int64(
                 (
-                    amount * waveMs
+                    amount
+                    * waveMs
                 )
                 .rounded()
             )
@@ -118,7 +165,8 @@ final class FPMeshFact: FPMeshMakePort {
             delayMs:
                 travelMs
                 + style.delayMs,
-            zone: key.zone
+            zone:
+                key.zone
         )
     }
 
@@ -127,10 +175,10 @@ final class FPMeshFact: FPMeshMakePort {
     ) -> Float {
         min(
             max(
-                source * 0.06,
-                0.008
+                source * 0.20,
+                0.05
             ),
-            0.024
+            0.18
         )
     }
 
@@ -145,22 +193,33 @@ final class FPMeshFact: FPMeshMakePort {
             )
 
         mat.triangleFillMode =
-            lines ? .lines : .fill
+            lines
+            ? .lines
+            : .fill
 
-        mat.faceCulling = .none
-        mat.readsDepth = true
-        mat.writesDepth = false
+        mat.faceCulling =
+            .none
 
-        mat.blending = .transparent(
-            opacity:
-                .init(
-                    floatLiteral:
-                        min(
-                            max(alpha, 0),
-                            1
-                        )
-                )
-        )
+        mat.readsDepth =
+            true
+
+        mat.writesDepth =
+            false
+
+        mat.blending =
+            .transparent(
+                opacity:
+                    .init(
+                        floatLiteral:
+                            min(
+                                max(
+                                    alpha,
+                                    0
+                                ),
+                                1
+                            )
+                    )
+            )
 
         return mat
     }

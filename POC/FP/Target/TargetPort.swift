@@ -11,21 +11,22 @@ import simd
 
 struct TargetEchoPart {
     let name: String
-    
     let pulse: Entity
     let trace: Entity
-    
     let center: SIMD3<Float>
     let half: SIMD3<Float>
     let radius: Float
-    
     let isMango: Bool
+}
+
+struct TargetWaveHit {
+    let index: Int
+    let distanceM: Float
 }
 
 struct TargetPart {
     let root: Entity
     let real: Entity
-    
     let parts: [TargetEchoPart]
     let height: Float
 }
@@ -38,7 +39,7 @@ struct TargetPose {
 @MainActor
 protocol TargetMaking: AnyObject {
     var loadError: String? { get }
-    
+
     func prepare() async -> Bool
     func make() -> TargetPart?
 }
@@ -59,5 +60,5 @@ protocol TargetWaveChecking {
         comp: TargetComp,
         data: WaveData,
         in scene: Scene
-    ) -> [Int]
+    ) -> [TargetWaveHit]
 }

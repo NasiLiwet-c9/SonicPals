@@ -7,6 +7,7 @@
 
 import RealityKit
 import UIKit
+import simd
 
 @MainActor
 struct TargetEchoSvc {
@@ -16,22 +17,28 @@ struct TargetEchoSvc {
     ) {
         set(
             on: pulse,
-            alpha: 0.82
+            alpha: TargetCfg.Echo.treePulseAlpha
         )
 
         set(
             on: trace,
-            alpha: 0.05
+            alpha: TargetCfg.Echo.treeTraceAlpha
         )
 
         setMango(
             on: pulse,
-            alpha: 1.0
+            alpha: TargetCfg.Echo.mangoPulseAlpha,
+            fill: true,
+            scale: TargetCfg.Echo.mangoPulseScale,
+            throughTree: true
         )
 
         setMango(
             on: trace,
-            alpha: 0.25
+            alpha: TargetCfg.Echo.mangoTraceAlpha,
+            fill: false,
+            scale: TargetCfg.Echo.mangoTraceScale,
+            throughTree: true
         )
     }
 
@@ -39,25 +46,12 @@ struct TargetEchoSvc {
         on entity: Entity,
         alpha: Float
     ) {
-        if var model = entity.components[
-            ModelComponent.self
-        ] {
-            let count = max(
-                model.materials.count,
-                1
-            )
+        if var model = entity.components[ModelComponent.self] {
+            let count = max(model.materials.count, 1)
+            let mat = echoMat(alpha: alpha)
 
-            let mat = echoMat(
-                alpha: alpha
-            )
-
-            model.materials = (0..<count).map {
-                _ in mat
-            }
-
-            entity.components[
-                ModelComponent.self
-            ] = model
+            model.materials = (0..<count).map { _ in mat }
+            entity.components[ModelComponent.self] = model
         }
 
         for child in entity.children {
@@ -70,12 +64,19 @@ struct TargetEchoSvc {
 
     private func setMango(
         on entity: Entity,
-        alpha: Float
+        alpha: Float,
+        fill: Bool,
+        scale: Float,
+        throughTree: Bool
     ) {
         if entity.name == "MangoTarget" {
-            setYellow(
+            entity.scale *= SIMD3<Float>(repeating: scale)
+
+            setFood(
                 on: entity,
-                alpha: alpha
+                alpha: alpha,
+                fill: fill,
+                throughTree: throughTree
             )
 
             return
@@ -84,40 +85,38 @@ struct TargetEchoSvc {
         for child in entity.children {
             setMango(
                 on: child,
-                alpha: alpha
+                alpha: alpha,
+                fill: fill,
+                scale: scale,
+                throughTree: throughTree
             )
         }
     }
 
-    private func setYellow(
+    private func setFood(
         on entity: Entity,
-        alpha: Float
+        alpha: Float,
+        fill: Bool,
+        throughTree: Bool
     ) {
-        if var model = entity.components[
-            ModelComponent.self
-        ] {
-            let count = max(
-                model.materials.count,
-                1
-            )
-
+        if var model = entity.components[ModelComponent.self] {
+            let count = max(model.materials.count, 1)
             let mat = mangoMat(
-                alpha: alpha
+                alpha: alpha,
+                fill: fill,
+                throughTree: throughTree
             )
 
-            model.materials = (0..<count).map {
-                _ in mat
-            }
-
-            entity.components[
-                ModelComponent.self
-            ] = model
+            model.materials = (0..<count).map { _ in mat }
+            entity.components[ModelComponent.self] = model
         }
 
         for child in entity.children {
-            setYellow(
+            setFood(
                 on: child,
-                alpha: alpha
+                alpha: alpha,
+                fill: fill,
+                throughTree: throughTree
             )
         }
     }
@@ -133,16 +132,9 @@ struct TargetEchoSvc {
         mat.faceCulling = .none
         mat.readsDepth = true
         mat.writesDepth = false
-
         mat.blending = .transparent(
             opacity: .init(
-                floatLiteral: min(
-                    max(
-                        alpha,
-                        0
-                    ),
-                    1
-                )
+                floatLiteral: min(max(alpha, 0), 1)
             )
         )
 
@@ -150,31 +142,26 @@ struct TargetEchoSvc {
     }
 
     private func mangoMat(
-        alpha: Float
+        alpha: Float,
+        fill: Bool,
+        throughTree: Bool
     ) -> UnlitMaterial {
         var mat = UnlitMaterial(
             color: UIColor(
-                red: 1,
-                green: 0.9,
-                blue: 0.05,
+                red: 108 / 255,
+                green: 92 / 255,
+                blue: 231 / 255,
                 alpha: 1
             )
         )
 
-        mat.triangleFillMode = .lines
+        mat.triangleFillMode = fill ? .fill : .lines
         mat.faceCulling = .none
-        mat.readsDepth = true
+        mat.readsDepth = !throughTree
         mat.writesDepth = false
-
         mat.blending = .transparent(
             opacity: .init(
-                floatLiteral: min(
-                    max(
-                        alpha,
-                        0
-                    ),
-                    1
-                )
+                floatLiteral: min(max(alpha, 0), 1)
             )
         )
 

@@ -22,39 +22,43 @@ extension FPKey {
         switch band {
         case .hot:
             color = UIColor(
-                red: 1.00,
-                green: 0.25,
-                blue: 0.25,
+                red: 102 / 255,
+                green: 0 / 255,
+                blue: 34 / 255,
                 alpha: 1
             )
+
             bandA = 1.00
 
         case .near:
             color = UIColor(
-                red: 1.00,
-                green: 0.58,
-                blue: 0.22,
+                red: 255 / 255,
+                green: 122 / 255,
+                blue: 0 / 255,
                 alpha: 1
             )
-            bandA = 0.92
+
+            bandA = 0.98
 
         case .mid:
             color = UIColor(
-                red: 0.73,
-                green: 0.43,
-                blue: 1.00,
+                red: 255 / 255,
+                green: 230 / 255,
+                blue: 0 / 255,
                 alpha: 1
             )
-            bandA = 0.78
+
+            bandA = 0.92
 
         case .far:
             color = UIColor(
-                red: 0.34,
-                green: 0.70,
-                blue: 1.00,
+                red: 0 / 255,
+                green: 255 / 255,
+                blue: 204 / 255,
                 alpha: 1
             )
-            bandA = 0.64
+
+            bandA = 0.90
         }
 
         let zoneA: Float
@@ -62,11 +66,11 @@ extension FPKey {
 
         switch zone {
         case .edge:
-            zoneA = 0.24
+            zoneA = 0.42
             delay = 0
 
         case .soft:
-            zoneA = 0.58
+            zoneA = 0.72
             delay = 35
 
         case .core:
@@ -76,8 +80,8 @@ extension FPKey {
 
         return FPStyle(
             color: color,
-            wireA: bandA * zoneA,
-            fillA: 0.14 * bandA * zoneA,
+            wireA: min(bandA * zoneA * 1.08, 1),
+            fillA: min(0.30 * bandA * zoneA, 0.30),
             delayMs: delay
         )
     }

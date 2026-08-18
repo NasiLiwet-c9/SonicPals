@@ -14,32 +14,21 @@ struct FPShade: View {
         RadialGradient(
             stops: [
                 .init(
-                    color:
-                        .black.opacity(
-                            dim
-                            ? 0.62
-                            : 0.10
-                        ),
+                    color: .black.opacity(
+                        dim ? 0.72 : 0.10
+                    ),
                     location: 0
                 ),
-
                 .init(
-                    color:
-                        .black.opacity(
-                            dim
-                            ? 0.84
-                            : 0.20
-                        ),
+                    color: .black.opacity(
+                        dim ? 0.84 : 0.20
+                    ),
                     location: 0.58
                 ),
-
                 .init(
-                    color:
-                        .black.opacity(
-                            dim
-                            ? 0.96
-                            : 0.32
-                        ),
+                    color: .black.opacity(
+                        dim ? 0.90 : 0.32
+                    ),
                     location: 1
                 )
             ],
