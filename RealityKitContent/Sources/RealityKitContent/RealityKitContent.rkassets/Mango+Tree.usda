@@ -70,13 +70,16 @@ def Xform "Root"
 
     def Xform "MangoSpawnPoint3" (
         active = true
+        customData = {
+            float3 rotationEulerHint = (0, 0, 0)
+        }
     )
     {
         float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
         int ui:nodegraph:node:stackingOrder = 1
         quatf xformOp:orient = (1, 0, 0, 0)
         float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0, 2.6383715, -2.370837)
+        float3 xformOp:translate = (0, 2.5077698, -2.370837)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 
@@ -88,7 +91,7 @@ def Xform "Root"
         int ui:nodegraph:node:stackingOrder = 1
         quatf xformOp:orient = (1, 0, 0, 0)
         float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0.13548094, 2.4246297, -1.5664611)
+        float3 xformOp:translate = (0.13548094, 2.2523386, -1.5664611)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 
@@ -103,7 +106,7 @@ def Xform "Root"
         int ui:nodegraph:node:stackingOrder = 1
         quatf xformOp:orient = (1, 0, 0, 0)
         float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (-1.2625961, 2.7306805, -0.10875082)
+        float3 xformOp:translate = (-1.2625961, 2.6804516, -0.10875082)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 
