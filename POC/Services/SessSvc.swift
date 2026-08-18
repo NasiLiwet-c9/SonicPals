@@ -59,7 +59,8 @@ final class SessSvc: SessServing {
                 .plane
             ],
             sceneUnderstanding: [
-                .collision
+                .collision,
+                .occlusion
             ],
             camera: .back
         )

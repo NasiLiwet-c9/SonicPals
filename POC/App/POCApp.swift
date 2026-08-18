@@ -15,10 +15,12 @@ struct POCApp: App {
         RevealComp.registerComponent()
         TraceComp.registerComponent()
         TargetComp.registerComponent()
+        FPScanComp.registerComponent()
 
         FPRevealSys.registerSystem()
         TargetSys.registerSystem()
         MangoEatSys.registerSystem()
+        FPScanSys.registerSystem()
     }
 
     var body: some SwiftUI.Scene {

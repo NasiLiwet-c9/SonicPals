@@ -20,13 +20,19 @@ struct MainView: View {
             RealitySceneView(world: world)
                 .ignoresSafeArea()
 
-            FPShade(
-                dim: world.model.dimOn
-            )
+            if world.model.missionDark
+                || world.model.hudStage == .mission {
+                FPShade(
+                    dim: world.model.dimOn
+                )
+                .transition(.opacity)
+            }
 
-            WaveRings(
-                seq: world.model.waveSeq
-            )
+            if world.model.hudStage == .mission {
+                WaveRings(
+                    seq: world.model.waveSeq
+                )
+            }
 
             HUDView(
                 world: world,
@@ -36,6 +42,10 @@ struct MainView: View {
                 }
             )
         }
+        .animation(
+            .easeInOut(duration: 0.35),
+            value: world.model.missionDark
+        )
         .preferredColorScheme(.dark)
         .sheet(
             isPresented: $showInfo

@@ -16,27 +16,35 @@ struct FPShade: View {
                 .init(
                     color:
                         .black.opacity(
-                            dim ? 0.18 : 0.02
+                            dim
+                            ? 0.62
+                            : 0.10
                         ),
                     location: 0
                 ),
+
                 .init(
                     color:
                         .black.opacity(
-                            dim ? 0.40 : 0.06
+                            dim
+                            ? 0.84
+                            : 0.20
                         ),
                     location: 0.58
                 ),
+
                 .init(
                     color:
                         .black.opacity(
-                            dim ? 0.72 : 0.12
+                            dim
+                            ? 0.96
+                            : 0.32
                         ),
                     location: 1
                 )
             ],
             center: .center,
-            startRadius: 40,
+            startRadius: 34,
             endRadius: 760
         )
         .ignoresSafeArea()

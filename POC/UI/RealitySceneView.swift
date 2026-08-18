@@ -15,14 +15,10 @@ struct RealitySceneView: View {
     var body: some View {
         RealityView { content in
             content.add(world.anchor)
-
-            await world.start()
-
-            guard world.model.lidarOK else {
-                return
-            }
-
             content.camera = .spatialTracking
+        }
+        .task {
+            await world.start()
         }
         .onDisappear {
             Task { @MainActor in

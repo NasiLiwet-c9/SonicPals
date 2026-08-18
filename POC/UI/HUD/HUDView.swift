@@ -13,89 +13,136 @@ struct HUDView: View {
     let onBack: () -> Void
     let onInfo: () -> Void
 
+    @State private var scanIntroDone = false
+
     var body: some View {
         ZStack {
-            
             reticle
-            
+
             switch world.model.hudStage {
             case .scanning:
-                EmptyView()
+                if !scanIntroDone {
+                    ScanDialogueBubbleView(
+                        lines: [
+                            "Scan the surrounding area first to start the game..."
+                        ],
+                        mascotName: "fly",
+                        bubbleImageName: "long-bubble-card",
+                        onFinishedAllLines: {
+                            withAnimation {
+                                scanIntroDone = true
+                            }
+                        }
+                    )
+                    .transition(.opacity)
+                }
 
             case .scanCompletePrompt:
-                ScanDialogueBubbleView(
-                    lines: [
-                        "Scan the surrounding area first to start the game..."
-                    ],
-                    mascotName: "fly",
-                    bubbleImageName: "long-bubble-card",
-                    onFinishedAllLines: {
+                Color.clear
+                    .task {
+                        world.endScan()
+                        world.model.missionDark = false
+
+                        try? await Task.sleep(
+                            for: .milliseconds(180)
+                        )
+
                         withAnimation {
                             world.model.hudStage = .transitioning
                         }
                     }
-                )
-                .transition(.opacity)
 
             case .transitioning:
-                GIFImageView(name: "light-to-dark-transition")
+                ZStack {
+                    GIFImageView(
+                        name: "light-to-dark-transition"
+                    )
                     .ignoresSafeArea()
-                    .task {
-                        // Estimate — adjust to the gif's real frame-count x delay
-                        // if it should sync exactly with the animation's end.
-                        try? await Task.sleep(for: .seconds(1.4))
-                        withAnimation { world.model.hudStage = .mission }
+
+                    Color.black
+                        .opacity(
+                            world.model.missionDark
+                            ? 0.18
+                            : 0
+                        )
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                }
+                .task {
+                    world.model.missionDark = false
+
+                    try? await Task.sleep(
+                        for: .milliseconds(700)
+                    )
+
+                    withAnimation(
+                        .easeInOut(duration: 0.35)
+                    ) {
+                        world.model.missionDark = true
                     }
-                    .transition(.opacity)
+
+                    try? await Task.sleep(
+                        for: .milliseconds(700)
+                    )
+
+                    world.beginMission()
+
+                    withAnimation {
+                        world.model.hudStage = .mission
+                    }
+                }
+                .transition(.opacity)
 
             case .mission:
                 EmptyView()
             }
-            
+
             VStack {
                 topBar
 
                 Spacer()
 
                 status
-                
-                if world.model.hudStage == .mission {
+
+                if world.model.hudStage == .mission,
+                   world.model.missionDialogueVisible {
                     MissionChatBubbleView(
-                        lines: ["I sense there are \(world.model.missionMangoTarget) mango here, let's find them."]
+                        lines: [
+                            world.model.missionDialogue
+                        ],
+                        onFinishedAllLines: {
+                            withAnimation {
+                                world.dismissMissionDialogue()
+                            }
+                        }
+                    )
+                    .id(
+                        world.model.missionDialogueID
                     )
                     .padding(.bottom, 8)
                 }
-                
-                controls
+
+                if world.model.hudStage == .mission {
+                    controls
+                }
             }
             .padding(.horizontal, 28)
             .padding(.top, 10)
             .padding(.bottom, 24)
         }
-        //debug
-//        .onAppear {
-//            print("ping-btn found:", UIImage(named: "ping-btn") != nil)
-//            print("eat-btn found:", UIImage(named: "eat-btn") != nil)
-//        }
-        .onChange(of: world.model.scanReady) { _, isReady in
+        .onChange(
+            of: world.model.scanReady
+        ) { _, isReady in
             if isReady {
-                withAnimation { world.model.hudStage = .scanCompletePrompt }
+                withAnimation {
+                    world.model.hudStage = .scanCompletePrompt
+                }
             }
         }
     }
 
     private var topBar: some View {
         HStack {
-//            if world.model.hudStage != .mission {
-//                // for debugging purposes — remove entirely once mission flow is verified
-//                circleButton(
-//                    icon: "chevron.left",
-//                    size: 58,
-//                    iconSize: 24,
-//                    action: onBack
-//                )
-//            }
-
             if world.model.hudStage == .mission {
                 MangoCounterView(
                     eatenCount: world.model.mangoEatenCount,
@@ -106,7 +153,7 @@ struct HUDView: View {
             Spacer()
         }
     }
-    
+
     @ViewBuilder
     private var status: some View {
         if !world.model.msg.isEmpty {
@@ -124,45 +171,22 @@ struct HUDView: View {
     }
 
     private var controls: some View {
-        HStack(
-            alignment: .bottom,
-            spacing: 36
-        ) {
-//            circleButton(
-//                icon:
-//                    world.model.dimOn
-//                    ? "lightbulb.fill"
-//                    : "lightbulb",
-//                size: 68,
-//                iconSize: 25
-//            ) {
-//                world.perform(.toggleDim)
-//            }
-
+        HStack {
             if world.model.mangoEatReady {
                 eatButton
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(
+                        .scale.combined(
+                            with: .opacity
+                        )
+                    )
             } else {
                 waveButton
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(
+                        .scale.combined(
+                            with: .opacity
+                        )
+                    )
             }
-
-            //for debugging purposes
-            circleButton(
-                icon: "tree",
-                size: 68,
-                iconSize: 27
-            ) {
-                world.perform(.spawnTarget)
-            }.glassEffect()
-            .disabled(
-                !world.model.canSpawn
-            )
-            .opacity(
-                world.model.canSpawn
-                ? 1
-                : 0.4
-            )
         }
         .animation(
             .easeInOut(duration: 0.2),
@@ -178,12 +202,23 @@ struct HUDView: View {
                 .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 108, height: 108)
+                .frame(
+                    width: 108,
+                    height: 108
+                )
         }
         .buttonStyle(.plain)
-        .disabled(!world.model.canWave)
-        .opacity(world.model.canWave ? 1 : 0.4)
-        .accessibilityLabel("Send ultrasonic wave")
+        .disabled(
+            !world.model.canWave
+        )
+        .opacity(
+            world.model.canWave
+            ? 1
+            : 0.4
+        )
+        .accessibilityLabel(
+            "Send ultrasonic wave"
+        )
     }
 
     private var eatButton: some View {
@@ -194,13 +229,18 @@ struct HUDView: View {
                 .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 108, height: 108)
+                .frame(
+                    width: 108,
+                    height: 108
+                )
         }
         .buttonStyle(.plain)
         .glassEffect()
-        .accessibilityLabel("Eat mango")
+        .accessibilityLabel(
+            "Eat mango"
+        )
     }
-    
+
     private var reticle: some View {
         ZStack {
             Circle()
@@ -249,44 +289,76 @@ struct HUDView: View {
                     width: 5,
                     height: 5
                 )
+
+            if world.model.hudStage == .scanning {
+                Text(
+                    "\(Int((world.model.scanProgress * 100).rounded()))%"
+                )
+                .font(
+                    .system(
+                        size: 12,
+                        weight: .semibold,
+                        design: .rounded
+                    )
+                )
+                .foregroundStyle(
+                    .white.opacity(0.82)
+                )
+                .offset(y: 67)
+
+                scanTurn
+            }
         }
         .allowsHitTesting(false)
     }
-    
 
-    private func circleButton(
-        icon: String,
-        size: CGFloat,
-        iconSize: CGFloat,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(
-                systemName: icon
-            )
+    @ViewBuilder
+    private var scanTurn: some View {
+        switch world.model.scanTurn {
+        case .left:
+            HStack(spacing: 0) {
+                Image(
+                    systemName: "chevron.left"
+                )
+
+                Image(
+                    systemName: "chevron.left"
+                )
+            }
             .font(
                 .system(
-                    size: iconSize,
-                    weight: .medium
+                    size: 15,
+                    weight: .bold
                 )
             )
-            .foregroundStyle(.primary)
-            .frame(
-                width: size,
-                height: size
+            .foregroundStyle(
+                .white.opacity(0.82)
             )
-            .background(
-                .ultraThinMaterial,
-                in: Circle()
-            )
-            .overlay {
-                Circle()
-                    .stroke(
-                        .primary.opacity(0.15),
-                        lineWidth: 1
-                    )
+            .offset(x: -86)
+
+        case .right:
+            HStack(spacing: 0) {
+                Image(
+                    systemName: "chevron.right"
+                )
+
+                Image(
+                    systemName: "chevron.right"
+                )
             }
+            .font(
+                .system(
+                    size: 15,
+                    weight: .bold
+                )
+            )
+            .foregroundStyle(
+                .white.opacity(0.82)
+            )
+            .offset(x: 86)
+
+        case .none:
+            EmptyView()
         }
-        .buttonStyle(.plain)
     }
 }

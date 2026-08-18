@@ -27,7 +27,7 @@ final class AppModel {
     var canSpawn: Bool {
         lidarOK
     }
-    
+
     enum HUDStage {
         case scanning
         case scanCompletePrompt
@@ -37,9 +37,15 @@ final class AppModel {
 
     var hudStage: HUDStage = .scanning
     var scanReady = false
+    var scanProgress: Float = 0
+    var scanTurn: FPScanTurn = .none
+
+    var missionStarted = false
+    var missionComplete = false
+    var missionDark = false
+    var missionDialogue = ""
+    var missionDialogueID = 0
+    var missionDialogueVisible = false
 
     let missionMangoTarget = 3
-
 }
-
-

@@ -45,9 +45,17 @@ final class TargetSys: System {
         
         for entity in context.scene.performQuery(Self.query) {
             guard entity.isEnabled,
-                  var comp = entity.components[TargetComp.self],
-                  !comp.found
+                  var comp = entity.components[TargetComp.self]
             else {
+                continue
+            }
+
+            lockPose(
+                entity,
+                comp: comp
+            )
+
+            guard !comp.found else {
                 continue
             }
             
@@ -103,7 +111,25 @@ final class TargetSys: System {
             entity.components[TargetComp.self] = comp
         }
     }
-    
+
+    private func lockPose(
+        _ entity: Entity,
+        comp: TargetComp
+    ) {
+        entity.setPosition(
+            comp.lockPos,
+            relativeTo: nil
+        )
+
+        entity.setOrientation(
+            simd_quatf(
+                angle: comp.lockYaw,
+                axis: SIMD3<Float>(0, 1, 0)
+            ),
+            relativeTo: nil
+        )
+    }
+
     private func cameraMatrix(
         in scene: Scene
     ) -> simd_float4x4? {
