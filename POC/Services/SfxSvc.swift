@@ -14,6 +14,7 @@ import AVFoundation
 final class SfxSvc {
     private var sonarPlayer: AVAudioPlayer?
     private var ambiencePlayer: AVAudioPlayer?
+    private var eatPlayer: AVAudioPlayer?
 
     init() {
         configureSession()
@@ -21,6 +22,7 @@ final class SfxSvc {
         ambiencePlayer = makePlayer(named: "night ambience-sfx", ext: "mp3")
         ambiencePlayer?.numberOfLoops = -1
         ambiencePlayer?.volume = 0.5
+        eatPlayer = makePlayer(named: "eat-sfx", ext: "mp3")
     }
 
     /// Plays the sonar ping. Safe to call rapidly — restarts from the
@@ -32,6 +34,18 @@ final class SfxSvc {
 
         sonarPlayer.currentTime = 0
         sonarPlayer.play()
+    }
+
+    /// Plays the mango-eaten bite sound. Safe to call rapidly —
+    /// restarts from the top each time rather than queuing or
+    /// overlapping instances.
+    func eat() {
+        guard let eatPlayer else {
+            return
+        }
+
+        eatPlayer.currentTime = 0
+        eatPlayer.play()
     }
 
     /// Starts the looping night-ambience bed. Safe to call more than

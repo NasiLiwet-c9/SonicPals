@@ -140,7 +140,7 @@ extension ECSWorld {
             eatCandidate else {
             return
         }
-
+        sfx.eat()
         mango.removeFromParent()
 
         model.mangoEatenCount += 1
