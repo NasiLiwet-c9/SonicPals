@@ -12,12 +12,14 @@ struct ScanDialogueBubbleView: View {
 
     let mascotName: String
     let bubbleImageName: String
+    let uiScale: CGFloat
 
     init(
         lines: [String],
         typingSpeed: Double = 0.03,
         mascotName: String = "fly",
         bubbleImageName: String = "long-bubble-card",
+        uiScale: CGFloat = 1,
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         _controller = StateObject(
@@ -30,24 +32,25 @@ struct ScanDialogueBubbleView: View {
 
         self.mascotName = mascotName
         self.bubbleImageName = bubbleImageName
+        self.uiScale = uiScale
     }
 
     var body: some View {
         VStack {
             HStack(
                 alignment: .top,
-                spacing: -108
+                spacing: UICfg.Sess.topGap * uiScale
             ) {
                 bubble
 
                 Model3DView(name: mascotName)
                     .frame(
-                        width: 110,
-                        height: 110
+                        width: UICfg.Sess.topBat * uiScale,
+                        height: UICfg.Sess.topBat * uiScale
                     )
                     .offset(
-                        x: 45,
-                        y: 15
+                        x: UICfg.Sess.topBatX * uiScale,
+                        y: UICfg.Sess.topBatY * uiScale
                     )
             }
             .frame(
@@ -57,8 +60,14 @@ struct ScanDialogueBubbleView: View {
 
             Spacer()
         }
-        .padding(.top, 10)
-        .padding(.horizontal, 24)
+        .padding(
+            .top,
+            10 * uiScale
+        )
+        .padding(
+            .horizontal,
+            24 * uiScale
+        )
         .contentShape(Rectangle())
         .onTapGesture {
             controller.advance()
@@ -82,7 +91,7 @@ struct ScanDialogueBubbleView: View {
             Text(controller.visibleText)
                 .font(
                     .system(
-                        size: 13,
+                        size: UICfg.Sess.topTxt * uiScale,
                         weight: .bold,
                         design: .rounded
                     )
@@ -91,8 +100,14 @@ struct ScanDialogueBubbleView: View {
                 .foregroundStyle(.black)
                 .lineLimit(2)
                 .minimumScaleFactor(0.75)
-                .padding(.horizontal, 18)
-                .padding(.top, 18)
+                .padding(
+                    .horizontal,
+                    UICfg.Sess.topPadX * uiScale
+                )
+                .padding(
+                    .top,
+                    UICfg.Sess.topPadY * uiScale
+                )
                 .frame(
                     maxWidth: .infinity,
                     maxHeight: .infinity,
@@ -100,8 +115,8 @@ struct ScanDialogueBubbleView: View {
                 )
         }
         .frame(
-            width: 210,
-            height: 91
+            width: UICfg.Sess.topW * uiScale,
+            height: UICfg.Sess.topH * uiScale
         )
     }
 }

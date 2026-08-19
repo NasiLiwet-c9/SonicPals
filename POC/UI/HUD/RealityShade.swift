@@ -47,7 +47,11 @@ enum RealityShade {
         anchor.addChild(light)
     }
 
-    static func update(_ anchor: AnchorEntity, visible: Bool, dim: Bool) {
+    static func update(
+        _ anchor: AnchorEntity,
+        visible: Bool,
+        dim: Bool
+    ) {
         anchor.isEnabled = visible
         guard visible else { return }
 
@@ -55,18 +59,24 @@ enum RealityShade {
         anchor.findEntity(named: lightName)?.isEnabled = !dim
     }
 
-    static func keepBright(_ entity: Entity) {
+    static func keepBright(
+        _ entity: Entity,
+        order: Int32 = 1
+    ) {
         if entity.components.has(ModelComponent.self) {
             entity.components.set(
                 ModelSortGroupComponent(
                     group: group,
-                    order: 1
+                    order: order
                 )
             )
         }
 
         for child in entity.children {
-            keepBright(child)
+            keepBright(
+                child,
+                order: order
+            )
         }
     }
 
@@ -76,7 +86,10 @@ enum RealityShade {
         middle: CGFloat,
         edge: CGFloat
     ) async -> ModelEntity {
-        let mesh = MeshResource.generatePlane(width: 1.2, depth: 2.2)
+        let mesh = MeshResource.generatePlane(
+            width: 1.2,
+            depth: 2.2
+        )
 
         let material = await makeMaterial(
             name: name,

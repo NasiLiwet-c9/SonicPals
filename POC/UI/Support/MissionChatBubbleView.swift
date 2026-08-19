@@ -7,17 +7,20 @@
 
 import Foundation
 import SwiftUI
+
 struct MissionChatBubbleView: View {
     @StateObject private var viewModel: DialogueViewModel
 
     let rightBubbleImageName: String
     let leftBubbleImageName: String
+    let uiScale: CGFloat
 
     init(
         lines: [String],
         typingSpeed: Double = 0.03,
         rightBubbleImageName: String = "long-bubble-card",
         leftBubbleImageName: String = "long-bubble-card-left",
+        uiScale: CGFloat = 1,
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         _viewModel = StateObject(
@@ -27,8 +30,10 @@ struct MissionChatBubbleView: View {
                 onFinishedAllLines: onFinishedAllLines
             )
         )
+
         self.rightBubbleImageName = rightBubbleImageName
         self.leftBubbleImageName = leftBubbleImageName
+        self.uiScale = uiScale
     }
 
     private var isEvenLine: Bool {
@@ -39,36 +44,71 @@ struct MissionChatBubbleView: View {
         HStack {
             if isEvenLine {
                 Spacer(minLength: 0)
-                bubble(imageName: rightBubbleImageName)
+
+                bubble(
+                    imageName: rightBubbleImageName
+                )
             } else {
-                bubble(imageName: leftBubbleImageName)
+                bubble(
+                    imageName: leftBubbleImageName
+                )
+
                 Spacer(minLength: 0)
             }
         }
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
-        .onTapGesture { viewModel.advance() }
-        .onAppear { viewModel.start() }
-        .onDisappear { viewModel.stop() }
+        .onTapGesture {
+            viewModel.advance()
+        }
+        .onAppear {
+            viewModel.start()
+        }
+        .onDisappear {
+            viewModel.stop()
+        }
     }
 
-    private func bubble(imageName: String) -> some View {
-        ZStack {
+    private func bubble(
+        imageName: String
+    ) -> some View {
+        let width = UICfg.Sess.botW * uiScale
+
+        return ZStack {
             Image(imageName)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(
+                    contentMode: .fit
+                )
 
             Text(viewModel.visibleText)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .font(
+                    .system(
+                        size: UICfg.Sess.botTxt * uiScale,
+                        weight: .bold,
+                        design: .rounded
+                    )
+                )
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.75)
                 .foregroundStyle(.black)
-                .padding(.horizontal, 18)
-                .padding(.bottom, 18)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(
+                    .horizontal,
+                    UICfg.Sess.botPadX * uiScale
+                )
+                .padding(
+                    .bottom,
+                    UICfg.Sess.botPadY * uiScale
+                )
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .topLeading
+                )
         }
-        // long-bubble-card's real pixel ratio is 232x100.
-        .frame(width: 230, height: 230 * 100 / 232)
+        .frame(
+            width: width,
+            height: width * 100 / 232
+        )
     }
 }

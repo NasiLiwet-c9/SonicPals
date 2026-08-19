@@ -41,8 +41,16 @@ struct TargetEchoSvc {
             scale: TargetCfg.Echo.mangoTraceScale
         )
 
-        RealityShade.keepBright(pulse)
-        RealityShade.keepBright(trace)
+        // Sonar above full-color target.
+        RealityShade.keepBright(
+            pulse,
+            order: 2
+        )
+
+        RealityShade.keepBright(
+            trace,
+            order: 2
+        )
     }
 
     private func set(
@@ -58,7 +66,10 @@ struct TargetEchoSvc {
         }
 
         for child in entity.children {
-            set(on: child, alpha: alpha)
+            set(
+                on: child,
+                alpha: alpha
+            )
         }
     }
 
@@ -121,6 +132,7 @@ struct TargetEchoSvc {
             let xray = entity.clone(recursive: false)
             xray.name = "MangoXRay"
             xray.transform = .identity
+
             xray.scale = SIMD3<Float>(
                 repeating: TargetCfg.Echo.mangoXrayScale
             )
@@ -167,13 +179,13 @@ struct TargetEchoSvc {
         )
     }
 
-    private func echoMat(alpha: Float) -> UnlitMaterial {
+    private func echoMat(
+        alpha: Float
+    ) -> UnlitMaterial {
         var mat = UnlitMaterial(color: .white)
 
         mat.triangleFillMode = .fill
         mat.faceCulling = .none
-
-        // Tree echo obeys normal real-world occlusion.
         mat.readsDepth = true
         mat.writesDepth = false
 

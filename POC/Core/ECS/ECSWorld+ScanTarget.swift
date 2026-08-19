@@ -20,7 +20,8 @@ extension ECSWorld {
     func finishScanTarget() async {
         targetReserve.clearPose()
 
-        if targetReserve.canCheck(force: true), reserveScanTarget() {
+        if targetReserve.canCheck(force: true),
+           reserveScanTarget() {
             finishScanReady()
             return
         }
@@ -29,27 +30,42 @@ extension ECSWorld {
         model.scanTurn = .none
         model.msg = "Scan a little more open floor."
 
+        resumeOpenScan()
+
 #if DEBUG
-        print("[TARGET PREP] NO SAFE POSE AT SCAN COMPLETION")
+        print("[TARGET PREP] NO SAFE POSE - SCAN RESUMED")
 #endif
 
         while !Task.isCancelled,
               scanEntity.isEnabled,
               model.hudStage == .scanning,
               !targetReserve.ready {
-            try? await Task.sleep(for: .milliseconds(TargetCfg.Preflight.retryMs))
 
-            guard targetReserve.canCheck(force: true) else { continue }
+            try? await Task.sleep(
+                for: .milliseconds(
+                    TargetCfg.Preflight.retryMs
+                )
+            )
+
+            guard targetReserve.canCheck(force: true) else {
+                continue
+            }
+
             _ = reserveScanTarget()
         }
 
-        guard targetReserve.ready else { return }
+        guard targetReserve.ready else {
+            return
+        }
+
         finishScanReady()
     }
 
     @discardableResult
     private func reserveScanTarget() -> Bool {
-        guard let scene = anchor.scene else { return false }
+        guard let scene = anchor.scene else {
+            return false
+        }
 
         guard let pose = targetSpawn.pose(
             session: sess.session,
@@ -62,15 +78,35 @@ extension ECSWorld {
         targetReserve.reserve(pose)
 
 #if DEBUG
-        print(String(
-            format: "[TARGET PREP] RESERVED x=%.2f y=%.2f z=%.2f",
-            pose.pos.x,
-            pose.pos.y,
-            pose.pos.z
-        ))
+        print(
+            String(
+                format: "[TARGET PREP] RESERVED x=%.2f y=%.2f z=%.2f",
+                pose.pos.x,
+                pose.pos.y,
+                pose.pos.z
+            )
+        )
 #endif
 
         return true
+    }
+
+    // Resume LiDAR/cursor while finding open floor.
+    private func resumeOpenScan() {
+        guard var comp =
+                scanEntity.components[
+                    FPScanComp.self
+                ] else {
+            return
+        }
+
+        comp.active = true
+
+        scanEntity.components[
+            FPScanComp.self
+        ] = comp
+
+        scanEntity.isEnabled = true
     }
 
     private func finishScanReady() {

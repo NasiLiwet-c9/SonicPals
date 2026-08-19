@@ -105,8 +105,8 @@ final class FPMeshFact: FPMeshMakePort {
 
     private func traceAlpha(_ source: Float) -> Float {
         min(
-            max(source * 0.08, 0.025),
-            0.08
+            max(source * 0.06, 0.02),
+            0.06
         )
     }
 

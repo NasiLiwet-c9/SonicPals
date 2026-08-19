@@ -80,8 +80,8 @@ extension FPKey {
 
         return FPStyle(
             color: color,
-            wireA: min(bandA * zoneA * 1.08, 1),
-            fillA: min(0.30 * bandA * zoneA, 0.30),
+            wireA: min(bandA * zoneA * 1.02, 1),
+            fillA: min(0.20 * bandA * zoneA, 0.20),
             delayMs: delay
         )
     }

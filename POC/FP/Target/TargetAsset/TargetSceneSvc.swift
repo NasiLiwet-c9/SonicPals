@@ -6,6 +6,7 @@
 //
 
 import RealityKit
+import UIKit
 import simd
 
 @MainActor
@@ -61,5 +62,65 @@ struct TargetSceneSvc {
         for child in root.children {
             noShadow(child)
         }
+    }
+
+    func dim(_ root: Entity, factor: Float) {
+        if var model = root.components[ModelComponent.self] {
+            model.materials = model.materials.map { mat in
+                guard var pbr = mat as? PhysicallyBasedMaterial else {
+                    return mat
+                }
+
+                pbr.baseColor.tint = dimColor(
+                    pbr.baseColor.tint,
+                    factor: factor
+                )
+
+                return pbr
+            }
+
+            root.components[ModelComponent.self] = model
+        }
+
+        for child in root.children {
+            dim(child, factor: factor)
+        }
+    }
+
+    private func dimColor(
+        _ color: UIColor,
+        factor: Float
+    ) -> UIColor {
+        let f = CGFloat(min(max(factor, 0), 1))
+
+        var r: CGFloat = 1
+        var g: CGFloat = 1
+        var b: CGFloat = 1
+        var a: CGFloat = 1
+
+        if color.getRed(
+            &r,
+            green: &g,
+            blue: &b,
+            alpha: &a
+        ) {
+            return UIColor(
+                red: r * f,
+                green: g * f,
+                blue: b * f,
+                alpha: a
+            )
+        }
+
+        var w: CGFloat = 1
+
+        if color.getWhite(&w, alpha: &a) {
+            return UIColor(
+                white: w * f,
+                alpha: a
+            )
+        }
+
+        return color
     }
 }

@@ -4,6 +4,7 @@
 //
 //  Created by Shan Newcastle on 10/08/26.
 //  Updated by Asaryun on 13/08/26
+//
 
 import SwiftUI
 
@@ -20,151 +21,197 @@ struct HUDView: View {
     private let sfx = SfxSvc.shared
 
     var body: some View {
-        ZStack {
-            reticle
+        GeometryReader { geo in
+            let size = geo.size
+            let scale = UICfg.s(size)
 
-            #if DEBUG
-            Button("SKIP TO COMPLETION") {
-                world.model.missionComplete = true
-                world.model.showMissionCompleteCard = true
-                world.model.missionDialogueVisible = false
-            }
-            .buttonStyle(.borderedProminent)
-            .position(x: 120, y: 100)
-            .zIndex(100)
-            #endif
+            ZStack {
+                reticle(scale)
 
-            if world.model.showMissionCompleteCard {
-                MissionCompleteCardView {
-                    startQuizTransition()
+                /*
+                #if DEBUG
+                Button("SKIP TO COMPLETION") {
+                    world.model.missionComplete = true
+                    world.model.showMissionCompleteCard = true
+                    world.model.missionDialogueVisible = false
                 }
-                .transition(.scale(scale: 0.78).combined(with: .opacity))
-                .zIndex(10)
-            }
+                .buttonStyle(.borderedProminent)
+                .position(x: 120, y: 100)
+                .zIndex(100)
+                #endif
+                */
 
-            if world.model.showQuiz {
-                QuestionCardView(
-                    onPlayAgain: {
-                        sfx.tap()
-                        restartMission()
-                    },
-                    onBackToMenu: {
-                        sfx.tap()
-                        onBack()
+                if world.model.showMissionCompleteCard {
+                    MissionCompleteCardView {
+                        startQuizTransition()
                     }
-                )
-                .id(world.model.quizTransitionID)
-                .transition(.scale(scale: 0.76).combined(with: .opacity))
-                .zIndex(20)
-            }
+                    .transition(
+                        .scale(scale: 0.78)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(10)
+                }
 
-            if world.model.eatAnimationVisible {
-                GIFImageView(name: "eat-animation")
-                    .aspectRatio(contentMode: .fill)
-                    .ignoresSafeArea()
-                    .id(world.model.eatAnimationID)
-                    .allowsHitTesting(false)
-                    .task(id: world.model.eatAnimationID) {
-                        try? await Task.sleep(for: .milliseconds(500))
-                        world.model.eatAnimationVisible = false
+                if world.model.showQuiz {
+                    QuestionCardView(
+                        onPlayAgain: {
+                            sfx.tap()
+                            restartMission()
+                        },
+                        onBackToMenu: {
+                            sfx.tap()
+                            onBack()
+                        }
+                    )
+                    .id(world.model.quizTransitionID)
+                    .transition(
+                        .scale(scale: 0.76)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(20)
+                }
+
+                if world.model.eatAnimationVisible {
+                    eatAnimation
+                        .id(world.model.eatAnimationID)
+                        .task(
+                            id: world.model.eatAnimationID
+                        ) {
+                            try? await Task.sleep(
+                                for: .milliseconds(
+                                    UICfg.Eat.ms
+                                )
+                            )
+
+                            world.model.eatAnimationVisible = false
+                        }
+                        .transition(.opacity)
+                }
+
+                switch world.model.hudStage {
+                case .scanning:
+                    if !scanIntroDone {
+                        ScanDialogueBubbleView(
+                            lines: [
+                                "Scan the surrounding area first to start the game..."
+                            ],
+                            mascotName: "fly",
+                            bubbleImageName: "long-bubble-card",
+                            uiScale: scale,
+                            onFinishedAllLines: {
+                                withAnimation {
+                                    scanIntroDone = true
+                                }
+                            }
+                        )
+                        .transition(.opacity)
                     }
-                    .transition(.opacity)
-            }
 
-            switch world.model.hudStage {
-            case .scanning:
-                if !scanIntroDone {
-                    ScanDialogueBubbleView(
-                        lines: [
-                            "Scan the surrounding area first to start the game..."
-                        ],
-                        mascotName: "fly",
-                        bubbleImageName: "long-bubble-card",
-                        onFinishedAllLines: {
+                case .scanCompletePrompt:
+                    Color.clear
+                        .task {
+                            world.endScan()
+                            world.model.missionDark = false
+
+                            try? await Task.sleep(
+                                for: .milliseconds(180)
+                            )
+
                             withAnimation {
-                                scanIntroDone = true
+                                world.model.hudStage = .transitioning
                             }
                         }
-                    )
-                    .transition(.opacity)
-                }
 
-            case .scanCompletePrompt:
-                Color.clear
-                    .task {
-                        world.endScan()
-                        world.model.missionDark = false
+                case .transitioning:
+                    scanTransition
+                        .task {
+                            world.model.missionDark = false
 
-                        try? await Task.sleep(for: .milliseconds(180))
+                            try? await Task.sleep(
+                                for: .milliseconds(
+                                    UICfg.Trans.preMs
+                                )
+                            )
 
-                        withAnimation {
-                            world.model.hudStage = .transitioning
+                            withAnimation(
+                                .easeInOut(
+                                    duration: UICfg.Trans.fade
+                                )
+                            ) {
+                                world.model.missionDark = true
+                            }
+
+                            try? await Task.sleep(
+                                for: .milliseconds(
+                                    UICfg.Trans.postMs
+                                )
+                            )
+
+                            world.beginMission()
+
+                            withAnimation {
+                                world.model.hudStage = .mission
+                            }
                         }
-                    }
+                        .transition(.opacity)
 
-            case .transitioning:
-                ZStack {
-                    GIFImageView(name: "light-to-dark-transition")
-                        .ignoresSafeArea()
-
-                    Color.black
-                        .opacity(world.model.missionDark ? 0.18 : 0)
-                        .ignoresSafeArea()
-                        .allowsHitTesting(false)
+                case .mission:
+                    EmptyView()
                 }
-                .task {
-                    world.model.missionDark = false
 
-                    try? await Task.sleep(for: .milliseconds(700))
+                VStack {
+                    topBar
 
-                    withAnimation(.easeInOut(duration: 0.35)) {
-                        world.model.missionDark = true
+                    Spacer()
+
+                    status(scale)
+
+                    if world.model.hudStage == .mission,
+                       world.model.missionDialogueVisible {
+
+                        MissionChatBubbleView(
+                            lines: world.model.missionDialogueLines,
+                            uiScale: scale,
+                            onFinishedAllLines: {
+                                finishMissionDialogue()
+                            }
+                        )
+                        .id(world.model.missionDialogueID)
+                        .padding(
+                            .bottom,
+                            UICfg.Sess.botBottom * scale
+                        )
                     }
 
-                    try? await Task.sleep(for: .milliseconds(700))
-
-                    world.beginMission()
-
-                    withAnimation {
-                        world.model.hudStage = .mission
+                    if world.model.hudStage == .mission,
+                       !world.model.missionComplete {
+                        controls
                     }
                 }
-                .transition(.opacity)
-
-            case .mission:
-                EmptyView()
+                .padding(
+                    .horizontal,
+                    28 * scale
+                )
+                .padding(
+                    .top,
+                    10 * scale
+                )
+                .padding(
+                    .bottom,
+                    24 * scale
+                )
             }
-
-            VStack {
-                topBar
-
-                Spacer()
-
-                status
-
-                if world.model.hudStage == .mission,
-                   world.model.missionDialogueVisible {
-                    MissionChatBubbleView(
-                        lines: world.model.missionDialogueLines,
-                        onFinishedAllLines: {
-                            finishMissionDialogue()
-                        }
-                    )
-                    .id(world.model.missionDialogueID)
-                    .padding(.bottom, 8)
-                }
-
-                if world.model.hudStage == .mission,
-                   !world.model.missionComplete {
-                    controls
-                }
-            }
-            .padding(.horizontal, 28)
-            .padding(.top, 10)
-            .padding(.bottom, 24)
+            .frame(
+                width: size.width,
+                height: size.height
+            )
         }
-        .onChange(of: world.model.scanReady) { _, isReady in
-            guard world.model.hudStage == .scanning else { return }
+        .onChange(
+            of: world.model.scanReady
+        ) { _, isReady in
+            guard world.model.hudStage == .scanning else {
+                return
+            }
 
             if isReady {
                 sfx.scanDone()
@@ -174,6 +221,79 @@ struct HUDView: View {
                 }
             }
         }
+    }
+
+    private var eatAnimation: some View {
+        GeometryReader { geo in
+            let size = geo.size
+            let w = UICfg.v(
+                UICfg.Eat.gifW,
+                size
+            )
+
+            let h = w * (882.0 / 413.0)
+
+            GIFImageView(
+                name: "eat-animation",
+                contentMode: .scaleAspectFit
+            )
+            .frame(
+                width: w,
+                height: h
+            )
+            .position(
+                x: size.width / 2,
+                y: size.height / 2
+                    + UICfg.y(
+                        UICfg.Eat.gifY,
+                        size
+                    )
+            )
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+    }
+
+    private var scanTransition: some View {
+        GeometryReader { geo in
+            let size = geo.size
+            let w = UICfg.v(
+                UICfg.Trans.gifW,
+                size
+            )
+
+            let h = w * (874.0 / 404.0)
+
+            ZStack {
+                GIFImageView(
+                    name: "light-to-dark-transition",
+                    contentMode: .scaleAspectFit
+                )
+                .frame(
+                    width: w,
+                    height: h
+                )
+                .position(
+                    x: size.width / 2,
+                    y: size.height / 2
+                        + UICfg.y(
+                            UICfg.Trans.gifY,
+                            size
+                        )
+                )
+
+                Color.black
+                    .opacity(
+                        world.model.missionDark
+                            ? UICfg.Trans.dim
+                            : 0
+                    )
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+            }
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
     }
 
     private var topBar: some View {
@@ -190,15 +310,35 @@ struct HUDView: View {
     }
 
     @ViewBuilder
-    private var status: some View {
+    private func status(
+        _ scale: CGFloat
+    ) -> some View {
         if !world.model.msg.isEmpty {
             Text(world.model.msg)
-                .font(.caption)
+                .font(
+                    .system(
+                        size: UICfg.Sess.statusTxt * scale,
+                        weight: .semibold,
+                        design: .rounded
+                    )
+                )
                 .foregroundStyle(.white)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .background(.ultraThinMaterial, in: Capsule())
-                .padding(.bottom, 12)
+                .padding(
+                    .horizontal,
+                    14 * scale
+                )
+                .padding(
+                    .vertical,
+                    8 * scale
+                )
+                .background(
+                    .ultraThinMaterial,
+                    in: Capsule()
+                )
+                .padding(
+                    .bottom,
+                    12 * scale
+                )
         }
     }
 
@@ -206,10 +346,18 @@ struct HUDView: View {
         HStack {
             if world.model.mangoEatReady {
                 eatButton
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(
+                        .scale.combined(
+                            with: .opacity
+                        )
+                    )
             } else {
                 waveButton
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(
+                        .scale.combined(
+                            with: .opacity
+                        )
+                    )
             }
         }
         .animation(
@@ -220,7 +368,10 @@ struct HUDView: View {
 
     private var waveButton: some View {
         Button {
-            guard !waveCD, world.model.canWave else { return }
+            guard !waveCD,
+                  world.model.canWave else {
+                return
+            }
 
             sfx.tap()
             world.perform(.sendWave)
@@ -230,16 +381,29 @@ struct HUDView: View {
                 Image("ping-btn")
                     .renderingMode(.original)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 108, height: 108)
+                    .aspectRatio(
+                        contentMode: .fit
+                    )
+                    .frame(
+                        width: 108,
+                        height: 108
+                    )
 
                 if waveCD {
                     Circle()
-                        .fill(.black.opacity(0.48))
-                        .frame(width: 94, height: 94)
+                        .fill(
+                            .black.opacity(0.48)
+                        )
+                        .frame(
+                            width: 94,
+                            height: 94
+                        )
 
                     Circle()
-                        .trim(from: 0, to: waveCDProgress)
+                        .trim(
+                            from: 0,
+                            to: waveCDProgress
+                        )
                         .stroke(
                             .white.opacity(0.92),
                             style: StrokeStyle(
@@ -247,18 +411,34 @@ struct HUDView: View {
                                 lineCap: .round
                             )
                         )
-                        .rotationEffect(.degrees(-90))
-                        .frame(width: 96, height: 96)
+                        .rotationEffect(
+                            .degrees(-90)
+                        )
+                        .frame(
+                            width: 96,
+                            height: 96
+                        )
 
-                    Image(systemName: "timer")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
+                    Image(
+                        systemName: "timer"
+                    )
+                    .font(
+                        .system(
+                            size: 24,
+                            weight: .bold
+                        )
+                    )
+                    .foregroundStyle(.white)
                 }
             }
         }
         .buttonStyle(.plain)
-        .disabled(!world.model.canWave || waveCD)
-        .opacity(world.model.canWave ? 1 : 0.4)
+        .disabled(
+            !world.model.canWave || waveCD
+        )
+        .opacity(
+            world.model.canWave ? 1 : 0.4
+        )
         .accessibilityLabel(
             waveCD
                 ? "Ultrasonic wave recharging"
@@ -274,74 +454,163 @@ struct HUDView: View {
             Image("eat-btn")
                 .renderingMode(.original)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 108, height: 108)
+                .aspectRatio(
+                    contentMode: .fit
+                )
+                .frame(
+                    width: 108,
+                    height: 108
+                )
         }
         .buttonStyle(.plain)
         .glassEffect()
         .accessibilityLabel("Eat mango")
     }
 
-    private var reticle: some View {
+    private func reticle(
+        _ scale: CGFloat
+    ) -> some View {
         ZStack {
             Circle()
-                .stroke(.white.opacity(0.45), lineWidth: 1)
-                .frame(width: 82, height: 82)
+                .stroke(
+                    .white.opacity(0.45),
+                    lineWidth: 1
+                )
+                .frame(
+                    width: 82 * scale,
+                    height: 82 * scale
+                )
 
             Circle()
-                .stroke(.white.opacity(0.35), lineWidth: 1)
-                .frame(width: 40, height: 40)
+                .stroke(
+                    .white.opacity(0.35),
+                    lineWidth: 1
+                )
+                .frame(
+                    width: 40 * scale,
+                    height: 40 * scale
+                )
 
             Rectangle()
-                .fill(.white.opacity(0.45))
-                .frame(width: 1, height: 94)
+                .fill(
+                    .white.opacity(0.45)
+                )
+                .frame(
+                    width: 1,
+                    height: 94 * scale
+                )
 
             Rectangle()
-                .fill(.white.opacity(0.45))
-                .frame(width: 94, height: 1)
+                .fill(
+                    .white.opacity(0.45)
+                )
+                .frame(
+                    width: 94 * scale,
+                    height: 1
+                )
 
             Circle()
-                .fill(.white.opacity(0.8))
-                .frame(width: 5, height: 5)
+                .fill(.white)
+                .frame(
+                    width: 5 * scale,
+                    height: 5 * scale
+                )
 
             if world.model.hudStage == .scanning {
-                Text("\(Int((world.model.scanProgress * 100).rounded()))%")
-                    .font(
-                        .system(
-                            size: 12,
-                            weight: .semibold,
-                            design: .rounded
-                        )
+                Text(
+                    "\(Int((world.model.scanProgress * 100).rounded()))%"
+                )
+                .font(
+                    .system(
+                        size: UICfg.Scan.pctTxt * scale,
+                        weight: .heavy,
+                        design: .rounded
                     )
-                    .foregroundStyle(.white.opacity(0.82))
-                    .offset(y: 67)
+                )
+                .foregroundStyle(.white)
+                .padding(
+                    .horizontal,
+                    UICfg.Scan.pctPadX * scale
+                )
+                .padding(
+                    .vertical,
+                    UICfg.Scan.pctPadY * scale
+                )
+                .background(
+                    Color.black
+                        .opacity(
+                            UICfg.Scan.pctBg
+                        ),
+                    in: Capsule()
+                )
+                .shadow(
+                    color: .black.opacity(0.5),
+                    radius: 3
+                )
+                .offset(
+                    y: UICfg.Scan.pctY * scale
+                )
 
-                scanTurn
+                scanTurn(scale)
             }
         }
         .allowsHitTesting(false)
     }
 
     @ViewBuilder
-    private var scanTurn: some View {
+    private func scanTurn(
+        _ scale: CGFloat
+    ) -> some View {
         switch world.model.scanTurn {
         case .left:
             HStack(spacing: 0) {
-                Image(systemName: "chevron.left")
-                Image(systemName: "chevron.left")
+                Image(
+                    systemName: "chevron.left"
+                )
+
+                Image(
+                    systemName: "chevron.left"
+                )
             }
-            .font(.system(size: 15, weight: .bold))
-            .foregroundStyle(.white.opacity(0.82))
-            .offset(x: -86)
+            .font(
+                .system(
+                    size: UICfg.Scan.arrTxt * scale,
+                    weight: .heavy
+                )
+            )
+            .foregroundStyle(.white)
+            .shadow(
+                color: .black.opacity(0.55),
+                radius: 2
+            )
+            .offset(
+                x: -UICfg.Scan.arrX * scale
+            )
 
         case .right:
             HStack(spacing: 0) {
-                Image(systemName: "chevron.right")
-                Image(systemName: "chevron.right")
+                Image(
+                    systemName: "chevron.right"
+                )
+
+                Image(
+                    systemName: "chevron.right"
+                )
             }
-            .font(.system(size: 15, weight: .bold))
-            .foregroundStyle(.white.opacity(0.82))
-            .offset(x: 86)
+            .font(
+                .system(
+                    size: UICfg.Scan.arrTxt * scale,
+                    weight: .heavy
+                )
+            )
+            .foregroundStyle(.white)
+            .shadow(
+                color: .black.opacity(0.55),
+                radius: 2
+            )
+            .offset(
+                x: UICfg.Scan.arrX * scale
+            )
 
         case .none:
             EmptyView()
@@ -355,11 +624,15 @@ struct HUDView: View {
         Task { @MainActor in
             await Task.yield()
 
-            withAnimation(.linear(duration: 1.0)) {
+            withAnimation(
+                .linear(duration: 1)
+            ) {
                 waveCDProgress = 0
             }
 
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(
+                for: .seconds(1)
+            )
 
             waveCD = false
             waveCDProgress = 0
@@ -381,16 +654,25 @@ struct HUDView: View {
         world.model.quizCorrect = false
         world.model.quizTransitionID += 1
 
-        withAnimation(.easeInOut(duration: 0.18)) {
+        withAnimation(
+            .easeInOut(duration: 0.18)
+        ) {
             world.model.showMissionCompleteCard = false
         }
 
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(220))
+            try? await Task.sleep(
+                for: .milliseconds(220)
+            )
 
             sfx.popup()
 
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.78)) {
+            withAnimation(
+                .spring(
+                    response: 0.45,
+                    dampingFraction: 0.78
+                )
+            ) {
                 world.model.showQuiz = true
             }
         }

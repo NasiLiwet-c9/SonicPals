@@ -16,41 +16,83 @@ struct MissionCompleteCardView: View {
     private let sfx = SfxSvc.shared
 
     var body: some View {
-        ZStack {
-            Color.black.opacity(show ? 0.55 : 0)
-                .ignoresSafeArea()
+        GeometryReader { geo in
+            let size = geo.size
 
-            if confetti {
-                ConfettiBurstView()
-                    .allowsHitTesting(false)
-            }
+            ZStack {
+                Color.black
+                    .opacity(show ? UICfg.Done.dim : 0)
+                    .ignoresSafeArea()
 
-            ZStack(alignment: .bottomLeading) {
-                GIFImageView(name: "mission-completed-animation")
-                    .aspectRatio(1806.0 / 1537.0, contentMode: .fit)
-                    .scaleEffect(1.3)
-
-                Button(action: onNext) {
-                    ZStack {
-                        Image("btn-sort")
-                            .resizable()
-                            .aspectRatio(144.0 / 57.0, contentMode: .fit)
-                            .frame(width: 130)
-
-                        Text("Next")
-                            .font(.system(size: 20, weight: .heavy, design: .rounded))
-                            .foregroundStyle(.black)
-                    }
+                if confetti {
+                    ConfettiBurstView()
+                        .allowsHitTesting(false)
                 }
-                .buttonStyle(.plain)
-                .padding(.leading, 38)
-                .padding(.bottom, 20)
+
+                ZStack(alignment: .bottomLeading) {
+                    GIFImageView(
+                        name: "mission-completed-animation",
+                        contentMode: .scaleAspectFit
+                    )
+                    .frame(
+                        width: UICfg.v(UICfg.Done.cardW, size)
+                    )
+                    .offset(
+                        y: UICfg.y(UICfg.Done.cardY, size)
+                    )
+
+                    Button {
+                        sfx.tap()
+                        onNext()
+                    } label: {
+                        ZStack {
+                            Image("btn-sort")
+                                .resizable()
+                                .aspectRatio(
+                                    144.0 / 57.0,
+                                    contentMode: .fit
+                                )
+                                .frame(
+                                    width: UICfg.v(
+                                        UICfg.Done.nextW,
+                                        size
+                                    )
+                                )
+
+                            Text("Next")
+                                .font(
+                                    .system(
+                                        size: UICfg.v(20, size),
+                                        weight: .heavy,
+                                        design: .rounded
+                                    )
+                                )
+                                .foregroundStyle(.black)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(
+                        .leading,
+                        UICfg.x(UICfg.Done.nextX, size)
+                    )
+                    .padding(
+                        .bottom,
+                        UICfg.y(UICfg.Done.nextY, size)
+                    )
+                }
+                .padding(
+                    .bottom,
+                    UICfg.y(UICfg.Done.bottom, size)
+                )
+                .scaleEffect(show ? 1 : 0.72)
+                .opacity(show ? 1 : 0)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 60)
-            .scaleEffect(show ? 1 : 0.72)
-            .opacity(show ? 1 : 0)
+            .frame(
+                width: size.width,
+                height: size.height
+            )
         }
+        .ignoresSafeArea()
         .onAppear {
             sfx.levelDone()
             sfx.popup()
@@ -82,7 +124,7 @@ private struct ConfettiBurstView: View {
     ]
 
     var body: some View {
-        GeometryReader { proxy in
+        GeometryReader { geo in
             ZStack {
                 ForEach(0..<30, id: \.self) { i in
                     RoundedRectangle(cornerRadius: 2)
@@ -92,8 +134,8 @@ private struct ConfettiBurstView: View {
                             height: i.isMultiple(of: 2) ? 14 : 10
                         )
                         .position(
-                            x: proxy.size.width * 0.5,
-                            y: proxy.size.height * 0.43
+                            x: geo.size.width * 0.5,
+                            y: geo.size.height * 0.43
                         )
                         .offset(
                             x: go ? xOffset(i) : 0,

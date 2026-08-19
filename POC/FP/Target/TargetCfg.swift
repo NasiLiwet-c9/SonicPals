@@ -10,6 +10,7 @@ import Foundation
 nonisolated enum TargetCfg {
     enum Tree {
         static let height: Float = 1.40
+        static let realDim: Float = 0.82
     }
 
     enum Spawn {
@@ -49,11 +50,11 @@ nonisolated enum TargetCfg {
         static let treePulseAlpha: Float = 1.0
         static let treeTraceAlpha: Float = 0.07
 
-        static let mangoPulseAlpha: Float = 0.60
-        static let mangoPulseBehindAlpha: Float = 0.30
+        static let mangoPulseAlpha: Float = 0.65
+        static let mangoPulseBehindAlpha: Float = 0.42
 
         static let mangoTraceAlpha: Float = 0.18
-        static let mangoTraceBehindAlpha: Float = 0.06
+        static let mangoTraceBehindAlpha: Float = 0.08
 
         static let mangoPulseScale: Float = 1.05
         static let mangoTraceScale: Float = 1.08

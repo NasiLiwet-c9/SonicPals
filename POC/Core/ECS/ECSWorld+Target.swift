@@ -78,28 +78,44 @@ extension ECSWorld {
     func eatMango() {
         guard let mango = eatCandidate else { return }
 
+        let eatenTarget = targetEntity
+
         sfx.eat()
 
         // Particle FX disabled for stability.
         // let mangoWorldPos = mango.position(relativeTo: nil)
         // playMangoFX(at: mangoWorldPos)
 
+        // Mango disappears immediately when bitten.
         mango.removeFromParent()
 
         model.mangoEatenCount += 1
         model.mangoEatReady = false
-
         eatCandidate = nil
 
-        targetEntity?.removeFromParent()
+        // Stop target interaction while bite animation plays.
         targetEntity = nil
-
         model.hasTarget = false
         model.targetFound = false
 
         setMsg("")
         playEatAnimation()
-        advanceMission()
+
+        // Wait for bite animation before removing the tree.
+        missionTask?.cancel()
+
+        missionTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(500))
+
+            guard let self,
+                  !Task.isCancelled else {
+                return
+            }
+
+            eatenTarget?.removeFromParent()
+
+            advanceMission()
+        }
     }
 
     private func hasEcho(in comp: TargetComp, mango: Bool) -> Bool {

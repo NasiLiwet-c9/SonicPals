@@ -58,20 +58,47 @@ private enum GIFLoader {
     }
 }
 
+private final class GIFUIImageView: UIImageView {
+    override var intrinsicContentSize: CGSize {
+        .zero
+    }
+}
+
 private struct AnimatedGIF: UIViewRepresentable {
     let name: String
     let contentMode: UIView.ContentMode
 
-    func makeUIView(context: Context) -> UIImageView {
-        let imageView = UIImageView()
+    func makeUIView(context: Context) -> GIFUIImageView {
+        let imageView = GIFUIImageView()
+
         imageView.contentMode = contentMode
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .clear
         imageView.image = GIFLoader.animatedImage(named: name)
+
+        imageView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+
         return imageView
     }
 
-    func updateUIView(_ uiView: UIImageView, context: Context) {
+    func updateUIView(_ uiView: GIFUIImageView, context: Context) {
         uiView.contentMode = contentMode
+    }
+
+    func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        uiView: GIFUIImageView,
+        context: Context
+    ) -> CGSize? {
+        guard let width = proposal.width,
+              let height = proposal.height else {
+            return nil
+        }
+
+        return CGSize(width: width, height: height)
     }
 }
 

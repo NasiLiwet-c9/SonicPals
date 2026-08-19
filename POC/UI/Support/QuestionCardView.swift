@@ -25,24 +25,38 @@ struct QuestionCardView: View {
         "What did you use to find the mangoes last night?"
 
     var body: some View {
-        ZStack {
-            Color.black
-                .opacity(0.15)
-                .ignoresSafeArea()
+        GeometryReader { geo in
+            let size = geo.size
 
-            if answered {
-                resultView
-            } else {
-                questionView
+            ZStack {
+                Color.black
+                    .opacity(0.15)
+                    .ignoresSafeArea()
+
+                if answered {
+                    resultView(size)
+                } else {
+                    questionView(size)
+                }
             }
+            .frame(
+                width: size.width,
+                height: size.height
+            )
         }
-        .transition(.scale(scale: 0.72).combined(with: .opacity))
+        .ignoresSafeArea()
+        .transition(
+            .scale(scale: 0.72)
+            .combined(with: .opacity)
+        )
         .onAppear {
             sfx.popup()
         }
     }
 
-    private var questionView: some View {
+    private func questionView(
+        _ size: CGSize
+    ) -> some View {
         ZStack {
             Image("quiz-card-bg")
                 .resizable()
@@ -50,37 +64,67 @@ struct QuestionCardView: View {
                     379.0 / 439.0,
                     contentMode: .fit
                 )
-                .frame(width: 330)
-//                .scaleEffect(1.2)
+                .frame(
+                    width: UICfg.v(
+                        UICfg.Quiz.cardW,
+                        size
+                    )
+                )
 
-            VStack(spacing: 14) {
+            VStack(
+                spacing: UICfg.v(
+                    UICfg.Quiz.qGap,
+                    size
+                )
+            ) {
                 Text(question)
                     .font(
                         .system(
-                            size: 17,
+                            size: UICfg.v(
+                                UICfg.Quiz.qTxt,
+                                size
+                            ),
                             weight: .heavy,
                             design: .rounded
                         )
                     )
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.black)
-                    .frame(width: 245)
+                    .frame(
+                        width: UICfg.v(
+                            UICfg.Quiz.qW,
+                            size
+                        )
+                    )
 
-                VStack(spacing: 8) {
+                VStack(
+                    spacing: UICfg.v(
+                        UICfg.Quiz.ansGap,
+                        size
+                    )
+                ) {
                     answerButton(
                         title: "A. ULTRASONIC",
-                        answer: .ultrasonic
+                        answer: .ultrasonic,
+                        size: size
                     )
 
                     answerButton(
                         title: "B. FLASHLIGHT",
-                        answer: .flashlight
+                        answer: .flashlight,
+                        size: size
                     )
                 }
             }
             .frame(
-                width: 330,
-                height: 380,
+                width: UICfg.v(
+                    UICfg.Quiz.cardW,
+                    size
+                ),
+                height: UICfg.v(
+                    UICfg.Quiz.cardH,
+                    size
+                ),
                 alignment: .center
             )
         }
@@ -88,7 +132,8 @@ struct QuestionCardView: View {
 
     private func answerButton(
         title: String,
-        answer: Answer
+        answer: Answer,
+        size: CGSize
     ) -> some View {
         Button {
             select(answer)
@@ -96,13 +141,23 @@ struct QuestionCardView: View {
             ZStack {
                 Image("filled-button-border")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 145)
+                    .aspectRatio(
+                        contentMode: .fit
+                    )
+                    .frame(
+                        width: UICfg.v(
+                            UICfg.Quiz.ansW,
+                            size
+                        )
+                    )
 
                 Text(title)
                     .font(
                         .system(
-                            size: 13,
+                            size: UICfg.v(
+                                UICfg.Quiz.ansTxt,
+                                size
+                            ),
                             weight: .heavy,
                             design: .rounded
                         )
@@ -117,122 +172,30 @@ struct QuestionCardView: View {
         selectedAnswer == .ultrasonic
     }
 
-    private var resultView: some View {
-        VStack(spacing: 16) {
-            ZStack(alignment: .top) {
-                Image(isCorrect ? "correct-quiz-card" : "incorrect-quiz-card")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 320)
+    private func resultView(
+        _ size: CGSize
+    ) -> some View {
+        VStack(
+            spacing: UICfg.v(
+                UICfg.Quiz.gap,
+                size
+            )
+        ) {
+            resultCard(size)
 
-                VStack(spacing: 8) {
-                    if isCorrect {
-                        Text("A. ULTRASONIC")
-                            .font(
-                                .system(
-                                    size: 18,
-                                    weight: .heavy,
-                                    design: .rounded
-                                )
-                            )
-                            .foregroundStyle(
-                                Color(
-                                    red: 0.15,
-                                    green: 0.2,
-                                    blue: 0.45
-                                )
-                            )
-
-                        Text(
-                            "You are super smart! You used your superpower perfectly."
-                        )
-                        .font(
-                            .system(
-                                size: 16,
-                                weight: .bold,
-                                design: .rounded
-                            )
-                        )
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.black)
-                        .frame(width: 220)
-                        .lineSpacing(3)
-                    } else {
-                        Text(
-                            "That's not it. Remember the bouncy sound we used? Try again!"
-                        )
-                        .font(
-                            .system(
-                                size: 16,
-                                weight: .bold,
-                                design: .rounded
-                            )
-                        )
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.black)
-                        .frame(width: 210)
-                        .lineSpacing(3)
-//                            .padding(.top, 16)
-                    }
-                }
-                .padding(.top, 120)
-            }
-
-            ZStack {
-                Image("card-play-again")
-                    .resizable()
-                    .aspectRatio(
-                        376.0 / 161.0,
-                        contentMode: .fit
-                    )
-                    .frame(width: 320)
-
-                VStack(spacing: 12) {
-                    Text("Want to explore again ?")
-                        .font(
-                            .system(
-                                size: 18,
-                                weight: .bold,
-                                design: .rounded
-                            )
-                        )
-                        .foregroundStyle(.black)
-
-                    Button {
-                        onPlayAgain()
-                    } label: {
-                        ZStack {
-                            Image("btn-sort")
-                                .resizable()
-                                .aspectRatio(
-                                    144.0 / 57.0,
-                                    contentMode: .fit
-                                )
-                                .frame(width: 145)
-
-                            Text("YES, PLAY AGAIN")
-                                .font(
-                                    .system(
-                                        size: 12,
-                                        weight: .heavy,
-                                        design: .rounded
-                                    )
-                                )
-                                .foregroundStyle(.black)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-                .offset(y: 16)
-            }
+            replayCard(size)
 
             Button {
+                sfx.tap()
                 onBackToMenu()
             } label: {
                 Text("BACK TO MAIN MENU")
                     .font(
                         .system(
-                            size: 12,
+                            size: UICfg.v(
+                                UICfg.Quiz.backTxt,
+                                size
+                            ),
                             weight: .heavy,
                             design: .rounded
                         )
@@ -246,11 +209,192 @@ struct QuestionCardView: View {
                     )
             }
             .buttonStyle(.plain)
-            .padding(.top, 2)
         }
     }
 
-    private func select(_ answer: Answer) {
+    private func resultCard(
+        _ size: CGSize
+    ) -> some View {
+        ZStack(alignment: .top) {
+            Image(
+                isCorrect
+                    ? "correct-quiz-card"
+                    : "incorrect-quiz-card"
+            )
+            .resizable()
+            .aspectRatio(
+                contentMode: .fit
+            )
+            .frame(
+                width: UICfg.v(
+                    UICfg.Quiz.resW,
+                    size
+                )
+            )
+
+            VStack(
+                spacing: UICfg.v(9, size)
+            ) {
+                if isCorrect {
+                    Text("A. ULTRASONIC")
+                        .font(
+                            .system(
+                                size: UICfg.v(
+                                    UICfg.Quiz.resTitle,
+                                    size
+                                ),
+                                weight: .heavy,
+                                design: .rounded
+                            )
+                        )
+                        .foregroundStyle(
+                            Color(
+                                red: 0.15,
+                                green: 0.2,
+                                blue: 0.45
+                            )
+                        )
+
+                    Text(
+                        "You are super smart! You used your superpower perfectly."
+                    )
+                    .font(
+                        .system(
+                            size: UICfg.v(
+                                UICfg.Quiz.resTxt,
+                                size
+                            ),
+                            weight: .bold,
+                            design: .rounded
+                        )
+                    )
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.black)
+                    .frame(
+                        width: UICfg.v(
+                            UICfg.Quiz.resTxtW,
+                            size
+                        )
+                    )
+                    .lineSpacing(
+                        UICfg.v(3, size)
+                    )
+                } else {
+                    Text(
+                        "That's not it. Remember the bouncy sound we used? Try again!"
+                    )
+                    .font(
+                        .system(
+                            size: UICfg.v(
+                                UICfg.Quiz.resTxt,
+                                size
+                            ),
+                            weight: .bold,
+                            design: .rounded
+                        )
+                    )
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.black)
+                    .frame(
+                        width: UICfg.v(
+                            UICfg.Quiz.resTxtW,
+                            size
+                        )
+                    )
+                    .lineSpacing(
+                        UICfg.v(3, size)
+                    )
+                }
+            }
+            .padding(
+                .top,
+                UICfg.v(
+                    UICfg.Quiz.resTop,
+                    size
+                )
+            )
+        }
+    }
+
+    private func replayCard(
+        _ size: CGSize
+    ) -> some View {
+        ZStack {
+            Image("card-play-again")
+                .resizable()
+                .aspectRatio(
+                    376.0 / 161.0,
+                    contentMode: .fit
+                )
+                .frame(
+                    width: UICfg.v(
+                        UICfg.Quiz.againW,
+                        size
+                    )
+                )
+
+            VStack(
+                spacing: UICfg.v(12, size)
+            ) {
+                Text("Want to explore again ?")
+                    .font(
+                        .system(
+                            size: UICfg.v(
+                                UICfg.Quiz.againTxt,
+                                size
+                            ),
+                            weight: .bold,
+                            design: .rounded
+                        )
+                    )
+                    .foregroundStyle(.black)
+
+                Button {
+                    sfx.tap()
+                    onPlayAgain()
+                } label: {
+                    ZStack {
+                        Image("btn-sort")
+                            .resizable()
+                            .aspectRatio(
+                                144.0 / 57.0,
+                                contentMode: .fit
+                            )
+                            .frame(
+                                width: UICfg.v(
+                                    UICfg.Quiz.againBtnW,
+                                    size
+                                )
+                            )
+
+                        Text("YES, PLAY AGAIN")
+                            .font(
+                                .system(
+                                    size: UICfg.v(
+                                        UICfg.Quiz.againBtnTxt,
+                                        size
+                                    ),
+                                    weight: .heavy,
+                                    design: .rounded
+                                )
+                            )
+                            .foregroundStyle(.black)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+            .offset(
+                y: UICfg.y(
+                    16,
+                    size
+                )
+            )
+        }
+    }
+
+    private func select(
+        _ answer: Answer
+    ) {
         sfx.tap()
 
         selectedAnswer = answer
@@ -261,8 +405,17 @@ struct QuestionCardView: View {
             sfx.incorrect()
         }
 
-        withAnimation(.easeInOut(duration: 0.25)) {
+        withAnimation(
+            .easeInOut(duration: 0.25)
+        ) {
             answered = true
         }
     }
+}
+
+#Preview("Quiz") {
+    QuestionCardView(
+        onPlayAgain: {},
+        onBackToMenu: {}
+    )
 }

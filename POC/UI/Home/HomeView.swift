@@ -21,11 +21,13 @@ struct HomeView: View {
 
     var body: some View {
         GeometryReader { geo in
+            let size = geo.size
+
             ZStack {
-                background(
-                    width: geo.size.width,
-                    height: geo.size.height
-                )
+                Color(red: 0.13, green: 0.11, blue: 0.28)
+                    .ignoresSafeArea()
+
+                background(size)
 
                 VStack {
                     Spacer()
@@ -34,10 +36,11 @@ struct HomeView: View {
                         lines: dialogueLines,
                         mascotName: mascotName,
                         mascotGIFName: "flying-animation-mascot",
-                        loops: true
+                        loops: true,
+                        uiScale: UICfg.s(size)
                     )
 
-                    VStack(spacing: 18) {
+                    VStack(spacing: UICfg.v(UICfg.Home.gap, size)) {
                         Button(action: onStart) {
                             ZStack {
                                 Image("filled-button-border")
@@ -45,10 +48,19 @@ struct HomeView: View {
                                     .aspectRatio(contentMode: .fit)
 
                                 Text(primaryButtonText.uppercased())
-                                    .font(.system(size: 20, weight: .heavy, design: .rounded))
+                                    .font(
+                                        .system(
+                                            size: UICfg.v(20, size),
+                                            weight: .heavy,
+                                            design: .rounded
+                                        )
+                                    )
                                     .foregroundStyle(.black)
                             }
-                            .frame(width: 220, height: 64)
+                            .frame(
+                                width: UICfg.v(UICfg.Home.playW, size),
+                                height: UICfg.v(UICfg.Home.playH, size)
+                            )
                         }
                         .buttonStyle(.plain)
 
@@ -56,34 +68,48 @@ struct HomeView: View {
                             Image("map-btn-yellow")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 76, height: 86)
+                                .frame(
+                                    width: UICfg.v(UICfg.Home.mapW, size),
+                                    height: UICfg.v(UICfg.Home.mapH, size)
+                                )
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Open map")
                     }
-                    .padding(.bottom, 210)
+                    .padding(
+                        .bottom,
+                        UICfg.v(UICfg.Home.bottom, size)
+                    )
                 }
-                .padding(.horizontal, 20)
+                .padding(
+                    .horizontal,
+                    UICfg.v(20, size)
+                )
             }
-            .frame(width: geo.size.width, height: geo.size.height)
+            .frame(
+                width: size.width,
+                height: size.height
+            )
         }
         .ignoresSafeArea()
         .preferredColorScheme(.light)
     }
 
-    private func background(
-        width: CGFloat,
-        height: CGFloat
-    ) -> some View {
-        GIFImageView(
+    private func background(_ size: CGSize) -> some View {
+        let bgW = UICfg.v(UICfg.Home.bgW, size)
+        let bgH = bgW * (1748.0 / 804.0)
+
+        return GIFImageView(
             name: "bg-main-animation",
-            contentMode: .scaleAspectFill
+            contentMode: .scaleAspectFit
         )
         .frame(
-            width: width,
-            height: height
+            width: bgW,
+            height: bgH
         )
-        .clipped()
+        .offset(
+            y: UICfg.y(UICfg.Home.bgY, size)
+        )
         .allowsHitTesting(false)
     }
 }

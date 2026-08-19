@@ -78,8 +78,21 @@ final class TargetAssetSvc: TargetMaking {
         sceneSvc.noShadow(real)
         sceneSvc.muteParticles(real)
 
+        // Clone sonar before changing real model color.
         let pulse = real.clone(recursive: true)
         let trace = real.clone(recursive: true)
+
+        // Real target above mission shade.
+        RealityShade.keepBright(
+            real,
+            order: 1
+        )
+
+        // Darker RGB only. Opacity stays unchanged.
+        sceneSvc.dim(
+            real,
+            factor: TargetCfg.Tree.realDim
+        )
 
         sceneSvc.freeze(pulse)
         sceneSvc.freeze(trace)
@@ -127,7 +140,9 @@ final class TargetAssetSvc: TargetMaking {
         )
     }
 
-    private func finish(_ task: Task<Entity, Error>) async -> Bool {
+    private func finish(
+        _ task: Task<Entity, Error>
+    ) async -> Bool {
         do {
             sceneTpl = try await task.value
             self.task = nil

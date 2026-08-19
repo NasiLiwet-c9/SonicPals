@@ -17,6 +17,7 @@ struct DialogueBubbleView: View {
     let shortBubbleImageName: String
     let tallBubbleImageName: String
     let shortLineCharacterThreshold: Int
+    let uiScale: CGFloat
 
     init(
         lines: [String],
@@ -27,6 +28,7 @@ struct DialogueBubbleView: View {
         tallBubbleImageName: String = "tall-bubble-card",
         shortLineCharacterThreshold: Int = 24,
         loops: Bool = false,
+        uiScale: CGFloat = 1,
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         _controller = StateObject(
@@ -43,22 +45,36 @@ struct DialogueBubbleView: View {
         self.shortBubbleImageName = shortBubbleImageName
         self.tallBubbleImageName = tallBubbleImageName
         self.shortLineCharacterThreshold = shortLineCharacterThreshold
+        self.uiScale = uiScale
     }
 
     private var isCurrentLineShort: Bool {
-        guard controller.lines.indices.contains(controller.currentLineIndex) else { return true }
+        guard controller.lines.indices.contains(controller.currentLineIndex) else {
+            return true
+        }
 
         return controller.lines[controller.currentLineIndex].count <= shortLineCharacterThreshold
     }
 
     private var bubbleImageName: String {
-        isCurrentLineShort ? shortBubbleImageName : tallBubbleImageName
+        isCurrentLineShort
+            ? shortBubbleImageName
+            : tallBubbleImageName
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: -50) {
+        HStack(
+            alignment: .top,
+            spacing: UICfg.Dlg.gap * uiScale
+        ) {
             bubble
-                .offset(y: isCurrentLineShort ? -15 : -88)
+                .offset(
+                    y: (
+                        isCurrentLineShort
+                            ? UICfg.Dlg.shortY
+                            : UICfg.Dlg.tallY
+                    ) * uiScale
+                )
 
             mascot
         }
@@ -78,10 +94,16 @@ struct DialogueBubbleView: View {
     private var mascot: some View {
         if let mascotGIFName {
             GIFImageView(name: mascotGIFName)
-                .frame(width: 240, height: 240)
+                .frame(
+                    width: UICfg.Dlg.bat * uiScale,
+                    height: UICfg.Dlg.bat * uiScale
+                )
         } else {
             Model3DView(name: mascotName)
-                .frame(width: 240, height: 240)
+                .frame(
+                    width: UICfg.Dlg.bat * uiScale,
+                    height: UICfg.Dlg.bat * uiScale
+                )
         }
     }
 
@@ -92,26 +114,37 @@ struct DialogueBubbleView: View {
                 .aspectRatio(contentMode: .fit)
 
             Text(controller.visibleText)
-                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .font(
+                    .system(
+                        size: UICfg.Dlg.txt * uiScale,
+                        weight: .bold,
+                        design: .rounded
+                    )
+                )
                 .multilineTextAlignment(.leading)
                 .lineLimit(isCurrentLineShort ? 1 : 4)
                 .minimumScaleFactor(0.75)
                 .foregroundStyle(.black)
-                .padding(.horizontal, 20)
-                .padding(.bottom, isCurrentLineShort ? 18 : 20)
-                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding(
+                    .horizontal,
+                    UICfg.Dlg.padX * uiScale
+                )
+                .padding(
+                    .bottom,
+                    (isCurrentLineShort ? 18 : 20) * uiScale
+                )
+                .frame(
+                    maxWidth: .infinity,
+                    alignment: .topLeading
+                )
         }
         .frame(
-            width: 170,
-            height: isCurrentLineShort
-                ? 170 * 78 / 163
-                : 200 * 136 / 163
+            width: UICfg.Dlg.bubW * uiScale,
+            height: (
+                isCurrentLineShort
+                    ? UICfg.Dlg.shortH
+                    : UICfg.Dlg.tallH
+            ) * uiScale
         )
-    }
-
-    private var bubbleOffset: CGSize {
-        isCurrentLineShort
-            ? CGSize(width: -75, height: -140)
-            : CGSize(width: -90, height: -160)
     }
 }

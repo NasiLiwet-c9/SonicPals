@@ -14,17 +14,17 @@ final class HapticSvc {
 
     private let dir =
         UIImpactFeedbackGenerator(
-            style: .light
+            style: .rigid
         )
 
     private let near =
         UIImpactFeedbackGenerator(
-            style: .medium
+            style: .heavy
         )
 
     private let strong =
         UIImpactFeedbackGenerator(
-            style: .heavy
+            style: .rigid
         )
 
     private let success =
@@ -45,26 +45,44 @@ final class HapticSvc {
         }
 
         dir.impactOccurred(
-            intensity: 0.65
+            intensity: 1.0
         )
 
         dir.prepare()
     }
 
-    func closer(strong isStrong: Bool) {
+    func closer(
+        strong isStrong: Bool
+    ) {
         guard supported else {
             return
         }
 
         if isStrong {
             strong.impactOccurred(
-                intensity: 0.85
+                intensity: 1.0
             )
 
             strong.prepare()
+
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(
+                    for: .milliseconds(55)
+                )
+
+                guard let self else {
+                    return
+                }
+
+                strong.impactOccurred(
+                    intensity: 1.0
+                )
+
+                strong.prepare()
+            }
         } else {
             near.impactOccurred(
-                intensity: 0.70
+                intensity: 1.0
             )
 
             near.prepare()
@@ -76,11 +94,32 @@ final class HapticSvc {
             return
         }
 
+        strong.impactOccurred(
+            intensity: 1.0
+        )
+
         success.notificationOccurred(
             .success
         )
 
+        strong.prepare()
         success.prepare()
+
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(
+                for: .milliseconds(80)
+            )
+
+            guard let self else {
+                return
+            }
+
+            strong.impactOccurred(
+                intensity: 1.0
+            )
+
+            strong.prepare()
+        }
     }
 
     private func prepare() {
