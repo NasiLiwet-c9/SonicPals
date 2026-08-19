@@ -10,6 +10,10 @@ import simd
 
 extension ECSWorld {
     func spawnTargetNow(showError: Bool) async -> Bool {
+        if ForceSpawnRuntime.shared.isActive(for: self) {
+            return await forceSpawnTargetNow(showError: showError)
+        }
+
         guard model.lidarOK,
               let scene = anchor.scene,
               var sessComp = sessEntity.components[SessComp.self],

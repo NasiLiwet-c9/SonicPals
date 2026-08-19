@@ -27,9 +27,7 @@ final class TargetAssetSvc: TargetMaking {
         treeH: Float = TargetCfg.Tree.height
     ) {
         self.sceneName = sceneName
-        sceneSvc = TargetSceneSvc(
-            treeH: treeH
-        )
+        sceneSvc = TargetSceneSvc(treeH: treeH)
     }
 
     func prepare() async -> Bool {
@@ -43,9 +41,7 @@ final class TargetAssetSvc: TargetMaking {
 
         let name = sceneName
 
-        let newTask = Task {
-            @MainActor in
-
+        let newTask = Task { @MainActor in
             try await Entity(
                 named: name,
                 in: realityKitContentBundle
@@ -59,55 +55,37 @@ final class TargetAssetSvc: TargetMaking {
 
     func make() -> TargetPart? {
         guard let sceneTpl else {
-            return fail(
-                "Target assets are not ready"
-            )
+            return fail("Target assets are not ready")
         }
 
-        let real = sceneTpl.clone(
-            recursive: true
-        )
-
+        let real = sceneTpl.clone(recursive: true)
         real.name = "targetReal"
 
         sceneSvc.freeze(real)
 
-        guard let size = sceneSvc.place(
-            real
-        ) else {
-            return fail(
-                "Scene bounds are empty"
-            )
+        guard let size = sceneSvc.place(real) else {
+            return fail("Scene bounds are empty")
         }
 
-        guard mangoSvc.place(
-            in: real
-        ) else {
-            return fail(
-                "Could not place mango at a spawn point"
-            )
+        guard mangoSvc.place(in: real) else {
+            return fail("Could not place mango at a spawn point")
         }
 
-        guard mangoSvc.mark(
-            in: real
-        ) else {
-            return fail(
-                "Mango entity not found in scene"
-            )
+        guard mangoSvc.mark(in: real) else {
+            return fail("Mango entity not found in scene")
         }
 
         sceneSvc.noShadow(real)
+        sceneSvc.muteParticles(real)
 
-        let pulse = real.clone(
-            recursive: true
-        )
-
-        let trace = real.clone(
-            recursive: true
-        )
+        let pulse = real.clone(recursive: true)
+        let trace = real.clone(recursive: true)
 
         sceneSvc.freeze(pulse)
         sceneSvc.freeze(trace)
+
+        sceneSvc.muteParticles(pulse)
+        sceneSvc.muteParticles(trace)
 
         echoSvc.style(
             pulse: pulse,
@@ -118,7 +96,6 @@ final class TargetAssetSvc: TargetMaking {
         sceneSvc.noShadow(trace)
 
         let root = Entity()
-
         root.name = "target"
 
         root.addChild(real)
@@ -130,9 +107,7 @@ final class TargetAssetSvc: TargetMaking {
             trace: trace
         ),
         !parts.isEmpty else {
-            return fail(
-                "Target has no renderable parts"
-            )
+            return fail("Target has no renderable parts")
         }
 
         real.isEnabled = false
@@ -152,29 +127,20 @@ final class TargetAssetSvc: TargetMaking {
         )
     }
 
-    private func finish(
-        _ task: Task<Entity, Error>
-    ) async -> Bool {
+    private func finish(_ task: Task<Entity, Error>) async -> Bool {
         do {
-            sceneTpl =
-                try await task.value
-
+            sceneTpl = try await task.value
             self.task = nil
             loadError = nil
-
             return true
         } catch {
             self.task = nil
-            loadError =
-                error.localizedDescription
-
+            loadError = error.localizedDescription
             return false
         }
     }
 
-    private func fail(
-        _ text: String
-    ) -> TargetPart? {
+    private func fail(_ text: String) -> TargetPart? {
         loadError = text
         return nil
     }

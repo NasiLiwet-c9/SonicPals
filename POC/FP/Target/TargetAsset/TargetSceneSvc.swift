@@ -12,9 +12,7 @@ import simd
 struct TargetSceneSvc {
     let treeH: Float
 
-    func place(
-        _ scene: Entity
-    ) -> SIMD3<Float>? {
+    func place(_ scene: Entity) -> SIMD3<Float>? {
         let b = scene.visualBounds(
             recursive: true,
             relativeTo: scene,
@@ -29,9 +27,7 @@ struct TargetSceneSvc {
         let size = b.extents * s
         let center = b.center * s
 
-        scene.scale = SIMD3<Float>(
-            repeating: s
-        )
+        scene.scale = SIMD3<Float>(repeating: s)
 
         scene.position = SIMD3<Float>(
             -center.x,
@@ -42,21 +38,24 @@ struct TargetSceneSvc {
         return size
     }
 
-    func freeze(
-        _ root: Entity
-    ) {
-        root.stopAllAnimations(
-            recursive: true
-        )
+    func freeze(_ root: Entity) {
+        root.stopAllAnimations(recursive: true)
     }
 
-    func noShadow(
-        _ root: Entity
-    ) {
+    func muteParticles(_ root: Entity) {
+        if var emitter = root.components[ParticleEmitterComponent.self] {
+            emitter.isEmitting = false
+            root.components[ParticleEmitterComponent.self] = emitter
+        }
+
+        for child in root.children {
+            muteParticles(child)
+        }
+    }
+
+    func noShadow(_ root: Entity) {
         root.components.set(
-            GroundingShadowComponent(
-                castsShadow: false
-            )
+            GroundingShadowComponent(castsShadow: false)
         )
 
         for child in root.children {

@@ -28,16 +28,9 @@ enum TargetFind {
         return nil
     }
 
-    static func models(
-        in root: Entity
-    ) -> [Entity] {
+    static func models(in root: Entity) -> [Entity] {
         var out: [Entity] = []
-
-        walk(
-            root,
-            into: &out
-        )
-
+        walk(root, into: &out)
         return out
     }
 
@@ -62,17 +55,16 @@ enum TargetFind {
         _ entity: Entity,
         into out: inout [Entity]
     ) {
-        if entity.components.has(
-            ModelComponent.self
-        ) {
+        if entity.name == "MangoXRay" {
+            return
+        }
+
+        if entity.components.has(ModelComponent.self) {
             out.append(entity)
         }
 
         for child in entity.children {
-            walk(
-                child,
-                into: &out
-            )
+            walk(child, into: &out)
         }
     }
 }

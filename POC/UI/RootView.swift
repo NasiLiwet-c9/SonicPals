@@ -17,12 +17,15 @@ struct RootView: View {
 
     @State private var stage: Stage = .home
 
+    private let sfx = SfxSvc.shared
+
     var body: some View {
         ZStack {
             switch stage {
             case .home:
                 HomeView(
                     onStart: {
+                        sfx.tap()
                         move(to: .splash)
                     },
                     onSelectMode: {
@@ -30,7 +33,7 @@ struct RootView: View {
                     }
                 )
                 .transition(.opacity)
-                
+
             case .splash:
                 SplashView {
                     move(to: .main)
@@ -52,16 +55,21 @@ struct RootView: View {
                 .transition(.opacity)
             }
         }
+        .task {
+            sfx.menuBgm()
+        }
     }
 
-    private func move(
-        to next: Stage
-    ) {
-        withAnimation(
-            .easeInOut(
-                duration: 0.35
-            )
-        ) {
+    private func move(to next: Stage) {
+        switch next {
+        case .home:
+            sfx.menuBgm()
+
+        case .splash, .main:
+            sfx.sessionBgm()
+        }
+
+        withAnimation(.easeInOut(duration: 0.35)) {
             stage = next
         }
     }

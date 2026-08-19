@@ -15,10 +15,12 @@ struct HUDView: View {
 
     @State private var scanIntroDone = false
 
+    private let sfx = SfxSvc.shared
+
     var body: some View {
         ZStack {
             reticle
-            
+
 //            #if DEBUG
 //            Button("SKIP TO COMPLETION") {
 //                world.model.missionComplete = true
@@ -29,41 +31,39 @@ struct HUDView: View {
 //            .position(x: 120, y: 100)
 //            .zIndex(100)
 //            #endif
-//            
+
             if world.model.quizTransitionID > 0,
                !world.model.showQuiz {
-                GIFImageView(
-                    name: "dark-to-light-transition"
-                )
-                .ignoresSafeArea()
-                .id(world.model.quizTransitionID)
-                .zIndex(15)
-                .allowsHitTesting(false)
-                .task(id: world.model.quizTransitionID) {
-                    try? await Task.sleep(
-                        for: .milliseconds(700)
-                    )
+                GIFImageView(name: "dark-to-light-transition")
+                    .ignoresSafeArea()
+                    .id(world.model.quizTransitionID)
+                    .zIndex(15)
+                    .allowsHitTesting(false)
+                    .task(id: world.model.quizTransitionID) {
+                        try? await Task.sleep(for: .milliseconds(700))
 
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        world.model.showQuiz = true
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            world.model.showQuiz = true
+                        }
                     }
-                }
             }
-            
+
             if world.model.showMissionCompleteCard {
                 MissionCompleteCardView {
-                        startQuizTransition()
-                    }
+                    startQuizTransition()
+                }
                 .transition(.opacity)
                 .zIndex(10)
             }
-            
+
             if world.model.showQuiz {
                 QuestionCardView(
                     onPlayAgain: {
+                        sfx.tap()
                         restartMission()
                     },
                     onBackToMenu: {
+                        sfx.tap()
                         onBack()
                     }
                 )
@@ -71,7 +71,7 @@ struct HUDView: View {
                 .transition(.opacity)
                 .zIndex(20)
             }
-            
+
             if world.model.eatAnimationVisible {
                 GIFImageView(name: "eat-animation")
                     .aspectRatio(contentMode: .fill)
@@ -79,13 +79,12 @@ struct HUDView: View {
                     .id(world.model.eatAnimationID)
                     .allowsHitTesting(false)
                     .task(id: world.model.eatAnimationID) {
-                        // Matches the gif's real loop length (5 frames x 100ms).
                         try? await Task.sleep(for: .milliseconds(500))
                         world.model.eatAnimationVisible = false
                     }
                     .transition(.opacity)
             }
-            
+
             switch world.model.hudStage {
             case .scanning:
                 if !scanIntroDone {
@@ -110,9 +109,7 @@ struct HUDView: View {
                         world.endScan()
                         world.model.missionDark = false
 
-                        try? await Task.sleep(
-                            for: .milliseconds(180)
-                        )
+                        try? await Task.sleep(for: .milliseconds(180))
 
                         withAnimation {
                             world.model.hudStage = .transitioning
@@ -121,36 +118,24 @@ struct HUDView: View {
 
             case .transitioning:
                 ZStack {
-                    GIFImageView(
-                        name: "light-to-dark-transition"
-                    )
-                    .ignoresSafeArea()
+                    GIFImageView(name: "light-to-dark-transition")
+                        .ignoresSafeArea()
 
                     Color.black
-                        .opacity(
-                            world.model.missionDark
-                            ? 0.18
-                            : 0
-                        )
+                        .opacity(world.model.missionDark ? 0.18 : 0)
                         .ignoresSafeArea()
                         .allowsHitTesting(false)
                 }
                 .task {
                     world.model.missionDark = false
 
-                    try? await Task.sleep(
-                        for: .milliseconds(700)
-                    )
+                    try? await Task.sleep(for: .milliseconds(700))
 
-                    withAnimation(
-                        .easeInOut(duration: 0.35)
-                    ) {
+                    withAnimation(.easeInOut(duration: 0.35)) {
                         world.model.missionDark = true
                     }
 
-                    try? await Task.sleep(
-                        for: .milliseconds(700)
-                    )
+                    try? await Task.sleep(for: .milliseconds(700))
 
                     world.beginMission()
 
@@ -176,17 +161,10 @@ struct HUDView: View {
                     MissionChatBubbleView(
                         lines: world.model.missionDialogueLines,
                         onFinishedAllLines: {
-                            withAnimation {
-                                world.dismissMissionDialogue()
-                                        if world.model.missionComplete {
-                                            world.model.showMissionCompleteCard = true
-                                        }
-                            }
+                            finishMissionDialogue()
                         }
                     )
-                    .id(
-                        world.model.missionDialogueID
-                    )
+                    .id(world.model.missionDialogueID)
                     .padding(.bottom, 8)
                 }
 
@@ -198,10 +176,10 @@ struct HUDView: View {
             .padding(.top, 10)
             .padding(.bottom, 24)
         }
-        .onChange(
-            of: world.model.scanReady
-        ) { _, isReady in
+        .onChange(of: world.model.scanReady) { _, isReady in
             if isReady {
+                sfx.scanDone()
+
                 withAnimation {
                     world.model.hudStage = .scanCompletePrompt
                 }
@@ -230,10 +208,7 @@ struct HUDView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 7)
-                .background(
-                    .ultraThinMaterial,
-                    in: Capsule()
-                )
+                .background(.ultraThinMaterial, in: Capsule())
                 .padding(.bottom, 12)
         }
     }
@@ -242,18 +217,10 @@ struct HUDView: View {
         HStack {
             if world.model.mangoEatReady {
                 eatButton
-                    .transition(
-                        .scale.combined(
-                            with: .opacity
-                        )
-                    )
+                    .transition(.scale.combined(with: .opacity))
             } else {
                 waveButton
-                    .transition(
-                        .scale.combined(
-                            with: .opacity
-                        )
-                    )
+                    .transition(.scale.combined(with: .opacity))
             }
         }
         .animation(
@@ -264,115 +231,70 @@ struct HUDView: View {
 
     private var waveButton: some View {
         Button {
+            sfx.tap()
             world.perform(.sendWave)
         } label: {
             Image("ping-btn")
                 .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(
-                    width: 108,
-                    height: 108
-                )
+                .frame(width: 108, height: 108)
         }
         .buttonStyle(.plain)
-        .disabled(
-            !world.model.canWave
-        )
-        .opacity(
-            world.model.canWave
-            ? 1
-            : 0.4
-        )
-        .accessibilityLabel(
-            "Send ultrasonic wave"
-        )
+        .disabled(!world.model.canWave)
+        .opacity(world.model.canWave ? 1 : 0.4)
+        .accessibilityLabel("Send ultrasonic wave")
     }
 
     private var eatButton: some View {
         Button {
+            sfx.tap()
             world.perform(.eatMango)
         } label: {
             Image("eat-btn")
                 .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(
-                    width: 108,
-                    height: 108
-                )
+                .frame(width: 108, height: 108)
         }
         .buttonStyle(.plain)
         .glassEffect()
-        .accessibilityLabel(
-            "Eat mango"
-        )
+        .accessibilityLabel("Eat mango")
     }
 
     private var reticle: some View {
         ZStack {
             Circle()
-                .stroke(
-                    .white.opacity(0.45),
-                    lineWidth: 1
-                )
-                .frame(
-                    width: 82,
-                    height: 82
-                )
+                .stroke(.white.opacity(0.45), lineWidth: 1)
+                .frame(width: 82, height: 82)
 
             Circle()
-                .stroke(
-                    .white.opacity(0.35),
-                    lineWidth: 1
-                )
-                .frame(
-                    width: 40,
-                    height: 40
-                )
+                .stroke(.white.opacity(0.35), lineWidth: 1)
+                .frame(width: 40, height: 40)
 
             Rectangle()
-                .fill(
-                    .white.opacity(0.45)
-                )
-                .frame(
-                    width: 1,
-                    height: 94
-                )
+                .fill(.white.opacity(0.45))
+                .frame(width: 1, height: 94)
 
             Rectangle()
-                .fill(
-                    .white.opacity(0.45)
-                )
-                .frame(
-                    width: 94,
-                    height: 1
-                )
+                .fill(.white.opacity(0.45))
+                .frame(width: 94, height: 1)
 
             Circle()
-                .fill(
-                    .white.opacity(0.8)
-                )
-                .frame(
-                    width: 5,
-                    height: 5
-                )
+                .fill(.white.opacity(0.8))
+                .frame(width: 5, height: 5)
 
             if world.model.hudStage == .scanning {
-                Text(
-                    "\(Int((world.model.scanProgress * 100).rounded()))%"
-                )
-                .font(
-                    .system(
-                        size: 12,
-                        weight: .semibold,
-                        design: .rounded
+                Text("\(Int((world.model.scanProgress * 100).rounded()))%")
+                    .font(
+                        .system(
+                            size: 12,
+                            weight: .semibold,
+                            design: .rounded
+                        )
                     )
-                )
-                .foregroundStyle(
-                    .white.opacity(0.82)
-                )
-                .offset(y: 67)
+                    .foregroundStyle(.white.opacity(0.82))
+                    .offset(y: 67)
 
                 scanTurn
             }
@@ -385,58 +307,54 @@ struct HUDView: View {
         switch world.model.scanTurn {
         case .left:
             HStack(spacing: 0) {
-                Image(
-                    systemName: "chevron.left"
-                )
-
-                Image(
-                    systemName: "chevron.left"
-                )
+                Image(systemName: "chevron.left")
+                Image(systemName: "chevron.left")
             }
-            .font(
-                .system(
-                    size: 15,
-                    weight: .bold
-                )
-            )
-            .foregroundStyle(
-                .white.opacity(0.82)
-            )
+            .font(.system(size: 15, weight: .bold))
+            .foregroundStyle(.white.opacity(0.82))
             .offset(x: -86)
 
         case .right:
             HStack(spacing: 0) {
-                Image(
-                    systemName: "chevron.right"
-                )
-
-                Image(
-                    systemName: "chevron.right"
-                )
+                Image(systemName: "chevron.right")
+                Image(systemName: "chevron.right")
             }
-            .font(
-                .system(
-                    size: 15,
-                    weight: .bold
-                )
-            )
-            .foregroundStyle(
-                .white.opacity(0.82)
-            )
+            .font(.system(size: 15, weight: .bold))
+            .foregroundStyle(.white.opacity(0.82))
             .offset(x: 86)
 
         case .none:
             EmptyView()
         }
     }
-    
+
+    private func finishMissionDialogue() {
+        withAnimation {
+            world.dismissMissionDialogue()
+        }
+
+        guard world.model.missionComplete else { return }
+
+        Task { @MainActor in
+            world.clearActiveWave()
+            world.clearTraces()
+
+            await world.stop()
+
+            withAnimation(.easeInOut(duration: 0.25)) {
+                world.model.showMissionCompleteCard = true
+            }
+        }
+    }
+
     private func startQuizTransition() {
+        sfx.tap()
+        sfx.quizBgm()
+
         world.model.showMissionCompleteCard = false
         world.model.showQuiz = false
-
         world.model.quizAnswered = false
         world.model.quizCorrect = false
-
         world.model.quizTransitionID += 1
 
         withAnimation(.easeInOut(duration: 0.2)) {
@@ -444,23 +362,25 @@ struct HUDView: View {
         }
 
         Task { @MainActor in
-            try? await Task.sleep(
-                for: .milliseconds(50)
-            )
+            try? await Task.sleep(for: .milliseconds(50))
 
             world.model.missionDark = true
 
-            try? await Task.sleep(
-                for: .milliseconds(700)
-            )
+            try? await Task.sleep(for: .milliseconds(700))
 
             world.model.showQuiz = true
         }
     }
+
     private func restartMission() {
+        sfx.sessionBgm()
+
         withAnimation {
-                    scanIntroDone = false
-                }
-        world.restartMission()
+            scanIntroDone = false
+        }
+
+        Task { @MainActor in
+            await world.restartMission()
+        }
     }
 }

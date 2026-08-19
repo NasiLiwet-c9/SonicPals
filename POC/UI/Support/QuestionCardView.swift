@@ -14,6 +14,8 @@ struct QuestionCardView: View {
     @State private var selectedAnswer: Answer?
     @State private var answered = false
 
+    private let sfx = SfxSvc.shared
+
     enum Answer {
         case ultrasonic
         case flashlight
@@ -36,8 +38,6 @@ struct QuestionCardView: View {
         }
         .transition(.opacity)
     }
-
-    // MARK: - Question
 
     private var questionView: some View {
         ZStack {
@@ -83,8 +83,6 @@ struct QuestionCardView: View {
         }
     }
 
-    // MARK: - Answer Button
-
     private func answerButton(
         title: String,
         answer: Answer
@@ -95,9 +93,7 @@ struct QuestionCardView: View {
             ZStack {
                 Image("filled-button-border")
                     .resizable()
-                    .aspectRatio(
-                        contentMode: .fit
-                    )
+                    .aspectRatio(contentMode: .fit)
                     .frame(width: 145)
 
                 Text(title)
@@ -114,98 +110,97 @@ struct QuestionCardView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Result View
+    private var isCorrect: Bool {
+        selectedAnswer == .ultrasonic
+    }
 
-        private var isCorrect: Bool {
-            selectedAnswer == .ultrasonic
-        }
+    private var resultView: some View {
+        VStack(spacing: 16) {
+            ZStack(alignment: .top) {
+                Image(isCorrect ? "correct-quiz-card" : "incorrect-quiz-card")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 320)
 
-        private var resultView: some View {
-            VStack(spacing: 16) {
-                // Main Top Result Card
-                ZStack(alignment: .top) {
-                    Image(isCorrect ? "correct-quiz-card" : "incorrect-quiz-card")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 320)
+                VStack(spacing: 8) {
+                    if isCorrect {
+                        Text("A. ULTRASONIC")
+                            .font(.system(size: 18, weight: .heavy, design: .rounded))
+                            .foregroundStyle(Color(red: 0.15, green: 0.2, blue: 0.45))
 
-                    VStack(spacing: 8) {
-                        if isCorrect {
-                            Text("A. ULTRASONIC")
-                                .font(.system(size: 18, weight: .heavy, design: .rounded))
-                                .foregroundStyle(Color(red: 0.15, green: 0.2, blue: 0.45))
-
-                            Text("You are super smart! You used your superpower perfectly.")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.black)
-                                .frame(width: 220)
-                                .lineSpacing(3)
-                        } else {
-                            Text("That's not it. Remember the bouncy sound we used? Try again!")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(.black)
-                                .frame(width: 210)
-                                .lineSpacing(3)
-//                                .padding(.top, 16)
-                        }
-                    }
-                    .padding(.top, 120) // Offsets text safely below the header banner
-                }
-
-                // Bottom "Play Again" Container Card
-                ZStack {
-                    Image("card-play-again")
-                        .resizable()
-                        .aspectRatio(376.0 / 161.0, contentMode: .fit)
-                        .frame(width: 320)
-
-                    VStack(spacing: 12) {
-                        Text("Want to explore again ?")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                        Text("You are super smart! You used your superpower perfectly.")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .multilineTextAlignment(.center)
                             .foregroundStyle(.black)
-
-                        Button {
-                            onPlayAgain()
-                        } label: {
-                            ZStack {
-                                Image("btn-sort")
-                                    .resizable()
-                                    .aspectRatio(144.0 / 57.0, contentMode: .fit)
-                                    .frame(width: 145)
-
-                                Text("YES, PLAY AGAIN")
-                                    .font(.system(size: 12, weight: .heavy, design: .rounded))
-                                    .foregroundStyle(.black)
-                            }
-                        }
-                        .buttonStyle(.plain)
+                            .frame(width: 220)
+                            .lineSpacing(3)
+                    } else {
+                        Text("That's not it. Remember the bouncy sound we used? Try again!")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.black)
+                            .frame(width: 210)
+                            .lineSpacing(3)
+//                            .padding(.top, 16)
                     }
-                    .offset(y: 16)
                 }
-
-                // Back to Menu Button
-                Button {
-                    onBackToMenu()
-                } label: {
-                    Text("BACK TO MAIN MENU")
-                        .font(.system(size: 12, weight: .heavy, design: .rounded))
-                        .foregroundStyle(Color(red: 0.9, green: 0.3, blue: 0.3))
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 2)
+                .padding(.top, 120)
             }
+
+            ZStack {
+                Image("card-play-again")
+                    .resizable()
+                    .aspectRatio(376.0 / 161.0, contentMode: .fit)
+                    .frame(width: 320)
+
+                VStack(spacing: 12) {
+                    Text("Want to explore again ?")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(.black)
+
+                    Button {
+                        onPlayAgain()
+                    } label: {
+                        ZStack {
+                            Image("btn-sort")
+                                .resizable()
+                                .aspectRatio(144.0 / 57.0, contentMode: .fit)
+                                .frame(width: 145)
+
+                            Text("YES, PLAY AGAIN")
+                                .font(.system(size: 12, weight: .heavy, design: .rounded))
+                                .foregroundStyle(.black)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+                .offset(y: 16)
+            }
+
+            Button {
+                onBackToMenu()
+            } label: {
+                Text("BACK TO MAIN MENU")
+                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .foregroundStyle(Color(red: 0.9, green: 0.3, blue: 0.3))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 2)
         }
-    
-    // MARK: - Logic
+    }
 
     private func select(_ answer: Answer) {
+        sfx.tap()
+
         selectedAnswer = answer
 
-        withAnimation(
-            .easeInOut(duration: 0.25)
-        ) {
+        if answer == .ultrasonic {
+            sfx.correct()
+        } else {
+            sfx.incorrect()
+        }
+
+        withAnimation(.easeInOut(duration: 0.25)) {
             answered = true
         }
     }

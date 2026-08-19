@@ -53,11 +53,12 @@ extension ECSWorld {
         let eaten = model.mangoEatenCount
         let goal = model.missionMangoTarget
 
-        // Check if final target was reached
         if eaten >= goal {
             missionTask?.cancel()
             missionTask = nil
             model.missionComplete = true
+
+            sfx.complete()
 
             showMissionDialogue([
                 "Great job! You found all \(goal) mangoes!",
@@ -70,7 +71,6 @@ extension ECSWorld {
             return
         }
 
-        // Progressing to next target
         showMissionDialogue(
             eaten == 1
                 ? ["Great! One mango down. Let's search for another tree!"]
@@ -83,37 +83,38 @@ extension ECSWorld {
 
         spawnNextTarget(delayMs: 450)
     }
-    
-    func restartMission() {
-            // 1. Cancel background tasks & clear entities
-            missionTask?.cancel()
-            missionTask = nil
-            clear()
 
-            // 2. Clear all completion & quiz flags so overlays dismiss
-            model.showMissionCompleteCard = false
-            model.showQuiz = false
-            model.quizAnswered = false
-            model.quizCorrect = false
-            model.missionDialogueVisible = false
-            model.missionComplete = false
-            model.missionStarted = false
-            model.mangoEatenCount = 0
+    func restartMission() async {
+        missionTask?.cancel()
+        missionTask = nil
+        clear()
 
-            // 3. Reset HUD back to scanning or initial state
-            model.hudStage = .scanning
+        model.showMissionCompleteCard = false
+        model.showQuiz = false
+        model.quizAnswered = false
+        model.quizCorrect = false
+        model.missionDialogueVisible = false
+        model.missionComplete = false
+        model.missionStarted = false
+        model.mangoEatenCount = 0
+        model.hudStage = .scanning
 
-    #if DEBUG
-            print("[MISSION DEBUG] MISSION RESTARTED & OVERLAYS CLEARED")
-    #endif
+        await start()
 
-            // 4. Delay beginning the new mission slightly to let SwiftUI unmount QuestionCardView
-            Task { @MainActor [weak self] in
-                try? await Task.sleep(for: .milliseconds(300))
-                self?.beginMission()
-            }
-        }
-    
+        guard model.lidarOK else { return }
+
+        endScan()
+
+        try? await Task.sleep(for: .milliseconds(300))
+
+        model.hudStage = .mission
+        beginMission()
+
+#if DEBUG
+        print("[MISSION DEBUG] MISSION RESTARTED")
+#endif
+    }
+
     private func showMissionDialogue(_ lines: [String]) {
         model.missionDialogueLines = lines
         model.missionDialogueID += 1

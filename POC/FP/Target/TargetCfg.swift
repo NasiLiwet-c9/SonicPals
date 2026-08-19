@@ -47,13 +47,17 @@ nonisolated enum TargetCfg {
         static let pulseHoldS: TimeInterval = 1.25
 
         static let treePulseAlpha: Float = 1.0
-        static let treeTraceAlpha: Float = 0.14
+        static let treeTraceAlpha: Float = 0.07
 
-        static let mangoPulseAlpha: Float = 0.82
-        static let mangoTraceAlpha: Float = 0.50
+        static let mangoPulseAlpha: Float = 0.60
+        static let mangoPulseBehindAlpha: Float = 0.30
+
+        static let mangoTraceAlpha: Float = 0.18
+        static let mangoTraceBehindAlpha: Float = 0.06
 
         static let mangoPulseScale: Float = 1.05
         static let mangoTraceScale: Float = 1.08
+        static let mangoXrayScale: Float = 1.01
     }
 
     enum Preflight {

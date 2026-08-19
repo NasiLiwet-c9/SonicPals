@@ -21,17 +21,13 @@ struct MainView: View {
                 .ignoresSafeArea()
 
             if world.model.missionDark
-                || world.model.hudStage == .mission {
-                FPShade(
-                    dim: world.model.dimOn
-                )
-                .transition(.opacity)
+                && world.model.hudStage != .mission {
+                FPShade(dim: world.model.dimOn)
+                    .transition(.opacity)
             }
 
             if world.model.hudStage == .mission {
-                WaveRings(
-                    seq: world.model.waveSeq
-                )
+                WaveRings(seq: world.model.waveSeq)
             }
 
             HUDView(
@@ -42,17 +38,16 @@ struct MainView: View {
                 }
             )
         }
+        .overlay {
+            ForceSpawnSecret(world: world)
+        }
         .animation(
             .easeInOut(duration: 0.35),
             value: world.model.missionDark
         )
         .preferredColorScheme(.dark)
-        .sheet(
-            isPresented: $showInfo
-        ) {
-            OnboardView(
-                buttonText: "Done"
-            ) {
+        .sheet(isPresented: $showInfo) {
+            OnboardView(buttonText: "Done") {
                 showInfo = false
             }
         }

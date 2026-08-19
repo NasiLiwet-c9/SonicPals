@@ -9,9 +9,7 @@ import SwiftUI
 
 struct OnboardPage: Identifiable {
     let id: Int
-
     let modelName: String
-
     let title: String
     let text: String
 }
@@ -19,6 +17,8 @@ struct OnboardPage: Identifiable {
 struct OnboardView: View {
     var buttonText = "Start"
     var onFinished: () -> Void = {}
+
+    private let sfx = SfxSvc.shared
 
     private let pages = [
         OnboardPage(
@@ -54,53 +54,33 @@ struct OnboardView: View {
             VStack(spacing: 22) {
                 Spacer()
 
-                TabView(
-                    selection: $page
-                ) {
+                TabView(selection: $page) {
                     ForEach(pages) { item in
-                        OnboardCard(
-                            page: item
-                        )
-                        .tag(item.id)
+                        OnboardCard(page: item)
+                            .tag(item.id)
                     }
                 }
                 .tabViewStyle(
-                    .page(
-                        indexDisplayMode:
-                            .never
-                    )
+                    .page(indexDisplayMode: .never)
                 )
-                .frame(
-                    height: 560
-                )
+                .frame(height: 560)
 
                 dots
 
-                Button(
-                    action: advance
-                ) {
+                Button(action: advance) {
                     Text(
-                        page
-                        == pages.count - 1
-                        ? buttonText
-                        : "Next"
+                        page == pages.count - 1
+                            ? buttonText
+                            : "Next"
                     )
                     .font(.headline)
                     .foregroundStyle(.primary)
-                    .frame(
-                        width: 150,
-                        height: 52
-                    )
-                    .background(
-                        .ultraThinMaterial,
-                        in: Capsule()
-                    )
+                    .frame(width: 150, height: 52)
+                    .background(.ultraThinMaterial, in: Capsule())
                     .overlay(
                         Capsule()
                             .stroke(
-                                Color.primary.opacity(
-                                    0.12
-                                ),
+                                Color.primary.opacity(0.12),
                                 lineWidth: 1
                             )
                     )
@@ -108,10 +88,7 @@ struct OnboardView: View {
 
                 Spacer()
             }
-            .padding(
-                .horizontal,
-                24
-            )
+            .padding(.horizontal, 24)
         }
         .preferredColorScheme(.light)
     }
@@ -122,32 +99,23 @@ struct OnboardView: View {
                 Circle()
                     .fill(
                         item.id == page
-                        ? Color.primary
-                        : Color(
-                            .systemGray4
-                        )
+                            ? Color.primary
+                            : Color(.systemGray4)
                     )
-                    .frame(
-                        width: 7,
-                        height: 7
-                    )
+                    .frame(width: 7, height: 7)
             }
         }
         .animation(
-            .easeInOut(
-                duration: 0.2
-            ),
+            .easeInOut(duration: 0.2),
             value: page
         )
     }
 
     private func advance() {
+        sfx.tap()
+
         if page < pages.count - 1 {
-            withAnimation(
-                .easeInOut(
-                    duration: 0.3
-                )
-            ) {
+            withAnimation(.easeInOut(duration: 0.3)) {
                 page += 1
             }
         } else {

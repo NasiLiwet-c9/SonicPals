@@ -31,7 +31,7 @@ final class ECSWorld {
     private var scanTask: Task<Void, Never>?
 
     let sess: any SessServing
-    let sfx = SfxSvc()
+    let sfx = SfxSvc.shared
     let waveSim: any WaveSimulating
     let targetMaker: any TargetMaking
     let targetSpawn: any TargetSpawning
@@ -88,8 +88,12 @@ final class ECSWorld {
         started = false
         missionTask?.cancel()
         missionTask = nil
+
         targetReserve.clear()
+        clearActiveWave()
+        clearTraces()
         endScan()
+
         sfx.stopAmbience()
         await sess.stop()
     }
@@ -175,6 +179,7 @@ final class ECSWorld {
 
                 model.targetFound = true
                 setMsg("")
+                sfx.treeFound()
                 showFoundTreeDialogue()
             }
         }
@@ -184,6 +189,11 @@ final class ECSWorld {
         eatReadyTask = Task { @MainActor [weak self] in
             for await note in NotificationCenter.default.notifications(named: .mangoEatReady) {
                 guard let self, let mango = note.object as? Entity else { continue }
+
+                if !model.mangoEatReady {
+                    sfx.mangoReady()
+                }
+
                 eatCandidate = mango
                 model.mangoEatReady = true
             }
@@ -192,6 +202,7 @@ final class ECSWorld {
         eatLostTask = Task { @MainActor [weak self] in
             for await _ in NotificationCenter.default.notifications(named: .mangoEatLost) {
                 guard let self else { continue }
+
                 eatCandidate = nil
                 model.mangoEatReady = false
             }

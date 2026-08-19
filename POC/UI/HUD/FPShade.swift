@@ -15,19 +15,19 @@ struct FPShade: View {
             stops: [
                 .init(
                     color: .black.opacity(
-                        dim ? 0.72 : 0.10
+                        dim ? 0.93 : 0.10
                     ),
                     location: 0
                 ),
                 .init(
                     color: .black.opacity(
-                        dim ? 0.84 : 0.20
+                        dim ? 0.96 : 0.20
                     ),
                     location: 0.58
                 ),
                 .init(
                     color: .black.opacity(
-                        dim ? 0.90 : 0.32
+                        dim ? 0.98 : 0.32
                     ),
                     location: 1
                 )

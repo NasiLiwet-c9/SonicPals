@@ -4,6 +4,7 @@
 //
 //  Created by James Richard Renaldo on 17/08/26.
 //
+
 import Foundation
 import SwiftUI
 import Combine
@@ -18,6 +19,7 @@ final class DialogueViewModel: ObservableObject {
     var typingSpeed: Double
     var onFinishedAllLines: (() -> Void)?
 
+    private let sfx = SfxSvc.shared
     private var typingTask: Task<Void, Never>?
 
     init(
@@ -35,8 +37,9 @@ final class DialogueViewModel: ObservableObject {
         typeCurrentLine()
     }
 
-    /// Call this from a tap gesture on the bubble.
     func advance() {
+        sfx.tap()
+
         if isLineFullyTyped {
             goToNextLine()
         } else {
@@ -46,25 +49,33 @@ final class DialogueViewModel: ObservableObject {
 
     private func typeCurrentLine() {
         guard lines.indices.contains(currentLineIndex) else { return }
+
         let line = lines[currentLineIndex]
 
         visibleText = ""
         isLineFullyTyped = false
 
+        sfx.dialogue()
+
         typingTask?.cancel()
         typingTask = Task {
             for character in line {
                 if Task.isCancelled { return }
+
                 try? await Task.sleep(for: .seconds(typingSpeed))
+
                 if Task.isCancelled { return }
+
                 visibleText.append(character)
             }
+
             isLineFullyTyped = true
         }
     }
 
     private func revealFullLine() {
         guard lines.indices.contains(currentLineIndex) else { return }
+
         typingTask?.cancel()
         visibleText = lines[currentLineIndex]
         isLineFullyTyped = true
@@ -72,6 +83,7 @@ final class DialogueViewModel: ObservableObject {
 
     private func goToNextLine() {
         let nextIndex = currentLineIndex + 1
+
         if lines.indices.contains(nextIndex) {
             currentLineIndex = nextIndex
             typeCurrentLine()

@@ -27,19 +27,22 @@ struct TargetEchoSvc {
 
         setMango(
             on: pulse,
-            alpha: TargetCfg.Echo.mangoPulseAlpha,
+            totalAlpha: TargetCfg.Echo.mangoPulseAlpha,
+            behindAlpha: TargetCfg.Echo.mangoPulseBehindAlpha,
             fill: true,
-            scale: TargetCfg.Echo.mangoPulseScale,
-            throughTree: true
+            scale: TargetCfg.Echo.mangoPulseScale
         )
 
         setMango(
             on: trace,
-            alpha: TargetCfg.Echo.mangoTraceAlpha,
+            totalAlpha: TargetCfg.Echo.mangoTraceAlpha,
+            behindAlpha: TargetCfg.Echo.mangoTraceBehindAlpha,
             fill: false,
-            scale: TargetCfg.Echo.mangoTraceScale,
-            throughTree: true
+            scale: TargetCfg.Echo.mangoTraceScale
         )
+
+        RealityShade.keepBright(pulse)
+        RealityShade.keepBright(trace)
     }
 
     private func set(
@@ -55,28 +58,30 @@ struct TargetEchoSvc {
         }
 
         for child in entity.children {
-            set(
-                on: child,
-                alpha: alpha
-            )
+            set(on: child, alpha: alpha)
         }
     }
 
     private func setMango(
         on entity: Entity,
-        alpha: Float,
+        totalAlpha: Float,
+        behindAlpha: Float,
         fill: Bool,
-        scale: Float,
-        throughTree: Bool
+        scale: Float
     ) {
         if entity.name == "MangoTarget" {
             entity.scale *= SIMD3<Float>(repeating: scale)
 
-            setFood(
+            let frontAlpha = frontAlpha(
+                total: totalAlpha,
+                behind: behindAlpha
+            )
+
+            setMangoModels(
                 on: entity,
-                alpha: alpha,
-                fill: fill,
-                throughTree: throughTree
+                frontAlpha: frontAlpha,
+                behindAlpha: behindAlpha,
+                fill: fill
             )
 
             return
@@ -85,53 +90,93 @@ struct TargetEchoSvc {
         for child in entity.children {
             setMango(
                 on: child,
-                alpha: alpha,
+                totalAlpha: totalAlpha,
+                behindAlpha: behindAlpha,
                 fill: fill,
-                scale: scale,
-                throughTree: throughTree
+                scale: scale
             )
         }
     }
 
-    private func setFood(
+    private func setMangoModels(
         on entity: Entity,
-        alpha: Float,
-        fill: Bool,
-        throughTree: Bool
+        frontAlpha: Float,
+        behindAlpha: Float,
+        fill: Bool
     ) {
+        let children = Array(entity.children)
+
         if var model = entity.components[ModelComponent.self] {
             let count = max(model.materials.count, 1)
-            let mat = mangoMat(
-                alpha: alpha,
+
+            let front = mangoMat(
+                alpha: frontAlpha,
                 fill: fill,
-                throughTree: throughTree
+                readsDepth: true
             )
 
-            model.materials = (0..<count).map { _ in mat }
+            model.materials = (0..<count).map { _ in front }
             entity.components[ModelComponent.self] = model
+
+            let xray = entity.clone(recursive: false)
+            xray.name = "MangoXRay"
+            xray.transform = .identity
+            xray.scale = SIMD3<Float>(
+                repeating: TargetCfg.Echo.mangoXrayScale
+            )
+
+            if var xrayModel = xray.components[ModelComponent.self] {
+                let xrayCount = max(xrayModel.materials.count, 1)
+
+                let behind = mangoMat(
+                    alpha: behindAlpha,
+                    fill: fill,
+                    readsDepth: false
+                )
+
+                xrayModel.materials = (0..<xrayCount).map { _ in behind }
+                xray.components[ModelComponent.self] = xrayModel
+            }
+
+            entity.addChild(xray)
         }
 
-        for child in entity.children {
-            setFood(
+        for child in children {
+            setMangoModels(
                 on: child,
-                alpha: alpha,
-                fill: fill,
-                throughTree: throughTree
+                frontAlpha: frontAlpha,
+                behindAlpha: behindAlpha,
+                fill: fill
             )
         }
     }
 
-    private func echoMat(
-        alpha: Float
-    ) -> UnlitMaterial {
-        var mat = UnlitMaterial(
-            color: .white
+    private func frontAlpha(
+        total: Float,
+        behind: Float
+    ) -> Float {
+        let total = min(max(total, 0), 1)
+        let behind = min(max(behind, 0), 0.99)
+
+        return min(
+            max(
+                1 - ((1 - total) / (1 - behind)),
+                0
+            ),
+            1
         )
+    }
+
+    private func echoMat(alpha: Float) -> UnlitMaterial {
+        var mat = UnlitMaterial(color: .white)
 
         mat.triangleFillMode = .fill
         mat.faceCulling = .none
+
+        // Tree echo obeys normal real-world occlusion.
         mat.readsDepth = true
         mat.writesDepth = false
+
         mat.blending = .transparent(
             opacity: .init(
                 floatLiteral: min(max(alpha, 0), 1)
@@ -144,7 +189,7 @@ struct TargetEchoSvc {
     private func mangoMat(
         alpha: Float,
         fill: Bool,
-        throughTree: Bool
+        readsDepth: Bool
     ) -> UnlitMaterial {
         var mat = UnlitMaterial(
             color: UIColor(
@@ -157,8 +202,9 @@ struct TargetEchoSvc {
 
         mat.triangleFillMode = fill ? .fill : .lines
         mat.faceCulling = .none
-        mat.readsDepth = !throughTree
+        mat.readsDepth = readsDepth
         mat.writesDepth = false
+
         mat.blending = .transparent(
             opacity: .init(
                 floatLiteral: min(max(alpha, 0), 1)
