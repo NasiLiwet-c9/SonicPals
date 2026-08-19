@@ -1,126 +1,87 @@
+//
+//  MainView.swift
+//  POC
+//
+//  Created by Shan Newcastle on 10/08/26.
+//
+
 import SwiftUI
+import UIKit
 
 @MainActor
 struct MainView: View {
-    @StateObject private var vm: ARVM
+    let onBack: () -> Void
 
-    init() {
-        _vm = StateObject(
-            wrappedValue: ARVM()
-        )
-    }
+    @State private var world = ECSWorld()
+    @State private var showInfo = false
 
     var body: some View {
         ZStack {
-            ARViewBox(vm: vm)
-                .ignoresSafeArea()
-
-            crosshair
-
-            VStack {
-                status
-
-                Spacer()
-
-                controls
+            if world.model.missionComplete {
+                endBackground
+                    .transition(.opacity)
+            } else {
+                RealitySceneView(world: world)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
             }
-            .padding()
+
+            if world.model.missionDark
+                && world.model.hudStage != .mission {
+                FPShade(dim: world.model.dimOn)
+                    .transition(.opacity)
+            }
+
+            if world.model.hudStage == .mission,
+               !world.model.missionComplete {
+                WaveRings(seq: world.model.waveSeq)
+            }
+
+            HUDView(
+                world: world,
+                onBack: onBack,
+                onInfo: {
+                    showInfo = true
+                }
+            )
         }
+        .overlay {
+            ForceSpawnSecret(world: world)
+        }
+        .animation(
+            .easeInOut(duration: 0.35),
+            value: world.model.missionDark
+        )
+        .animation(
+            .easeInOut(duration: 0.3),
+            value: world.model.missionComplete
+        )
         .preferredColorScheme(.dark)
-    }
-
-    private var status: some View {
-        Text(vm.state.msg)
-            .font(.subheadline)
-            .multilineTextAlignment(.center)
-            .padding(10)
-            .frame(maxWidth: .infinity)
-            .background(
-                Color.black.opacity(0.6)
-            )
-            .clipShape(
-                RoundedRectangle(
-                    cornerRadius: 10
-                )
-            )
-    }
-
-    private var crosshair: some View {
-        Image(systemName: "plus")
-            .font(
-                .system(
-                    size: 26,
-                    weight: .bold
-                )
-            )
-            .foregroundStyle(.white)
-            .shadow(radius: 3)
-            .allowsHitTesting(false)
-    }
-
-    private var controls: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Button("Place") {
-                    vm.spawn()
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!vm.state.lidarOK)
-
-                Button("Wave") {
-                    vm.pulse()
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.cyan)
-                .disabled(!vm.state.hasBot)
-
-                Button("Clear") {
-                    vm.clear()
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
+        .sheet(isPresented: $showInfo) {
+            OnboardView(buttonText: "Done") {
+                showInfo = false
             }
-
-            HStack {
-                Button("<-") {
-                    vm.turn(15)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
-
-                Button("->") {
-                    vm.turn(-15)
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.hasBot)
-
-                Button(
-                    vm.state.meshOn
-                        ? "Hide Mesh"
-                        : "Show Mesh"
-                ) {
-                    vm.toggleMesh()
-                }
-                .buttonStyle(.bordered)
-                .disabled(!vm.state.lidarOK)
-            }
-
-            Text(
-                vm.state.hasBot
-                    ? "drag to move the robot"
-                    : "aim at floor / table"
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
-        .padding(10)
-        .background(
-            Color.black.opacity(0.65)
+        .task {
+            for await _ in NotificationCenter.default.notifications(
+                named: UIApplication.didReceiveMemoryWarningNotification
+            ) {
+                world.perform(.memoryWarning)
+            }
+        }
+    }
+
+    private var endBackground: some View {
+        RadialGradient(
+            stops: [
+                .init(color: Color(red: 0.055, green: 0.065, blue: 0.09), location: 0),
+                .init(color: Color(red: 0.025, green: 0.03, blue: 0.045), location: 0.55),
+                .init(color: .black, location: 1)
+            ],
+            center: .center,
+            startRadius: 20,
+            endRadius: 700
         )
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 12
-            )
-        )
+        .ignoresSafeArea()
     }
 }

@@ -1,0 +1,219 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 2.0 (494.100.6)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    reorder nameChildren = ["MangoItem", "MangoSpawnPoint1", "MangoSpawnPoint2", "MangoSpawnPoint3", "MangoSpawnPoint4", "MangoSpawnPoint5", "TreeItem", "MangoFX"]
+    def "MangoItem" (
+        customData = {
+            float3 rotationEulerHint = (0, 0, 0)
+        }
+        references = @Mango.usdz@
+    )
+    {
+        reorder nameChildren = ["ParticleEmitter", "Materials", "Meshes"]
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (0.014948546, 0.014948546, 0.014948546)
+        float3 xformOp:translate = (4.033201, 2.0821085, 4.4146843)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        over "Materials"
+        {
+            over "Material_005"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+
+            over "Material_003"
+            {
+                reorder nameChildren = ["pbr_shader", "uvset0", "tex_base"]
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (0, 110.5)
+            }
+
+            over "Material_001"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+            }
+        }
+
+        def Xform "ParticleEmitter"
+        {
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (120, 120, 120)
+            float3 xformOp:translate = (6.7006216, 15.514219, 0.0003662109)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def RealityKitComponent "VFXEmitter"
+            {
+                token info:id = "RealityKit.VFXEmitter"
+
+                def RealityKitStruct "currentState"
+                {
+                    int64 burstCount = 0
+                    token emitterShape = "Sphere"
+                    bool isLocalFields = 1
+                    float particleSpeed = 0
+                    float3 shapeSize = (0.15, 0.15, 0.15)
+                    bool spawnInheritParentColor = 1
+                    token spawnOccasion = "OnBirth"
+                    float spawnVelocityFactor = 0
+
+                    def RealityKitStruct "mainEmitter"
+                    {
+                        float birthRate = 15
+                        float birthRateVariation = 5
+                        token blendMode = "Additive"
+                        float4 endColorA = (0.5072854, 0.03240655, 0.016743759, 1)
+                        float4 endColorB = (0.509961, 0.14690435, 0.007592777, 1)
+                        token opacityOverLife = "QuickFadeInOut"
+                        asset particleImage = @@
+                        double particleLifeSpan = 0.8
+                        float particleSize = 0.018
+                        float sizeMultiplierAtEndOfLifespan = 0.1
+                        float4 startColorA = (0.53191257, 0.13993196, 0.0011883774, 1)
+                        float4 startColorB = (0.6669336, 0.090331085, 0.025241388, 1)
+                        bool useEndColor = 1
+                        bool useEndColorRange = 1
+                        bool useStartColorRange = 1
+                    }
+
+                    def RealityKitStruct "spawnedEmitter"
+                    {
+                    }
+                }
+            }
+        }
+    }
+
+    def Xform "MangoSpawnPoint1" (
+        active = true
+    )
+    {
+        float3 xformOp:translate = (8.9779496e-7, 2.1780443, 1.5683429)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint2" (
+        active = true
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (2.2767515, 3.186894, 0.2547574)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint3" (
+        active = true
+        customData = {
+            float3 rotationEulerHint = (0, 0, 0)
+        }
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 2.5077698, -2.370837)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint4" (
+        active = true
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0.13548094, 2.2523386, -1.5664611)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoSpawnPoint5" (
+        active = true
+        customData = {
+            float3 rotationEulerHint = (0, 0, 0)
+        }
+    )
+    {
+        float2 ui:nodegraph:node:pos = (254.37633, 131.68149)
+        int ui:nodegraph:node:stackingOrder = 1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (-1.2625961, 2.6804516, -0.10875082)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def "TreeItem" (
+        active = true
+        references = @Low_Poly_Tree-2.usdz@
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (0.015238972, 0.015238972, 0.015238972)
+        float3 xformOp:translate = (0.44356185, 0, -0.2783053)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def Xform "MangoFX"
+    {
+        float3 xformOp:translate = (4.070792, 2.3340952, 4.4225893)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+        def RealityKitComponent "VFXEmitter"
+        {
+            token info:id = "RealityKit.VFXEmitter"
+
+            def RealityKitStruct "currentState"
+            {
+                int64 burstCount = 25
+                int64 burstCountVariation = 5
+                double emissionDuration = 0.5
+                token emitterShape = "Sphere"
+                bool loops = 0
+                float3 shapeSize = (0.15, 0.15, 0.15)
+                token spawnOccasion = "OnBirth"
+
+                def RealityKitStruct "mainEmitter"
+                {
+                    float3 acceleration = (0, -3, 0)
+                    float birthRate = 20
+                    float dampingFactor = 4
+                    float4 endColorA = (0.5199851, 0.03846991, 0.029153612, 1)
+                    float4 endColorB = (0.5298721, 0.14938182, 0.014530703, 1)
+                    token opacityOverLife = "EaseFadeOut"
+                    float particleAngularVelocity = 5
+                    asset particleImage = @pixil-frame-0-2.png@
+                    double particleLifeSpan = 0.35
+                    double particleLifeSpanVariation = 0.15
+                    float particleSize = 0.06
+                    float spreadingAngle = 6.2831855
+                    float4 startColorA = (0.49411765, 0.12941177, 0.003921569, 1)
+                    float4 startColorB = (0.5464093, 0.040986948, 0.020220842, 1)
+                    bool useEndColor = 1
+                    bool useEndColorRange = 1
+                    bool useStartColorRange = 1
+                }
+
+                def RealityKitStruct "spawnedEmitter"
+                {
+                }
+            }
+        }
+    }
+}
+
