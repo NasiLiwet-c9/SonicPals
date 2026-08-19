@@ -17,8 +17,14 @@ struct MainView: View {
 
     var body: some View {
         ZStack {
-            RealitySceneView(world: world)
-                .ignoresSafeArea()
+            if world.model.missionComplete {
+                endBackground
+                    .transition(.opacity)
+            } else {
+                RealitySceneView(world: world)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+            }
 
             if world.model.missionDark
                 && world.model.hudStage != .mission {
@@ -26,7 +32,8 @@ struct MainView: View {
                     .transition(.opacity)
             }
 
-            if world.model.hudStage == .mission {
+            if world.model.hudStage == .mission,
+               !world.model.missionComplete {
                 WaveRings(seq: world.model.waveSeq)
             }
 
@@ -45,6 +52,10 @@ struct MainView: View {
             .easeInOut(duration: 0.35),
             value: world.model.missionDark
         )
+        .animation(
+            .easeInOut(duration: 0.3),
+            value: world.model.missionComplete
+        )
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showInfo) {
             OnboardView(buttonText: "Done") {
@@ -58,5 +69,19 @@ struct MainView: View {
                 world.perform(.memoryWarning)
             }
         }
+    }
+
+    private var endBackground: some View {
+        RadialGradient(
+            stops: [
+                .init(color: Color(red: 0.055, green: 0.065, blue: 0.09), location: 0),
+                .init(color: Color(red: 0.025, green: 0.03, blue: 0.045), location: 0.55),
+                .init(color: .black, location: 1)
+            ],
+            center: .center,
+            startRadius: 20,
+            endRadius: 700
+        )
+        .ignoresSafeArea()
     }
 }

@@ -11,6 +11,7 @@ struct RootView: View {
     private enum Stage {
         case splash
         case home
+        case map
 //        case onboard
         case main
     }
@@ -29,9 +30,17 @@ struct RootView: View {
                         move(to: .splash)
                     },
                     onSelectMode: {
-                        // TODO: hook up mode-selection flow once it exists
+                        sfx.tap()
+                        move(to: .map)
                     }
                 )
+                .transition(.opacity)
+
+            case .map:
+                MapView {
+                    sfx.tap()
+                    move(to: .home)
+                }
                 .transition(.opacity)
 
             case .splash:
@@ -62,10 +71,13 @@ struct RootView: View {
 
     private func move(to next: Stage) {
         switch next {
-        case .home:
+        case .home, .map:
             sfx.menuBgm()
 
-        case .splash, .main:
+        case .splash:
+            sfx.stopBgm()
+
+        case .main:
             sfx.sessionBgm()
         }
 

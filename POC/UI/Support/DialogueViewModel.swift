@@ -16,6 +16,7 @@ final class DialogueViewModel: ObservableObject {
     @Published private(set) var currentLineIndex = 0
 
     let lines: [String]
+    let loops: Bool
     var typingSpeed: Double
     var onFinishedAllLines: (() -> Void)?
 
@@ -25,10 +26,12 @@ final class DialogueViewModel: ObservableObject {
     init(
         lines: [String],
         typingSpeed: Double = 0.03,
+        loops: Bool = false,
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         self.lines = lines
         self.typingSpeed = typingSpeed
+        self.loops = loops
         self.onFinishedAllLines = onFinishedAllLines
     }
 
@@ -87,9 +90,16 @@ final class DialogueViewModel: ObservableObject {
         if lines.indices.contains(nextIndex) {
             currentLineIndex = nextIndex
             typeCurrentLine()
-        } else {
-            onFinishedAllLines?()
+            return
         }
+
+        if loops, !lines.isEmpty {
+            currentLineIndex = 0
+            typeCurrentLine()
+            return
+        }
+
+        onFinishedAllLines?()
     }
 
     func stop() {

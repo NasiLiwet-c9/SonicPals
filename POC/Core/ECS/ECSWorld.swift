@@ -101,6 +101,8 @@ final class ECSWorld {
     func startScan() {
         guard var comp = scanEntity.components[FPScanComp.self] else { return }
 
+        clearScanVisuals()
+
         comp.resetID += 1
         comp.active = true
         scanEntity.components[FPScanComp.self] = comp
@@ -118,6 +120,18 @@ final class ECSWorld {
         comp.active = false
         scanEntity.components[FPScanComp.self] = comp
         scanEntity.isEnabled = false
+
+        clearScanVisuals()
+    }
+
+    private func clearScanVisuals() {
+        let old = scanEntity.children.filter {
+            $0.name == "scanFloor" || $0.name == "scanMesh"
+        }
+
+        for entity in old {
+            entity.removeFromParent()
+        }
     }
 
     func perform(_ cmd: ECSCmd) {
@@ -144,12 +158,16 @@ final class ECSWorld {
 
     func clearActiveWave() {
         let active = anchor.children.filter { $0.components.has(RevealComp.self) }
-        for entity in active { entity.removeFromParent() }
+        for entity in active {
+            entity.removeFromParent()
+        }
     }
 
     func clearTraces() {
         let traces = anchor.children.filter { $0.components.has(TraceComp.self) }
-        for entity in traces { entity.removeFromParent() }
+        for entity in traces {
+            entity.removeFromParent()
+        }
     }
 
     func clear() {

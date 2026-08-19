@@ -9,61 +9,83 @@ import SwiftUI
 
 struct HomeView: View {
     var mascotName = "fly"
-    var speechText = "Your eyes might not be able to see in the dark, but my sonar can!"
+
     var dialogueLines: [String] = [
         "Hi.... i'm Battiw",
         "I'm hungry, help me find something to eat tonight...!"
     ]
+
     var primaryButtonText = "Fly and Find!"
     var onStart: () -> Void = {}
     var onSelectMode: () -> Void = {}
 
     var body: some View {
-        ZStack {
-            background
+        GeometryReader { geo in
+            ZStack {
+                background(
+                    width: geo.size.width,
+                    height: geo.size.height
+                )
 
-            VStack {
-                Spacer()
+                VStack {
+                    Spacer()
 
-                DialogueBubbleView(lines: dialogueLines, mascotName: mascotName)
-                
-//                Spacer()
+                    DialogueBubbleView(
+                        lines: dialogueLines,
+                        mascotName: mascotName,
+                        mascotGIFName: "flying-animation-mascot",
+                        loops: true
+                    )
 
-                VStack(spacing: 14) {
-                    Button(action: onStart) {
-                        ZStack {
-                            Image("filled-button-border")
+                    VStack(spacing: 18) {
+                        Button(action: onStart) {
+                            ZStack {
+                                Image("filled-button-border")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+
+                                Text(primaryButtonText.uppercased())
+                                    .font(.system(size: 20, weight: .heavy, design: .rounded))
+                                    .foregroundStyle(.black)
+                            }
+                            .frame(width: 220, height: 64)
+                        }
+                        .buttonStyle(.plain)
+
+                        Button(action: onSelectMode) {
+                            Image("map-btn-yellow")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-
-                            Text(primaryButtonText.uppercased())
-                                .font(.system(size: 20, weight: .heavy, design: .rounded))
-                                .foregroundStyle(Color.black)
+                                .frame(width: 76, height: 86)
                         }
-                        .frame(width: 220, height: 64)
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Open map")
                     }
-                    .padding(.horizontal, 32)
-                    .buttonStyle(.plain)
+                    .padding(.bottom, 210)
                 }
-                .padding(.bottom, 300)
+                .padding(.horizontal, 20)
             }
-            .padding(.horizontal, 20)
+            .frame(width: geo.size.width, height: geo.size.height)
         }
+        .ignoresSafeArea()
         .preferredColorScheme(.light)
     }
 
-    //Background
-    private var background: some View {
-            ZStack {
-                Image("onboarding-with-star")
-                    .ignoresSafeArea()
-            }
-            //debug
-//            .onAppear {
-//                print("Asset found:", UIImage(named: "Onboarding full") != nil)
-//            }
-            .ignoresSafeArea()
-        }
+    private func background(
+        width: CGFloat,
+        height: CGFloat
+    ) -> some View {
+        GIFImageView(
+            name: "bg-main-animation",
+            contentMode: .scaleAspectFill
+        )
+        .frame(
+            width: width,
+            height: height
+        )
+        .clipped()
+        .allowsHitTesting(false)
+    }
 }
 
 #Preview {

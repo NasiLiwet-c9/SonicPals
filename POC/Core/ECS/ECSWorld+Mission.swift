@@ -56,14 +56,25 @@ extension ECSWorld {
         if eaten >= goal {
             missionTask?.cancel()
             missionTask = nil
+
+            model.missionDialogueVisible = false
             model.missionComplete = true
 
-            sfx.complete()
+            // Final mango success sound plays immediately.
+            sfx.missionDone()
+            sfx.stopBgm()
 
-//            showMissionDialogue([
-//                "Great job! You found all \(goal) mangoes!",
-//                "I'm full now, it's time to go home...."
-//            ])
+            clearActiveWave()
+            clearTraces()
+
+            // Wait 0.5 seconds after Mango 3 before showing completion.
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .milliseconds(500))
+
+                guard let self, model.missionComplete else { return }
+
+                model.showMissionCompleteCard = true
+            }
 
 #if DEBUG
             print("[MISSION DEBUG] MISSION COMPLETE \(eaten)/\(goal)")
@@ -94,22 +105,26 @@ extension ECSWorld {
         model.quizAnswered = false
         model.quizCorrect = false
         model.quizTransitionID = 0
+
         model.missionDialogueVisible = false
         model.missionComplete = false
         model.missionStarted = false
         model.mangoEatenCount = 0
+        model.eatAnimationVisible = false
+
+        model.missionDark = false
+        model.dimOn = false
+
+        model.scanReady = false
+        model.scanProgress = 0
+        model.scanTurn = .none
         model.hudStage = .scanning
 
         await start()
 
-//        guard model.lidarOK else { return }
-//
-//        endScan()
-//
-//        try? await Task.sleep(for: .milliseconds(300))
-//
-//        model.hudStage = .mission
-//        beginMission()
+        guard model.lidarOK else { return }
+
+        sfx.sessionBgm()
 
 #if DEBUG
         print("[MISSION DEBUG] MISSION RESTARTED")

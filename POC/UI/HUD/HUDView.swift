@@ -14,6 +14,8 @@ struct HUDView: View {
     let onInfo: () -> Void
 
     @State private var scanIntroDone = false
+    @State private var waveCD = false
+    @State private var waveCDProgress: CGFloat = 0
 
     private let sfx = SfxSvc.shared
 
@@ -32,27 +34,11 @@ struct HUDView: View {
             .zIndex(100)
             #endif
 
-            if world.model.quizTransitionID > 0,
-               !world.model.showQuiz {
-                GIFImageView(name: "dark-to-light-transition")
-                    .ignoresSafeArea()
-                    .id(world.model.quizTransitionID)
-                    .zIndex(15)
-                    .allowsHitTesting(false)
-                    .task(id: world.model.quizTransitionID) {
-                        try? await Task.sleep(for: .milliseconds(700))
-
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            world.model.showQuiz = true
-                        }
-                    }
-            }
-
             if world.model.showMissionCompleteCard {
                 MissionCompleteCardView {
                     startQuizTransition()
                 }
-                .transition(.opacity)
+                .transition(.scale(scale: 0.78).combined(with: .opacity))
                 .zIndex(10)
             }
 
@@ -68,7 +54,7 @@ struct HUDView: View {
                     }
                 )
                 .id(world.model.quizTransitionID)
-                .transition(.opacity)
+                .transition(.scale(scale: 0.76).combined(with: .opacity))
                 .zIndex(20)
             }
 
@@ -168,7 +154,8 @@ struct HUDView: View {
                     .padding(.bottom, 8)
                 }
 
-                if world.model.hudStage == .mission {
+                if world.model.hudStage == .mission,
+                   !world.model.missionComplete {
                     controls
                 }
             }
@@ -178,8 +165,10 @@ struct HUDView: View {
         }
         .onChange(of: world.model.scanReady) { _, isReady in
             guard world.model.hudStage == .scanning else { return }
+
             if isReady {
                 sfx.scanDone()
+
                 withAnimation {
                     world.model.hudStage = .scanCompletePrompt
                 }
@@ -231,19 +220,50 @@ struct HUDView: View {
 
     private var waveButton: some View {
         Button {
+            guard !waveCD, world.model.canWave else { return }
+
             sfx.tap()
             world.perform(.sendWave)
+            startWaveCooldown()
         } label: {
-            Image("ping-btn")
-                .renderingMode(.original)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 108, height: 108)
+            ZStack {
+                Image("ping-btn")
+                    .renderingMode(.original)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 108, height: 108)
+
+                if waveCD {
+                    Circle()
+                        .fill(.black.opacity(0.48))
+                        .frame(width: 94, height: 94)
+
+                    Circle()
+                        .trim(from: 0, to: waveCDProgress)
+                        .stroke(
+                            .white.opacity(0.92),
+                            style: StrokeStyle(
+                                lineWidth: 4,
+                                lineCap: .round
+                            )
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: 96, height: 96)
+
+                    Image(systemName: "timer")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+            }
         }
         .buttonStyle(.plain)
-        .disabled(!world.model.canWave)
+        .disabled(!world.model.canWave || waveCD)
         .opacity(world.model.canWave ? 1 : 0.4)
-        .accessibilityLabel("Send ultrasonic wave")
+        .accessibilityLabel(
+            waveCD
+                ? "Ultrasonic wave recharging"
+                : "Send ultrasonic wave"
+        )
     }
 
     private var eatButton: some View {
@@ -328,22 +348,27 @@ struct HUDView: View {
         }
     }
 
+    private func startWaveCooldown() {
+        waveCD = true
+        waveCDProgress = 1
+
+        Task { @MainActor in
+            await Task.yield()
+
+            withAnimation(.linear(duration: 1.0)) {
+                waveCDProgress = 0
+            }
+
+            try? await Task.sleep(for: .seconds(1))
+
+            waveCD = false
+            waveCDProgress = 0
+        }
+    }
+
     private func finishMissionDialogue() {
         withAnimation {
             world.dismissMissionDialogue()
-        }
-
-        guard world.model.missionComplete else { return }
-
-        Task { @MainActor in
-            world.clearActiveWave()
-            world.clearTraces()
-
-            await world.stop()
-
-            withAnimation(.easeInOut(duration: 0.25)) {
-                world.model.showMissionCompleteCard = true
-            }
         }
     }
 
@@ -351,30 +376,27 @@ struct HUDView: View {
         sfx.tap()
         sfx.quizBgm()
 
-        world.model.showMissionCompleteCard = false
         world.model.showQuiz = false
         world.model.quizAnswered = false
         world.model.quizCorrect = false
         world.model.quizTransitionID += 1
 
-        withAnimation(.easeInOut(duration: 0.2)) {
-            world.model.missionDark = false
+        withAnimation(.easeInOut(duration: 0.18)) {
+            world.model.showMissionCompleteCard = false
         }
 
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(50))
+            try? await Task.sleep(for: .milliseconds(220))
 
-            world.model.missionDark = true
+            sfx.popup()
 
-            try? await Task.sleep(for: .milliseconds(700))
-
-            world.model.showQuiz = true
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.78)) {
+                world.model.showQuiz = true
+            }
         }
     }
 
     private func restartMission() {
-        sfx.sessionBgm()
-
         withAnimation {
             scanIntroDone = false
         }

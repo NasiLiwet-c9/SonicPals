@@ -9,93 +9,109 @@ import Foundation
 import SwiftUI
 import Combine
 
-
 struct DialogueBubbleView: View {
     @StateObject private var controller: DialogueViewModel
+
     let mascotName: String
+    let mascotGIFName: String?
     let shortBubbleImageName: String
     let tallBubbleImageName: String
     let shortLineCharacterThreshold: Int
-    
+
     init(
         lines: [String],
         typingSpeed: Double = 0.03,
         mascotName: String = "fly",
+        mascotGIFName: String? = nil,
         shortBubbleImageName: String = "small-bubble-card",
         tallBubbleImageName: String = "tall-bubble-card",
         shortLineCharacterThreshold: Int = 24,
+        loops: Bool = false,
         onFinishedAllLines: (() -> Void)? = nil
     ) {
         _controller = StateObject(
             wrappedValue: DialogueViewModel(
                 lines: lines,
                 typingSpeed: typingSpeed,
+                loops: loops,
                 onFinishedAllLines: onFinishedAllLines
             )
         )
+
         self.mascotName = mascotName
+        self.mascotGIFName = mascotGIFName
         self.shortBubbleImageName = shortBubbleImageName
         self.tallBubbleImageName = tallBubbleImageName
         self.shortLineCharacterThreshold = shortLineCharacterThreshold
     }
-    
-    // Picks the asset by content length instead of stretching one image.
+
     private var isCurrentLineShort: Bool {
         guard controller.lines.indices.contains(controller.currentLineIndex) else { return true }
+
         return controller.lines[controller.currentLineIndex].count <= shortLineCharacterThreshold
     }
-    
+
     private var bubbleImageName: String {
         isCurrentLineShort ? shortBubbleImageName : tallBubbleImageName
     }
-    
+
     var body: some View {
-            HStack(alignment: .top, spacing: isCurrentLineShort ? -50 : -50) {
-                bubble
-                    .offset(y: isCurrentLineShort ? -15 : -88)
-            
-                Model3DView(name: mascotName)
-                    .frame(width: 240, height: 240)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                controller.advance()
-            }
-            .onAppear {
-                controller.start()
-            }
-            .onDisappear {
-                controller.stop()
-            }
-        }
+        HStack(alignment: .top, spacing: -50) {
+            bubble
+                .offset(y: isCurrentLineShort ? -15 : -88)
 
-        private var bubble: some View {
-            ZStack {
-                Image(bubbleImageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-
-                Text(controller.visibleText)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(isCurrentLineShort ? 1 : 4)
-                    .minimumScaleFactor(0.75)
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, isCurrentLineShort ? 18 : 20)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-            }
-            // Same fix as before — explicit height computed from each PNG's
-            // real aspect ratio (163x78 small, 163x136 tall), not left implicit.
-            .frame(
-                width: isCurrentLineShort ? 170 : 170,
-                height: isCurrentLineShort ? 170 * 78 / 163 : 200 * 136 / 163
-            )
+            mascot
         }
-    
+        .contentShape(Rectangle())
+        .onTapGesture {
+            controller.advance()
+        }
+        .onAppear {
+            controller.start()
+        }
+        .onDisappear {
+            controller.stop()
+        }
+    }
+
+    @ViewBuilder
+    private var mascot: some View {
+        if let mascotGIFName {
+            GIFImageView(name: mascotGIFName)
+                .frame(width: 240, height: 240)
+        } else {
+            Model3DView(name: mascotName)
+                .frame(width: 240, height: 240)
+        }
+    }
+
+    private var bubble: some View {
+        ZStack {
+            Image(bubbleImageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+
+            Text(controller.visibleText)
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .multilineTextAlignment(.leading)
+                .lineLimit(isCurrentLineShort ? 1 : 4)
+                .minimumScaleFactor(0.75)
+                .foregroundStyle(.black)
+                .padding(.horizontal, 20)
+                .padding(.bottom, isCurrentLineShort ? 18 : 20)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+        .frame(
+            width: 170,
+            height: isCurrentLineShort
+                ? 170 * 78 / 163
+                : 200 * 136 / 163
+        )
+    }
+
     private var bubbleOffset: CGSize {
         isCurrentLineShort
-        ? CGSize(width: -75, height: -140)
-        : CGSize(width: -90, height: -160)
+            ? CGSize(width: -75, height: -140)
+            : CGSize(width: -90, height: -160)
     }
 }

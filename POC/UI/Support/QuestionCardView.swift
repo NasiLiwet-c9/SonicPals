@@ -36,7 +36,10 @@ struct QuestionCardView: View {
                 questionView
             }
         }
-        .transition(.opacity)
+        .transition(.scale(scale: 0.72).combined(with: .opacity))
+        .onAppear {
+            sfx.popup()
+        }
     }
 
     private var questionView: some View {
@@ -125,22 +128,50 @@ struct QuestionCardView: View {
                 VStack(spacing: 8) {
                     if isCorrect {
                         Text("A. ULTRASONIC")
-                            .font(.system(size: 18, weight: .heavy, design: .rounded))
-                            .foregroundStyle(Color(red: 0.15, green: 0.2, blue: 0.45))
+                            .font(
+                                .system(
+                                    size: 18,
+                                    weight: .heavy,
+                                    design: .rounded
+                                )
+                            )
+                            .foregroundStyle(
+                                Color(
+                                    red: 0.15,
+                                    green: 0.2,
+                                    blue: 0.45
+                                )
+                            )
 
-                        Text("You are super smart! You used your superpower perfectly.")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(.black)
-                            .frame(width: 220)
-                            .lineSpacing(3)
+                        Text(
+                            "You are super smart! You used your superpower perfectly."
+                        )
+                        .font(
+                            .system(
+                                size: 16,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                        )
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.black)
+                        .frame(width: 220)
+                        .lineSpacing(3)
                     } else {
-                        Text("That's not it. Remember the bouncy sound we used? Try again!")
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(.black)
-                            .frame(width: 210)
-                            .lineSpacing(3)
+                        Text(
+                            "That's not it. Remember the bouncy sound we used? Try again!"
+                        )
+                        .font(
+                            .system(
+                                size: 16,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                        )
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.black)
+                        .frame(width: 210)
+                        .lineSpacing(3)
 //                            .padding(.top, 16)
                     }
                 }
@@ -150,12 +181,21 @@ struct QuestionCardView: View {
             ZStack {
                 Image("card-play-again")
                     .resizable()
-                    .aspectRatio(376.0 / 161.0, contentMode: .fit)
+                    .aspectRatio(
+                        376.0 / 161.0,
+                        contentMode: .fit
+                    )
                     .frame(width: 320)
 
                 VStack(spacing: 12) {
                     Text("Want to explore again ?")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .font(
+                            .system(
+                                size: 18,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                        )
                         .foregroundStyle(.black)
 
                     Button {
@@ -164,11 +204,20 @@ struct QuestionCardView: View {
                         ZStack {
                             Image("btn-sort")
                                 .resizable()
-                                .aspectRatio(144.0 / 57.0, contentMode: .fit)
+                                .aspectRatio(
+                                    144.0 / 57.0,
+                                    contentMode: .fit
+                                )
                                 .frame(width: 145)
 
                             Text("YES, PLAY AGAIN")
-                                .font(.system(size: 12, weight: .heavy, design: .rounded))
+                                .font(
+                                    .system(
+                                        size: 12,
+                                        weight: .heavy,
+                                        design: .rounded
+                                    )
+                                )
                                 .foregroundStyle(.black)
                         }
                     }
@@ -181,8 +230,20 @@ struct QuestionCardView: View {
                 onBackToMenu()
             } label: {
                 Text("BACK TO MAIN MENU")
-                    .font(.system(size: 12, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color(red: 0.9, green: 0.3, blue: 0.3))
+                    .font(
+                        .system(
+                            size: 12,
+                            weight: .heavy,
+                            design: .rounded
+                        )
+                    )
+                    .foregroundStyle(
+                        Color(
+                            red: 0.9,
+                            green: 0.3,
+                            blue: 0.3
+                        )
+                    )
             }
             .buttonStyle(.plain)
             .padding(.top, 2)

@@ -27,13 +27,17 @@ private enum GIFLoader {
 
         for index in 0..<frameCount {
             guard let cgImage = CGImageSourceCreateImageAtIndex(source, index, nil) else { continue }
+
             frames.append(UIImage(cgImage: cgImage))
             totalDuration += frameDuration(source: source, index: index)
         }
 
         guard !frames.isEmpty else { return nil }
 
-        return UIImage.animatedImage(with: frames, duration: totalDuration)
+        return UIImage.animatedImage(
+            with: frames,
+            duration: totalDuration
+        )
     }
 
     private static func frameDuration(source: CGImageSource, index: Int) -> Double {
@@ -56,23 +60,39 @@ private enum GIFLoader {
 
 private struct AnimatedGIF: UIViewRepresentable {
     let name: String
+    let contentMode: UIView.ContentMode
 
     func makeUIView(context: Context) -> UIImageView {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = contentMode
+        imageView.clipsToBounds = true
         imageView.image = GIFLoader.animatedImage(named: name)
         return imageView
     }
 
-    func updateUIView(_ uiView: UIImageView, context: Context) {}
+    func updateUIView(_ uiView: UIImageView, context: Context) {
+        uiView.contentMode = contentMode
+    }
 }
 
 struct GIFImageView: View {
     let name: String
+    let contentMode: UIView.ContentMode
+
+    init(
+        name: String,
+        contentMode: UIView.ContentMode = .scaleAspectFit
+    ) {
+        self.name = name
+        self.contentMode = contentMode
+    }
 
     var body: some View {
         if Bundle.main.url(forResource: name, withExtension: "gif") != nil {
-            AnimatedGIF(name: name)
+            AnimatedGIF(
+                name: name,
+                contentMode: contentMode
+            )
         } else {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 56))
