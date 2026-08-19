@@ -1,2 +1,2 @@
-# ARUltrasonic
+# Sonic Pals
 iOS LiDAR AR application for interactive ultrasonic wave visualization and simulation
