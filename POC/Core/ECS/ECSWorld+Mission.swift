@@ -60,10 +60,10 @@ extension ECSWorld {
 
             sfx.complete()
 
-            showMissionDialogue([
-                "Great job! You found all \(goal) mangoes!",
-                "I'm full now, it's time to go home...."
-            ])
+//            showMissionDialogue([
+//                "Great job! You found all \(goal) mangoes!",
+//                "I'm full now, it's time to go home...."
+//            ])
 
 #if DEBUG
             print("[MISSION DEBUG] MISSION COMPLETE \(eaten)/\(goal)")
@@ -93,6 +93,7 @@ extension ECSWorld {
         model.showQuiz = false
         model.quizAnswered = false
         model.quizCorrect = false
+        model.quizTransitionID = 0
         model.missionDialogueVisible = false
         model.missionComplete = false
         model.missionStarted = false
@@ -101,14 +102,14 @@ extension ECSWorld {
 
         await start()
 
-        guard model.lidarOK else { return }
-
-        endScan()
-
-        try? await Task.sleep(for: .milliseconds(300))
-
-        model.hudStage = .mission
-        beginMission()
+//        guard model.lidarOK else { return }
+//
+//        endScan()
+//
+//        try? await Task.sleep(for: .milliseconds(300))
+//
+//        model.hudStage = .mission
+//        beginMission()
 
 #if DEBUG
         print("[MISSION DEBUG] MISSION RESTARTED")

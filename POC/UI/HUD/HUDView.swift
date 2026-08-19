@@ -21,16 +21,16 @@ struct HUDView: View {
         ZStack {
             reticle
 
-//            #if DEBUG
-//            Button("SKIP TO COMPLETION") {
-//                world.model.missionComplete = true
-//                world.model.showMissionCompleteCard = true
-//                world.model.missionDialogueVisible = false
-//            }
-//            .buttonStyle(.borderedProminent)
-//            .position(x: 120, y: 100)
-//            .zIndex(100)
-//            #endif
+            #if DEBUG
+            Button("SKIP TO COMPLETION") {
+                world.model.missionComplete = true
+                world.model.showMissionCompleteCard = true
+                world.model.missionDialogueVisible = false
+            }
+            .buttonStyle(.borderedProminent)
+            .position(x: 120, y: 100)
+            .zIndex(100)
+            #endif
 
             if world.model.quizTransitionID > 0,
                !world.model.showQuiz {
@@ -177,9 +177,9 @@ struct HUDView: View {
             .padding(.bottom, 24)
         }
         .onChange(of: world.model.scanReady) { _, isReady in
+            guard world.model.hudStage == .scanning else { return }
             if isReady {
                 sfx.scanDone()
-
                 withAnimation {
                     world.model.hudStage = .scanCompletePrompt
                 }
