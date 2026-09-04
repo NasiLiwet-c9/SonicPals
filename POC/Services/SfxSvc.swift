@@ -326,6 +326,9 @@ final class SfxSvc {
         }
     }
 
+    /// Audio stays a bundle resource rather than an asset-catalog data
+    /// set: a data set hands back `Data`, forcing `AVAudioPlayer(data:)`
+    /// to hold every track in memory. BGM wants streaming from disk.
     private func find(_ name: String) -> URL? {
         for ext in exts {
             if let url = Bundle.main.url(forResource: name, withExtension: ext) {

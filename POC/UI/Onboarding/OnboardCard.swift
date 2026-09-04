@@ -12,7 +12,7 @@ struct OnboardCard: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            Model3DView(
+            AssetImageView(
                 name: page.modelName
             )
             .frame(

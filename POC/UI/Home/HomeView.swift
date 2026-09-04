@@ -11,8 +11,8 @@ struct HomeView: View {
     var mascotName = "fly"
 
     var dialogueLines: [String] = [
-        "Hi.... i'm Battiw",
-        "I'm hungry, help me find something to eat tonight...!"
+        "Hi! I'm Battiw.",
+        "I'm hungry. Help me find mangoes!"
     ]
 
     var primaryButtonText = "Fly and Find!"
@@ -51,8 +51,7 @@ struct HomeView: View {
                                     .font(
                                         .system(
                                             size: UICfg.v(20, size),
-                                            weight: .heavy,
-                                            design: .rounded
+                                            weight: .heavy
                                         )
                                     )
                                     .foregroundStyle(.black)
@@ -85,6 +84,17 @@ struct HomeView: View {
                     .horizontal,
                     UICfg.v(20, size)
                 )
+
+                VStack {
+                    Spacer()
+
+                    CreditsView(uiScale: UICfg.s(size))
+                        .padding(
+                            .bottom,
+                            UICfg.v(UICfg.Credits.bottom, size)
+                        )
+                }
+                .padding(.bottom, geo.safeAreaInsets.bottom)
             }
             .frame(
                 width: size.width,

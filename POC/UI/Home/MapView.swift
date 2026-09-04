@@ -221,8 +221,7 @@ struct MapView: View {
             .font(
                 .system(
                     size: UICfg.Map.msgTxt * scale,
-                    weight: .semibold,
-                    design: .rounded
+                    weight: .semibold
                 )
             )
             .multilineTextAlignment(.center)

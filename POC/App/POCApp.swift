@@ -16,9 +16,11 @@ struct POCApp: App {
         TraceComp.registerComponent()
         TargetComp.registerComponent()
         FPScanComp.registerComponent()
+        GuideComp.registerComponent()
 
         FPRevealSys.registerSystem()
         TargetSys.registerSystem()
+        TargetGuideSys.registerSystem()
         MangoEatSys.registerSystem()
         FPScanSys.registerSystem()
     }

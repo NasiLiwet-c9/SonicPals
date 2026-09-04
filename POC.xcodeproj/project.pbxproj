@@ -8,28 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		79B5432D302BBAEA009E3E7E /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432C302BBAEA009E3E7E /* RealityKitContent */; };
+		79B54330302BBAEA009E3E7E /* SonarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432F302BBAEA009E3E7E /* SonarCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		747491C8301BE3CD0012A049 /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = POC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		748F536D302B543600E791A9 /* Exceptions for "POC" folder in "POC" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 747491C7301BE3CD0012A049 /* POC */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		747491CA301BE3CD0012A049 /* POC */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				748F536D302B543600E791A9 /* Exceptions for "POC" folder in "POC" target */,
-			);
 			path = POC;
 			sourceTree = "<group>";
 		};
@@ -41,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79B5432D302BBAEA009E3E7E /* RealityKitContent in Frameworks */,
+				79B54330302BBAEA009E3E7E /* SonarCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +73,7 @@
 			name = POC;
 			packageProductDependencies = (
 				79B5432C302BBAEA009E3E7E /* RealityKitContent */,
+				79B5432F302BBAEA009E3E7E /* SonarCore */,
 			);
 			productName = POC;
 			productReference = 747491C8301BE3CD0012A049 /* POC.app */;
@@ -115,7 +105,8 @@
 			mainGroup = 747491BF301BE3CD0012A049;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				79B5432B302BBAEA009E3E7E /* XCLocalSwiftPackageReference "RealityKitContent" */,
+				79B5432B302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/RealityKitContent" */,
+				79B5432E302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/SonarCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 747491C9301BE3CD0012A049 /* Products */;
@@ -280,7 +271,6 @@
 				DEVELOPMENT_TEAM = X7WUH4Z65U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = POC/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sonic Pals";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
@@ -323,7 +313,6 @@
 				DEVELOPMENT_TEAM = X7WUH4Z65U;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = POC/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sonic Pals";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
@@ -378,9 +367,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		79B5432B302BBAEA009E3E7E /* XCLocalSwiftPackageReference "RealityKitContent" */ = {
+		79B5432B302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/RealityKitContent" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = RealityKitContent;
+			relativePath = Packages/RealityKitContent;
+		};
+		79B5432E302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/SonarCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SonarCore;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -388,6 +381,10 @@
 		79B5432C302BBAEA009E3E7E /* RealityKitContent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RealityKitContent;
+		};
+		79B5432F302BBAEA009E3E7E /* SonarCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SonarCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

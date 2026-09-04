@@ -73,14 +73,13 @@ final class SessSvc: SessServing {
             ]
         )
         
-        let unavailable = await spatial.run(
+        let unavailable = await runSpatial(
             spatialConfig,
-            session: session,
-            arConfiguration: arConfig
+            arConfig: arConfig
         )
         
         if let unavailable {
-            print("SPATIAL: \(unavailable.debugDescription)")
+            print("SPATIAL: unavailable anchors \(unavailable.anchor)")
             
             if unavailable.missingCameraAuthorization == true {
                 print("SPATIAL: camera authorization missing")
@@ -135,6 +134,24 @@ final class SessSvc: SessServing {
         print("ARSession: stopped")
     }
     
+    /// The `ARSession`-backed overload ships only in the device SDK.
+    /// Unreachable on the simulator anyway (no scene reconstruction), but
+    /// keeping it compiling lets the menu screens run there.
+    private func runSpatial(
+        _ config: SpatialTrackingSession.Configuration,
+        arConfig: ARWorldTrackingConfiguration
+    ) async -> SpatialTrackingSession.UnavailableCapabilities? {
+#if targetEnvironment(simulator)
+        await spatial.run(config)
+#else
+        await spatial.run(
+            config,
+            session: session,
+            arConfiguration: arConfig
+        )
+#endif
+    }
+
     private func cameraAccess() async -> Bool {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -144,11 +161,7 @@ final class SessSvc: SessServing {
         case .notDetermined:
             print("CAMERA status: requesting")
             
-            let granted = await withCheckedContinuation { continuation in
-                AVCaptureDevice.requestAccess(for: .video) { granted in
-                    continuation.resume(returning: granted)
-                }
-            }
+            let granted = await AVCaptureDevice.requestAccess(for: .video)
             
             print(
                 granted
