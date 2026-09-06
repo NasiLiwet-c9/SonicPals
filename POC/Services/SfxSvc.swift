@@ -12,7 +12,7 @@ final class SfxSvc {
     static let shared = SfxSvc()
 
     // MARK: - Audio Files
-    // Change filenames/volumes here only. Extension does not matter.
+    // Change filenames/volumes here only. Extension does not matter
 
     private enum File {
         static let menu = "bgm-menu"                 // Main menu BGM.
@@ -172,11 +172,11 @@ final class SfxSvc {
     func levelDone() { play(.lvl) }
 
     func treeDetect() {
-        // tree-detect-sfx was removed. Kept so existing gameplay calls stay untouched.
+        // tree-detect-sfx removed, kept so call sites still compile
     }
 
     func mangoReady() {
-        // mango-ready-sfx was removed. Kept so existing gameplay calls stay untouched.
+        // mango-ready-sfx removed, kept so call sites still compile
     }
 
     // MARK: - Ambience
@@ -326,9 +326,8 @@ final class SfxSvc {
         }
     }
 
-    /// Audio stays a bundle resource rather than an asset-catalog data
-    /// set: a data set hands back `Data`, forcing `AVAudioPlayer(data:)`
-    /// to hold every track in memory. BGM wants streaming from disk.
+    /// Not an asset-catalog data set: that hands back `Data` and holds
+    /// every track in memory. BGM wants streaming from disk
     private func find(_ name: String) -> URL? {
         for ext in exts {
             if let url = Bundle.main.url(forResource: name, withExtension: ext) {

@@ -55,8 +55,7 @@ extension ECSWorld {
         return true
     }
 
-    /// Prefers the target already staged in the scene; only builds one if
-    /// staging has not caught up.
+    /// Prefers the staged one, builds only if staging fell behind
     private func nextTargetPart() -> TargetPart? {
         if let staged = stagedTarget {
             stagedTarget = nil
@@ -66,8 +65,8 @@ extension ECSWorld {
         return targetMaker.make()
     }
 
-    /// Parents the next target now, disabled, so the work of putting it in
-    /// the scene does not land on the frame where it appears.
+    /// Parented now and disabled, so the scene work is off the frame
+    /// where it appears
     func stageTarget() {
         guard stagedTarget == nil,
               model.lidarOK,
@@ -119,7 +118,7 @@ extension ECSWorld {
             lockYaw: pose.yaw
         )
 
-        // Already parented when it was staged.
+        // Already parented when it was staged
         if part.root.parent !== anchor {
             anchor.addChild(part.root)
         }
@@ -140,7 +139,7 @@ extension ECSWorld {
         model.mangoEatReady = false
         model.msg = ""
 
-        // Stage the next one while the player hunts this one.
+        // Stage the next one while the player hunts this one
         Task { @MainActor [weak self] in
             guard let self else { return }
 
@@ -159,14 +158,10 @@ extension ECSWorld {
         simd_length(SIMD2<Float>(a.x - b.x, a.z - b.z))
     }
 
-    /// The player-facing respawn: sweeps the room again and puts the tree
-    /// somewhere new.
+    /// Player-facing respawn: re-sweeps, then moves the tree
     ///
-    /// Unlike the dev force-spawn this still goes through the normal
-    /// safe-pose search, and it re-arms the floor scan first so the search
-    /// runs on freshly sampled floor rather than whatever was found on the
-    /// way in. `lastTargetPos` is deliberately kept, so `repeatDistance`
-    /// pushes the new tree away from the one the player just gave up on.
+    /// Still uses the normal safe-pose search, and keeps `lastTargetPos`
+    /// so `repeatDistance` pushes it away from where they gave up
     func respawnTarget() {
         guard model.hudStage == .mission,
               !model.missionComplete else {
@@ -189,8 +184,7 @@ extension ECSWorld {
         mission.requestTarget()
     }
 
-    /// Restarts the floor sampling without disturbing the HUD, so the next
-    /// pose comes from a fresh look at the room.
+    /// Restarts floor sampling without touching the HUD
     private func rescanFloor() {
         guard var comp = scanEntity.components[FPScanComp.self] else { return }
 
@@ -287,7 +281,7 @@ extension ECSWorld {
         return true
     }
 
-    // Resume LiDAR/cursor while finding open floor.
+    // Resume LiDAR/cursor while finding open floor
     private func resumeOpenScan() {
         guard var comp =
                 scanEntity.components[

@@ -34,21 +34,39 @@ final class FPRevealSys: System {
     private let holdS: TimeInterval = 1.5
     private let fadeStepS: TimeInterval = 0.10
 
-    required init(scene: Scene) {
-        mesh = FPMeshBuild(
-            read: FPMeshRead(),
-            pack: FPMeshPack(liftM: 0.018),
-            fact: FPMeshFact()
+    required convenience init(scene: Scene) {
+        self.init(
+            mesh: FPMeshBuild(
+                read: FPMeshRead(),
+                pack: FPMeshPack(liftM: 0.018),
+                fact: FPMeshFact()
+            )
         )
+    }
+
+    /// Scene-free init taking the mesh builder, so the reveal state
+    /// machine can be driven in tests against a stub builder
+    init(mesh: any FPMeshBuilding) {
+        self.mesh = mesh
     }
 
     func update(
         context: SceneUpdateContext
     ) {
-        let now = Date().timeIntervalSinceReferenceDate
-        let session = session(in: context.scene)
+        step(
+            entities: context.scene.performQuery(Self.query),
+            session: session(in: context.scene),
+            now: Date().timeIntervalSinceReferenceDate
+        )
+    }
 
-        for entity in context.scene.performQuery(Self.query) {
+    /// Advances every in-flight ping by one tick
+    func step(
+        entities: some Sequence<Entity>,
+        session: ARSession?,
+        now: TimeInterval
+    ) {
+        for entity in entities {
             guard var comp = entity.components[RevealComp.self] else {
                 continue
             }

@@ -8,11 +8,11 @@
 import SwiftUI
 
 /// Moves the tree somewhere new when the player has swept the room and
-/// found nothing.
+/// found nothing
 ///
 /// Its own control rather than a line in Battiw's bubble, which is a
 /// narrator you dismiss. The hint waits until the hunt has dragged, so it
-/// never reads as "you were meant to press this".
+/// never reads as "you were meant to press this"
 struct RespawnButton: View {
     let uiScale: CGFloat
     let onRespawn: () -> Void

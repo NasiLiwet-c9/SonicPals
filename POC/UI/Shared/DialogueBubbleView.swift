@@ -142,7 +142,7 @@ struct DialogueBubbleView: View {
                     : UICfg.Dlg.tallH
             ) * uiScale
         )
-        // Each new line pops in, replacing the old typewriter reveal.
+        // Each new line pops in, replacing the old typewriter reveal
         .scaleEffect(popped ? 1 : 0.86)
         .opacity(popped ? 1 : 0)
         .task(id: controller.currentLineIndex) {

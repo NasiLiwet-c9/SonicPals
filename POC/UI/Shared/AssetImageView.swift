@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// An `Assets.xcassets` image, with a visible placeholder so a missing
-/// one shows up instead of rendering nothing.
+/// one shows up instead of rendering nothing
 struct AssetImageView: View {
     let name: String
 

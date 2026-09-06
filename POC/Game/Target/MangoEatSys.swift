@@ -11,16 +11,11 @@ import RealityKit
 import SonarCore
 import simd
 
-/// Watches how close the camera is to the mango and whether it's
-/// actually pointed at it. When both hold, posts `.mangoEatReady`
-/// (with the mango `Entity` as `object`) so the UI can swap the wave
-/// button for an "eat" button. When either stops holding — or the
-/// mango is gone (already eaten) — posts `.mangoEatLost`.
+/// Posts `.mangoEatReady` when the camera is close to a mango and
+/// pointed at it, `.mangoEatLost` when either stops holding
 ///
-/// Only considers a target once its tree has been found
-/// (`comp.found`), since that's what makes the real mango mesh
-/// visible in the scene (see `TargetSys`). Eating no longer requires
-/// separately "scanning" the mango — proximity + aim is enough.
+/// Only looks at found trees, since that is what makes the real mango
+/// mesh visible. Proximity and aim are enough, no scanning needed
 @MainActor
 final class MangoEatSys: System {
     static let query = EntityQuery(
@@ -31,36 +26,42 @@ final class MangoEatSys: System {
         where: .has(SessComp.self)
     )
 
-    /// "~10cm" from the spec — loosened a bit in practice. At true
-    /// 10-12cm, ARKit's camera-pose tracking gets noisy (little
-    /// usable feature area that close to a surface), and the
-    /// measured distance is to the mesh's *visual* center (see
-    /// `isReady`), not a fixed point on its surface, so real-world
-    /// "touching distance" reads higher than expected. 0.28m tested
-    /// as a much more reliable "right up close to it" trigger — see
-    /// `logDistance` below if this needs re-tuning.
+    /// Spec says ~10cm, but tracking gets noisy that close and the
+    /// distance is to the mesh centre, so touching distance reads higher
     private let eatDistanceM: Float = 0.5
 
-    /// How far off dead-center the camera can be while still
-    /// counting as "pointing at" the mango.
+    /// How far off centre still counts as pointing at it
     private let eatAngleDeg: Float = 30
 
-    /// Cached "MangoTarget" lookup per target root, so we don't walk
-    /// the scene hierarchy every frame.
+    /// Cached per target root, to avoid walking the hierarchy each frame
     private var mangoCache: [ObjectIdentifier: Entity] = [:]
 
     private var ready = false
 
     required init(scene: Scene) {}
 
+    /// Scene-free init, for tests
+    init() {}
+
     func update(context: SceneUpdateContext) {
         guard let camM = cameraMatrix(in: context.scene) else {
             return
         }
 
+        step(
+            targets: context.scene.performQuery(Self.query),
+            camM: camM
+        )
+    }
+
+    /// `update` once the scene has been queried
+    func step(
+        targets: some Sequence<Entity>,
+        camM: simd_float4x4
+    ) {
         var matched = false
 
-        for entity in context.scene.performQuery(Self.query) {
+        for entity in targets {
             guard entity.isEnabled,
                   let comp = entity.components[TargetComp.self],
                   comp.found,
@@ -83,7 +84,7 @@ final class MangoEatSys: System {
 
     // MARK: - Ready Check
 
-    private func isReady(
+    func isReady(
         mango: Entity,
         camM: simd_float4x4
     ) -> Bool {
@@ -105,8 +106,7 @@ final class MangoEatSys: System {
         var toMango = mangoPos - camPos
 
         guard simd_length(toMango) > 0.001 else {
-            // Camera is (almost) exactly at the mango's position;
-            // treat that as "pointing at it" by default.
+            // Camera is basically on it, count that as pointing
             return true
         }
 

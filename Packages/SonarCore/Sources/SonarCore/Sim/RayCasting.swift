@@ -7,7 +7,7 @@
 
 import simd
 
-/// One ray/geometry intersection, in world space.
+/// One ray/geometry intersection, in world space
 public struct RayCastHit: Sendable {
     public let position: SIMD3<Float>
     public let normal: SIMD3<Float>
@@ -24,8 +24,8 @@ public struct RayCastHit: Sendable {
     }
 }
 
-/// The one thing the simulation cannot do itself. Keeping it a port is
-/// what lets the rest of `SonarCore` stay free of RealityKit.
+/// The one thing the simulation cannot do itself. A port, so the rest
+/// of `SonarCore` stays free of RealityKit
 @MainActor
 public protocol RayCasting {
     func cast(

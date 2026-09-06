@@ -43,6 +43,9 @@ final class TargetSys: System {
         scene: Scene
     ) {}
 
+    /// Scene-free init, so the decision logic can be driven in tests
+    init() {}
+
     func update(
         context:
             SceneUpdateContext
@@ -53,19 +56,26 @@ final class TargetSys: System {
             return
         }
 
-        let camM = sess.camera
+        step(
+            targets: context.scene.performQuery(Self.query),
+            camM: sess.camera,
+            teaching: sess.teaching,
+            now: Date().timeIntervalSinceReferenceDate
+        )
+    }
 
-        let now =
-            Date()
-            .timeIntervalSinceReferenceDate
-
+    /// Everything `update` does once the scene has been queried
+    func step(
+        targets: some Sequence<Entity>,
+        camM: simd_float4x4,
+        teaching: Bool,
+        now: TimeInterval
+    ) {
         let cam =
             camM.pos3
 
         for entity
-        in context.scene.performQuery(
-            Self.query
-        ) {
+        in targets {
             guard entity.isEnabled,
                   var comp =
                     entity.components[
@@ -134,7 +144,7 @@ final class TargetSys: System {
                 continue
             }
 
-            guard !sess.teaching else {
+            guard !teaching else {
                 entity.components[
                     TargetComp.self
                 ] = comp
@@ -438,7 +448,7 @@ final class TargetSys: System {
         markFelt(&comp)
     }
 
-    /// The first buzz unlocks the guide arrow and gives Battiw a line.
+    /// The first buzz unlocks the guide arrow and gives Battiw a line
     private func markFelt(
         _ comp: inout TargetComp
     ) {

@@ -9,7 +9,7 @@
 import SwiftUI
 
 /// Reports where the bottom controls ended up, so the coach spotlight can
-/// be punched out at exactly that spot.
+/// be punched out at exactly that spot
 private struct ControlBounds: PreferenceKey {
     static let defaultValue: Anchor<CGRect>? = nil
 
@@ -158,7 +158,7 @@ struct HUDView: View {
                    world.model.coachStep.spotlight != .none {
                     CoachSpotlight(
                         // The scrim ignores the safe area, so it draws in
-                        // screen space; the anchor resolves in the HUD's.
+                        // screen space, the anchor resolves in the HUD's
                         rect: geo[controlBounds].offsetBy(
                             dx: geo.frame(in: .global).minX,
                             dy: geo.frame(in: .global).minY

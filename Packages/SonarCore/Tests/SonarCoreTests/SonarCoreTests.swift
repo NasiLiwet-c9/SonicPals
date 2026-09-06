@@ -2,6 +2,8 @@
 //  SonarCoreTests.swift
 //  SonarCore
 //
+//  Created by Shan Newcastle on 04/09/26.
+//
 
 import Testing
 import simd
@@ -15,7 +17,7 @@ private let forwardStart = WaveStart(
     up: SIMD3<Float>(0, 1, 0)
 )
 
-/// Answers every ray with a flat wall a fixed distance straight ahead.
+/// Answers every ray with a flat wall a fixed distance straight ahead
 private struct WallCaster: RayCasting {
     let distance: Float
 
@@ -128,7 +130,7 @@ struct RayMakerTests {
     func ringsProduceExpectedRayCount() {
         let setting = WaveSet.standard.far
 
-        // 1 centre ray, then ring r contributes r * 8 rays.
+        // 1 centre ray, then ring r contributes r * 8 rays
         #expect(RayMaker(rings: 0).make(for: setting).count == 1)
         #expect(RayMaker(rings: 1).make(for: setting).count == 9)
         #expect(RayMaker(rings: 2).make(for: setting).count == 25)
@@ -369,7 +371,7 @@ struct FPMeshPackTests {
 
         let moved = try #require(buckets[key]?.pos.first)
 
-        // Camera sits on -z, so lifted geometry moves toward -z.
+        // Camera sits on -z, so lifted geometry moves toward -z
         #expect(moved.z < 1)
     }
 }

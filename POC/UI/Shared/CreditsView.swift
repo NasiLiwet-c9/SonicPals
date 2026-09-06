@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// The team, as a quiet footer. Menu screens only.
+/// The team, as a quiet footer. Menu screens only
 struct CreditsView: View {
     let uiScale: CGFloat
 
@@ -34,7 +34,7 @@ struct CreditsView: View {
                     )
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.white.opacity(UICfg.Credits.alpha))
-                    // No plate, so the text carries its own contrast.
+                    // No plate, so the text carries its own contrast
                     .shadow(color: .black.opacity(0.85), radius: 1)
                     .shadow(color: .black.opacity(0.55), radius: 4)
             }

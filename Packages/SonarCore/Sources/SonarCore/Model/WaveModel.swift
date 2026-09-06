@@ -7,7 +7,7 @@
 
 import simd
 
-/// Beam shape for one ping, picked from how close the nearest surface is.
+/// Beam shape for one ping, picked from how close the nearest surface is
 public enum WaveMode: Sendable {
     case far
     case near
@@ -48,8 +48,7 @@ public struct WaveSetting: Sendable {
         (startKHz + endKHz) / 2
     }
 
-    /// Closer than this returns while the chirp is still emitting, so it
-    /// cannot be heard as a separate echo.
+    /// Anything nearer returns while the chirp is still emitting
     public func minRange(soundSpeed: Float) -> Float {
         soundSpeed * (durationMs / 1_000) / 2
     }
@@ -140,7 +139,7 @@ extension WaveSet {
     )
 }
 
-/// The pose a ping was fired from.
+/// The pose a ping was fired from
 public struct WaveStart: Sendable {
     public let pos: SIMD3<Float>
     public let forward: SIMD3<Float>
@@ -213,7 +212,7 @@ public struct WaveHit: Sendable {
     }
 }
 
-/// Everything one ping produced — the hand-off to whatever draws it.
+/// Everything one ping produced, handed to whatever draws it
 public struct WaveData: Sendable {
     public let start: WaveStart
     public let setting: WaveSetting
@@ -269,7 +268,7 @@ public struct WaveData: Sendable {
             }
     }
 
-    /// How far the reveal mesh may reach for this ping.
+    /// How far the reveal mesh may reach for this ping
     public var fpRange: Float {
         maxDistance
     }

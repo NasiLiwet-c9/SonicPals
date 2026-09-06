@@ -124,7 +124,7 @@ final class HapticSvc {
         }
     }
 
-    /// Two quick knocks, for biting the mango.
+    /// Two quick knocks, for biting the mango
     func munch() {
         guard supported else {
             return

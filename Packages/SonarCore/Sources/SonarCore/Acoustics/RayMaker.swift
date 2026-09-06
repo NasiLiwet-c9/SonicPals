@@ -20,7 +20,7 @@ public final class RayMaker: Sendable {
         self.beamPower = beamPower
     }
 
-    /// Centre ray plus concentric rings.
+    /// Centre ray plus concentric rings
     public func make(
         for setting: WaveSetting,
         ringCount: Int? = nil

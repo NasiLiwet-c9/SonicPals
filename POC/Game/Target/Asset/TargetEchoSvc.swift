@@ -41,7 +41,7 @@ struct TargetEchoSvc {
             scale: TargetCfg.Echo.mangoTraceScale
         )
 
-        // Sonar above full-color target.
+        // Sonar above full-color target
         RealityShade.keepBright(
             pulse,
             order: 2

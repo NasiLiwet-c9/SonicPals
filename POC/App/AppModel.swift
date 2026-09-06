@@ -20,7 +20,7 @@ final class AppModel {
     var mangoEatReady = false
     var mangoEatenCount = 0
 
-    /// First-run coaching, shown over the live camera. Driven by `CoachSvc`.
+    /// First-run coaching, shown over the live camera. Driven by `CoachSvc`
     var coachStep: CoachStep = .idle
     var coachLine = ""
     var coachLineID = 0
@@ -50,7 +50,7 @@ final class AppModel {
     var missionComplete = false
     var missionDark = false
     /// One line at a time. `MissionSvc` owns the pacing and the queue,
-    /// so a new beat can never wipe an important one off the screen.
+    /// so a new beat can never wipe an important one off the screen
     var missionDialogueText = ""
     var missionDialogueID = 0
     var missionDialogueVisible = false

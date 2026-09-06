@@ -19,6 +19,12 @@ struct QuestionCardView: View {
     enum Answer {
         case ultrasonic
         case flashlight
+
+        /// A bat hunts by sound, not by light. The one thing the quiz
+        /// checks, stated once so the card and the sound cannot disagree
+        var isCorrect: Bool {
+            self == .ultrasonic
+        }
     }
 
     private let question =
@@ -167,7 +173,7 @@ struct QuestionCardView: View {
     }
 
     private var isCorrect: Bool {
-        selectedAnswer == .ultrasonic
+        selectedAnswer?.isCorrect == true
     }
 
     private func resultView(
@@ -391,7 +397,7 @@ struct QuestionCardView: View {
 
         selectedAnswer = answer
 
-        if answer == .ultrasonic {
+        if answer.isCorrect {
             sfx.correct()
         } else {
             sfx.incorrect()

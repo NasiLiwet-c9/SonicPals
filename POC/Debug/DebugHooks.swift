@@ -8,9 +8,9 @@
 import SwiftUI
 
 /// Seams the shipping code uses to reach dev-only tooling. Both compile
-/// to nothing in release, so no feature folder needs its own `#if DEBUG`.
+/// to nothing in release, so no feature folder needs its own `#if DEBUG`
 extension View {
-    /// No-op outside DEBUG.
+    /// No-op outside DEBUG
     @ViewBuilder
     func debugForceSpawn(world: ECSWorld) -> some View {
 #if DEBUG
@@ -24,7 +24,7 @@ extension View {
 }
 
 extension ECSWorld {
-    /// Always `false` in release builds.
+    /// Always `false` in release builds
     var forceSpawnActive: Bool {
 #if DEBUG
         ForceSpawnRuntime.shared.isActive(for: self)

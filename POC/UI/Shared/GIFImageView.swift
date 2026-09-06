@@ -11,9 +11,9 @@ import UIKit
 
 private enum GIFLoader {
     /// GIFs live in `Assets.xcassets` as data sets. A catalog cannot
-    /// *animate* a GIF — that is why this bridge exists — but it can
+    /// *animate* a GIF, that is why this bridge exists, but it can
     /// perfectly well carry the bytes, which keeps them out of the
-    /// bundle root and compiled into `Assets.car` with everything else.
+    /// bundle root and compiled into `Assets.car` with everything else
     static func data(named name: String) -> Data? {
         NSDataAsset(name: name)?.data
     }

@@ -84,11 +84,11 @@ extension ECSWorld {
         sfx.eat()
         haptic.munch()
 
-        // Particle FX disabled for stability.
+        // Particle FX disabled for stability
         // let mangoWorldPos = mango.position(relativeTo: nil)
         // playMangoFX(at: mangoWorldPos)
 
-        // Mango disappears immediately when bitten.
+        // Mango disappears immediately when bitten
         mango.removeFromParent()
 
         coach.noteEaten()
@@ -96,7 +96,7 @@ extension ECSWorld {
         model.mangoEatReady = false
         eatCandidate = nil
 
-        // Stop target interaction while bite animation plays.
+        // Stop target interaction while bite animation plays
         targetEntity = nil
         model.hasTarget = false
         model.targetFound = false
@@ -104,7 +104,7 @@ extension ECSWorld {
         setMsg("")
         playEatAnimation()
 
-        // Wait for bite animation before removing the tree.
+        // Wait for bite animation before removing the tree
         mission.completeBite(removing: eatenTarget)
     }
 
@@ -145,8 +145,8 @@ extension ECSWorld {
     }
 
     /*
-    /// Particle FX disabled for stability.
-    /// Kept here so it can easily be restored later.
+    /// Particle FX disabled for stability
+    /// Kept here so it can easily be restored later
     private func playMangoFX(at worldPos: SIMD3<Float>) {
         guard let fx = targetEntity?.findEntity(named: "MangoFX") else {
 #if DEBUG

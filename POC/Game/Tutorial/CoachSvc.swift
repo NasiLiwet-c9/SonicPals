@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// What the coach is showing right now. `.idle` is nothing.
+/// Current beat, `.idle` is nothing showing
 enum CoachStep: Equatable {
     case idle
 
@@ -15,14 +15,14 @@ enum CoachStep: Equatable {
     case lookDown
     case fillRing
 
-    // How echolocation works — the point of the game
+    // The echolocation lesson
     case dark
     case squeak
     case bounce
     case echo
     case goal
 
-    // Controls, and what the echo actually shows
+    // Controls
     case ping
     case sawEcho
     case colours
@@ -30,7 +30,7 @@ enum CoachStep: Equatable {
     case hunt
     case eat
 
-    /// Which control the coach is pointing at, if any.
+    /// Which control the coach is pointing at, if any
     var spotlight: CoachTarget {
         switch self {
         case .ping, .hold: .ping
@@ -39,10 +39,7 @@ enum CoachStep: Equatable {
         }
     }
 
-    /// While Battiw is explaining how echolocation works, the controls
-    /// are held shut so a child cannot skip past it. Once they have
-    /// pinged, the lock comes off — the rest is explained *while* they
-    /// play with it, which is the part that actually teaches.
+    /// Shut until the lesson is done, so it cannot be skipped past
     var locksInput: Bool {
         switch self {
         case .idle, .ping, .sawEcho, .colours, .hold, .hunt, .eat: false
@@ -51,25 +48,34 @@ enum CoachStep: Equatable {
     }
 }
 
-/// The control a beat is pointing at.
+/// A protocol, not `ECSWorld`, so the script can be tested on its own
+@MainActor
+protocol CoachHost: AnyObject {
+    var model: AppModel { get }
+
+    /// Keeps guidance quiet while a lesson runs
+    func setTeaching(_ on: Bool)
+
+    /// Spawns the first tree once the lesson ends
+    func startHunt()
+
+    func playCoachCue()
+}
+
+/// The control a beat points at
 enum CoachTarget {
     case none
     case ping
     case eat
 }
 
-/// Teaches the game while the game is running.
+/// Teaches the game while it runs, off what the player just did
 ///
-/// Beats fire off what the player actually did — the session coming up,
-/// the scan filling, the first ping, the first mango in reach — so the
-/// camera never leaves the screen.
-///
-/// The echolocation beats come before the ping button is usable: the game
-/// is meant to teach how bats see with sound, and a child who taps first
-/// learns nothing.
+/// The lesson comes before the ping button works, since a child who taps
+/// first learns nothing
 @MainActor
 final class CoachSvc {
-    private unowned var world: ECSWorld!
+    private unowned var host: (any CoachHost)!
 
     private var task: Task<Void, Never>?
 
@@ -79,13 +85,17 @@ final class CoachSvc {
     private var ate = false
     private var finished = false
 
-    private var model: AppModel { world.model }
+    private var model: AppModel { host.model }
 
-    /// Long enough to read a short line aloud, short enough not to stall.
-    private let beat = Duration.milliseconds(2600)
+    /// Injectable so tests need not wait the script out
+    private let beat: Duration
 
-    func attach(to world: ECSWorld) {
-        self.world = world
+    init(beat: Duration = .milliseconds(2600)) {
+        self.beat = beat
+    }
+
+    func attach(to host: any CoachHost) {
+        self.host = host
     }
 
     var isDone: Bool { finished }
@@ -99,6 +109,9 @@ final class CoachSvc {
 
         run {
             await self.beat(.lookDown, "Look down at the floor!")
+
+            guard !Task.isCancelled else { return }
+
             self.set(.fillRing, "Fill the ring! Look around.")
         }
     }
@@ -106,7 +119,7 @@ final class CoachSvc {
     func noteScan(progress: Float) {
         guard model.coachStep == .fillRing, progress > 0.10 else { return }
 
-        // The percentage and the turn arrows take it from here.
+        // The percentage and arrows take over
         clear()
     }
 
@@ -122,6 +135,8 @@ final class CoachSvc {
             await self.beat(.echo, "...and back as an echo!")
             await self.beat(.goal, "Echoes help me see! Find 3 mangoes.")
 
+            guard !Task.isCancelled else { return }
+
             self.set(.ping, "Your turn. Tap to squeak!")
         }
     }
@@ -131,16 +146,17 @@ final class CoachSvc {
 
         pinged = true
 
-        // Input stays live through this: they can keep pinging and watch
-        // the colours change while Battiw explains what they mean.
+        // Input stays live, so they can ping while it is explained
         run {
             await self.beat(.sawEcho, "Whoa! That's my echo.")
             await self.beat(.colours, "Red is close. Blue is far!")
             await self.beat(.hold, "Hold it down for more!")
             await self.beat(.hunt, "Now find the tree. A buzz means close!")
 
+            guard !Task.isCancelled else { return }
+
             self.clear()
-            self.world.mission.startHunt()
+            self.host.startHunt()
         }
     }
 
@@ -163,9 +179,7 @@ final class CoachSvc {
         task = nil
     }
 
-    /// Stops a lesson and lifts the teaching lock. `cancel` alone would
-    /// leave the flag set, which silences guidance for the rest of the
-    /// run.
+    /// `cancel` alone leaves the lock set, killing guidance for the run
     func suspend() {
         cancel()
         clear()
@@ -178,7 +192,6 @@ final class CoachSvc {
         task = Task { @MainActor in await body() }
     }
 
-    /// Shows a line and waits it out.
     private func beat(_ step: CoachStep, _ line: String) async {
         guard !Task.isCancelled else { return }
 
@@ -192,14 +205,14 @@ final class CoachSvc {
         model.coachLine = line
         model.coachLineID += 1
 
-        world.setTeaching(step.locksInput)
-        world.sfx.dialogue()
+        host.setTeaching(step.locksInput)
+        host.playCoachCue()
     }
 
     private func clear() {
         model.coachStep = .idle
         model.coachLine = ""
 
-        world.setTeaching(false)
+        host.setTeaching(false)
     }
 }

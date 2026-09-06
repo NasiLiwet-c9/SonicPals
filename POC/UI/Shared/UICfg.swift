@@ -63,10 +63,10 @@ nonisolated enum UICfg {
         static let skipTop: CGFloat = 64   // Skip top gap.
     }
 
-    /// How dark the mission gets. Nearly opaque on purpose — the room is
+    /// How dark the mission gets. Nearly opaque on purpose, the room is
     /// meant to be unreadable until a ping reveals it. What has to punch
     /// through is the revealed geometry, which `RealityShade.keepBright`
-    /// puts in front of the shade rather than under it.
+    /// puts in front of the shade rather than under it
     enum Shade {
         static let darkMid: CGFloat = 0.93     // Dark, centre.
         static let darkHalf: CGFloat = 0.96    // Dark, mid.
@@ -79,7 +79,7 @@ nonisolated enum UICfg {
 
     /// Speech-bubble art carries its tail in the bottom of the frame, so
     /// the visual body sits above the frame centre. Text lifts by this
-    /// fraction of the frame height to land in the body.
+    /// fraction of the frame height to land in the body
     enum Bubble {
         static let aspect: CGFloat = 400.0 / 925.0
         static let tailLift: CGFloat = 0.09

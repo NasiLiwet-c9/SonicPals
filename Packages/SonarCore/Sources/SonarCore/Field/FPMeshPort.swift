@@ -7,8 +7,7 @@
 
 import simd
 
-/// Buckets sampled triangles by band/zone. Pure geometry — no rendering
-/// type crosses it.
+/// Buckets triangles by band and zone. No rendering type crosses it
 public protocol FPMeshPackPort: Sendable {
     func make(
         from items: [FPItem],

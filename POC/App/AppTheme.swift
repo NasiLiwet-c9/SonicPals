@@ -7,12 +7,10 @@
 
 import SwiftUI
 
-/// SF Pro Rounded, applied once at the root and inherited everywhere,
-/// sheets included.
+/// SF Pro Rounded, applied once at the root and inherited everywhere
 ///
-/// Views must ask for size and weight only — passing an explicit
-/// `design:` opts that view back out, which is what made the old UI
-/// inconsistent.
+/// Ask for size and weight only. An explicit `design:` opts that view
+/// back out, which is what made the old UI inconsistent
 extension View {
     func sonicPalsTypography() -> some View {
         fontDesign(.rounded)

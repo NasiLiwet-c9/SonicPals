@@ -32,8 +32,8 @@ struct RealitySceneView: View {
 
             await RealityShade.prepare(shadeAnchor)
 
-            // The mission shade dims everything drawn under it; the guide
-            // arrow has to sit above it to stay readable.
+            // The mission shade dims everything drawn under it, the guide
+            // arrow has to sit above it to stay readable
             RealityShade.keepBright(world.guideAnchor, order: 2)
 
             RealityShade.update(

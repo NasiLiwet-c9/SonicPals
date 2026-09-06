@@ -15,7 +15,7 @@ public final class EchoCalc: Sendable {
     private let surfaceLossDb: Float = 8
     private let refM: Float = 0.1
 
-    /// Received level in dB for one ray return.
+    /// Received level in dB for one ray return
     public func level(
         distanceM: Float,
         rayPower: Float,
@@ -57,7 +57,7 @@ public final class EchoCalc: Sendable {
             - surfaceLossDb
     }
 
-    /// Clears both the hearing floor and the blind zone.
+    /// Clears both the hearing floor and the blind zone
     public func heard(
         levelDb: Float,
         distanceM: Float,

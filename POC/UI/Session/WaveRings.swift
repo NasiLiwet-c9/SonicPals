@@ -77,7 +77,7 @@ struct WaveRings: View {
             pulse = false
 
             // One turn of the run loop so the "collapsed" state is drawn
-            // before the expansion animates out from it.
+            // before the expansion animates out from it
             await Task.yield()
             pulse = true
 

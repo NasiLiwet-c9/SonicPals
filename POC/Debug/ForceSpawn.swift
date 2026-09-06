@@ -16,7 +16,7 @@ import simd
 
 /// Dev-only: drops a tree in front of the camera, skipping the scan and
 /// the safe-pose search. Armed by a hidden gesture for demos. Compiles
-/// out of release entirely.
+/// out of release entirely
 @MainActor
 final class ForceSpawnRuntime {
     static let shared = ForceSpawnRuntime()
@@ -209,7 +209,7 @@ extension ECSWorld {
 
 // MARK: - Arming gesture
 
-/// Four fingers held on the window for 2.5s arms `ForceSpawnRuntime`.
+/// Four fingers held on the window for 2.5s arms `ForceSpawnRuntime`
 @MainActor
 struct ForceSpawnSecret: View {
     let world: ECSWorld
@@ -264,7 +264,7 @@ struct ForceSpawnSecret: View {
 }
 
 /// The press must be recognised on the window itself: SwiftUI gestures
-/// cannot see touches landing on the AR view.
+/// cannot see touches landing on the AR view
 @MainActor
 private struct ForceSpawnInstaller: UIViewRepresentable {
     let onTrigger: @MainActor () -> Void

@@ -9,8 +9,8 @@ import RealityKit
 import SonarCore
 import simd
 
-/// Satisfies `SonarCore.RayCasting` against the room mesh — the only
-/// place the simulation touches RealityKit.
+/// Satisfies `SonarCore.RayCasting` against the room mesh, the only
+/// place the simulation touches RealityKit
 @MainActor
 struct SceneRayCaster: RayCasting {
     private let scene: Scene

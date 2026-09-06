@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-/// Battiw's line during the hunt. Deliberately dumb — `MissionSvc` owns
-/// the queue and the pacing, so this only draws the current line.
+/// Battiw's line during the hunt. Deliberately dumb, `MissionSvc` owns
+/// the queue and the pacing, so this only draws the current line
 struct MissionChatBubbleView: View {
     let text: String
     let lineID: Int

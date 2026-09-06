@@ -7,24 +7,17 @@
 
 import SwiftUI
 
-/// The sonar button. A tap fires one ping; holding refires each time the
-/// cooldown clears, never faster.
+/// A tap fires once, holding refires each time the cooldown clears
 ///
 /// Driven by the press, not a `Button` action, which only lands on
-/// release. Assistive activation has no press, so it gets its own action.
+/// release. The rule itself lives in `PingCooldown`
 struct PingButton: View {
     let enabled: Bool
     let cooldown: Duration
     let onFire: () -> Void
 
-    @State private var coolingDown = false
-    @State private var cooldownProgress: CGFloat = 0
     @State private var pressed = false
-
-    /// The repeat awaits this rather than sleeping the same duration
-    /// alongside it, which would race. Not a child of the press task:
-    /// letting go must not cut a cooldown short.
-    @State private var cooldownTask: Task<Void, Never>?
+    @State private var ping: PingCooldown
 
     init(
         enabled: Bool,
@@ -34,6 +27,8 @@ struct PingButton: View {
         self.enabled = enabled
         self.cooldown = cooldown
         self.onFire = onFire
+
+        _ping = State(wrappedValue: PingCooldown(cooldown: cooldown))
     }
 
     var body: some View {
@@ -43,7 +38,7 @@ struct PingButton: View {
             .opacity(enabled ? 1 : 0.4)
             .contentShape(Circle())
             // minimumDuration is never reached, so `perform` never runs:
-            // this is here purely for the press-down / press-up callbacks.
+            // this is here purely for the press-down / press-up callbacks
             .onLongPressGesture(
                 minimumDuration: .infinity,
                 maximumDistance: 40,
@@ -55,7 +50,7 @@ struct PingButton: View {
             .accessibilityElement()
             .accessibilityAddTraits(.isButton)
             .accessibilityLabel(
-                coolingDown
+                ping.coolingDown
                     ? "Ultrasonic wave recharging"
                     : "Send ultrasonic wave"
             )
@@ -78,19 +73,23 @@ struct PingButton: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 108, height: 108)
 
-            if coolingDown {
+            if ping.coolingDown {
                 Circle()
                     .fill(.black.opacity(0.48))
                     .frame(width: 94, height: 94)
 
                 Circle()
-                    .trim(from: 0, to: cooldownProgress)
+                    .trim(from: 0, to: ping.progress)
                     .stroke(
                         .white.opacity(0.92),
                         style: StrokeStyle(lineWidth: 4, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
                     .frame(width: 96, height: 96)
+                    .animation(
+                        .linear(duration: cooldown.seconds),
+                        value: ping.progress
+                    )
 
                 Image(systemName: "timer")
                     .font(.system(size: 24, weight: .bold))
@@ -100,47 +99,20 @@ struct PingButton: View {
     }
 
     /// Fires while the finger is down. `.task(id: pressed)` cancels this
-    /// on release, which stops the repeat.
+    /// on release, which stops the repeat
     private func repeatWhileHeld() async {
         while !Task.isCancelled, pressed, enabled {
-            // Pressing part-way through an earlier shot's cooldown waits
-            // it out rather than being dropped.
-            if !coolingDown {
-                fire()
-            }
+            // A press part-way through an earlier shot's cooldown waits
+            // it out rather than being dropped
+            fire()
 
-            guard let cooldownTask else { return }
-
-            await cooldownTask.value
+            await ping.waitForCooldown()
         }
     }
 
     private func fire() {
-        guard enabled, !coolingDown else { return }
+        guard ping.fire(enabled: enabled) else { return }
 
         onFire()
-
-        coolingDown = true
-        cooldownProgress = 1
-
-        cooldownTask = Task { @MainActor in
-            await Task.yield()
-
-            withAnimation(.linear(duration: cooldown.seconds)) {
-                cooldownProgress = 0
-            }
-
-            try? await Task.sleep(for: cooldown)
-
-            coolingDown = false
-            cooldownProgress = 0
-        }
-    }
-}
-
-private extension Duration {
-    var seconds: Double {
-        Double(components.seconds)
-            + (Double(components.attoseconds) / 1e18)
     }
 }

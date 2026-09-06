@@ -52,21 +52,14 @@ final class FPScanSys: System {
             width: 0.045
         )
 
-    private var baseYaw: Float?
-
-    private var seen:
-        Set<Int> = []
-
-    private var lastSector:
-        Int?
+    /// Sweep coverage and the turn cue, split out so both can be tested
+    /// without a live session, see `ScanCoverage`
+    private var coverage = ScanCoverage(sectors: 24)
 
     private var lastMeshAt:
         TimeInterval = 0
 
     private var lastFloorAt:
-        TimeInterval = 0
-
-    private var lastProgressAt:
         TimeInterval = 0
 
     private var resetAt:
@@ -100,10 +93,10 @@ final class FPScanSys: System {
             frame.camera.transform
 
         let forward =
-            camForward(camera)
+            ScanGeometry.forward(camera)
 
         let yaw =
-            yaw(forward)
+            ScanGeometry.yaw(forward)
 
         for root in context.scene.performQuery(
             Self.query
@@ -153,7 +146,7 @@ final class FPScanSys: System {
                         normal:
                             hit.normal,
                         baseYaw:
-                            baseYaw
+                            coverage.baseYaw
                             ?? yaw
                     )
                 }
@@ -171,7 +164,7 @@ final class FPScanSys: System {
 
                 floorVis
                     .updateCoverage(
-                        seen: seen,
+                        seen: coverage.seen,
                         yaw: yaw
                     )
             }
@@ -209,21 +202,22 @@ final class FPScanSys: System {
 
             if canCount {
                 let index =
-                    sector(
+                    coverage.sector(
                         yaw: yaw
                     )
 
-                markView(
-                    index,
+                coverage.mark(
+                    sector: index,
                     now: now
                 )
 
                 floorVis
                     .showHead()
 
-                turn = turnCue(
+                turn = coverage.turnCue(
                     from: index,
-                    now: now
+                    now: now,
+                    after: turnDelayS
                 )
             } else {
                 floorVis
@@ -232,28 +226,13 @@ final class FPScanSys: System {
                 turn = .none
             }
 
-            let progress =
-                Float(
-                    seen.count
-                )
-                / Float(
-                    sectors
-                )
-
             let ready =
-                seen.count
-                >= sectors
+                coverage.isComplete
 
             post(
                 FPScanHUD(
                     progress:
-                        min(
-                            max(
-                                progress,
-                                0
-                            ),
-                            1
-                        ),
+                        coverage.progress,
                     turn:
                         ready
                         ? .none
@@ -278,157 +257,6 @@ final class FPScanSys: System {
                 ] = comp
             }
         }
-    }
-
-    private func markView(
-        _ index: Int,
-        now: TimeInterval
-    ) {
-        let before = seen.count
-
-        let left =
-            (
-                index
-                - 1
-                + sectors
-            )
-            % sectors
-
-        let right =
-            (
-                index
-                + 1
-            )
-            % sectors
-
-        seen.insert(left)
-        seen.insert(index)
-        seen.insert(right)
-
-        if let lastSector {
-            let forward =
-                (
-                    index
-                    - lastSector
-                    + sectors
-                )
-                % sectors
-
-            let backward =
-                (
-                    lastSector
-                    - index
-                    + sectors
-                )
-                % sectors
-
-            if forward == 2 {
-                seen.insert(
-                    (
-                        lastSector
-                        + 1
-                    )
-                    % sectors
-                )
-            } else if backward == 2 {
-                seen.insert(
-                    (
-                        lastSector
-                        - 1
-                        + sectors
-                    )
-                    % sectors
-                )
-            }
-        }
-
-        if seen.count > before {
-            lastProgressAt = now
-        }
-
-        lastSector = index
-    }
-
-    private func turnCue(
-        from index: Int,
-        now: TimeInterval
-    ) -> FPScanTurn {
-        guard now - lastProgressAt >= turnDelayS else {
-            return .none
-        }
-
-        for distance in 1..<sectors {
-            let right =
-                (
-                    index
-                    + distance
-                ) % sectors
-
-            let left =
-                (
-                    index
-                    - distance
-                    + sectors
-                ) % sectors
-
-            let needRight =
-                !seen.contains(right)
-
-            let needLeft =
-                !seen.contains(left)
-
-            if needRight && !needLeft {
-                return .right
-            }
-
-            if needLeft && !needRight {
-                return .left
-            }
-
-            if needRight && needLeft {
-                return .right
-            }
-        }
-
-        return .none
-    }
-
-    private func sector(
-        yaw value: Float
-    ) -> Int {
-        guard let baseYaw else {
-            return 0
-        }
-
-        let full =
-            Float.pi * 2
-
-        let step =
-            full
-            / Float(sectors)
-
-        var delta =
-            value - baseYaw
-
-        while delta < 0 {
-            delta += full
-        }
-
-        while delta >= full {
-            delta -= full
-        }
-
-        let value =
-            (
-                delta
-                + (
-                    step * 0.5
-                )
-            )
-            / step
-
-        return Int(value)
-            % sectors
     }
 
     private func findFloor(
@@ -513,8 +341,10 @@ final class FPScanSys: System {
                     cameraY
                     - pos.y
 
-                guard drop >= 0.45,
-                      drop <= 2.20 else {
+                guard ScanGeometry.isPlausibleFloor(
+                    y: pos.y,
+                    cameraY: cameraY
+                ) else {
                     return nil
                 }
 
@@ -571,18 +401,15 @@ final class FPScanSys: System {
         resetID: Int,
         now: TimeInterval
     ) {
-        baseYaw =
-            yaw(
-                camForward(
-                    camera
-                )
-            )
+        coverage.reset(
+            baseYaw: ScanGeometry.yaw(
+                ScanGeometry.forward(camera)
+            ),
+            now: now
+        )
 
-        seen.removeAll()
-        lastSector = nil
         lastMeshAt = 0
         lastFloorAt = 0
-        lastProgressAt = now
         resetAt = now
         lastReset = resetID
         lastHUD = nil
@@ -600,32 +427,6 @@ final class FPScanSys: System {
                 progress: 0,
                 turn: .none,
                 ready: false
-            )
-        )
-    }
-
-    private func yaw(
-        _ forward:
-            SIMD3<Float>
-    ) -> Float {
-        atan2(
-            forward.x,
-            -forward.z
-        )
-    }
-
-    private func camForward(
-        _ matrix:
-            simd_float4x4
-    ) -> SIMD3<Float> {
-        simd_normalize(
-            SIMD3<Float>(
-                -matrix
-                    .columns.2.x,
-                -matrix
-                    .columns.2.y,
-                -matrix
-                    .columns.2.z
             )
         )
     }

@@ -11,11 +11,9 @@ import RealityKit
 import SonarCore
 import simd
 
-/// Aims the guide arrow once the player has some sense of the tree —
-/// either an echo revealed part of it (`seen`) or a haptic fired
-/// (`felt`) — until it is `found`.
+/// Aims the guide arrow between `seen`/`felt` and `found`
 ///
-/// Separate from `TargetSys`, which guides by haptics over the same data.
+/// Separate from `TargetSys`, which buzzes over the same data
 @MainActor
 final class TargetGuideSys: System {
     static let query = EntityQuery(
@@ -32,17 +30,30 @@ final class TargetGuideSys: System {
 
     required init(scene: Scene) {}
 
+    /// Scene-free init, for tests
+    init() {}
+
     func update(context: SceneUpdateContext) {
-        guard let sess = sessState(in: context.scene),
-              !sess.teaching
-        else {
-            aim(in: context.scene, bearing: nil)
-            return
-        }
+        let bearing = guideBearing(
+            targets: context.scene.performQuery(Self.query),
+            sess: sessState(in: context.scene)
+        )
 
-        let camM = sess.camera
+        aim(
+            arrows: context.scene.performQuery(Self.guideQuery),
+            bearing: bearing
+        )
+    }
 
-        for entity in context.scene.performQuery(Self.query) {
+    /// Where to point, or `nil` to hide. Needs `seen` or `felt` first,
+    /// and stops at `found`
+    func guideBearing(
+        targets: some Sequence<Entity>,
+        sess: (camera: simd_float4x4, teaching: Bool)?
+    ) -> Float? {
+        guard let sess, !sess.teaching else { return nil }
+
+        for entity in targets {
             guard entity.isEnabled,
                   let comp = entity.components[TargetComp.self],
                   comp.seen || comp.felt,
@@ -53,37 +64,33 @@ final class TargetGuideSys: System {
 
             guard let bearing = bearing(
                 to: entity.position(relativeTo: nil),
-                camM: camM
+                camM: sess.camera
             ) else {
                 continue
             }
 
-            aim(in: context.scene, bearing: bearing)
-            return
+            return bearing
         }
 
-        aim(in: context.scene, bearing: nil)
+        return nil
     }
 
-    /// Drives the entity directly: it turns every frame, so routing
-    /// through the model would mean a notification per frame.
-    private func aim(in scene: Scene, bearing: Float?) {
-        for arrow in scene.performQuery(Self.guideQuery) {
+    /// Direct, not via the model: a notification per frame is waste
+    func aim(arrows: some Sequence<Entity>, bearing: Float?) {
+        for arrow in arrows {
             arrow.findEntity(named: GuideArrow.bodyName)?
                 .isEnabled = bearing != nil
 
             guard let bearing,
                   let anchor = arrow.parent else { continue }
 
-            // Roll is anticlockwise from the camera, so a target on the
-            // right needs a negative angle.
+            // Anticlockwise from the camera, so right is negative
             let roll = simd_quatf(
                 angle: -bearing,
                 axis: SIMD3<Float>(0, 0, 1)
             )
 
-            // Pitch outside the roll: the dial leans away from the
-            // viewer, and the arrow turns within it.
+            // Pitch outside the roll, so the arrow turns in the dial
             arrow.setOrientation(
                 GuideArrow.dialPitch * roll,
                 relativeTo: anchor
@@ -91,9 +98,8 @@ final class TargetGuideSys: System {
         }
     }
 
-    /// Signed angle about the up axis, from the camera's heading to the
-    /// target. Height is ignored: the player navigates on the floor.
-    private func bearing(
+    /// Signed angle from the camera's heading. Height is ignored
+    func bearing(
         to target: SIMD3<Float>,
         camM: simd_float4x4
     ) -> Float? {
@@ -125,12 +131,9 @@ final class TargetGuideSys: System {
         return atan2(cross, dot)
     }
 
-    /// Which way the player faces, on the floor plane.
-    ///
-    /// The camera's forward axis collapses when the phone tilts steeply,
-    /// which sent the arrow spinning. Near vertical the camera's up axis
-    /// is the one still lying along the floor, so blend toward it.
-    private func heading(_ camM: simd_float4x4) -> SIMD3<Float> {
+    /// Forward collapses at steep pitch, which sent the arrow spinning,
+    /// so blend toward the up axis near vertical
+    func heading(_ camM: simd_float4x4) -> SIMD3<Float> {
         let forward = SIMD3<Float>(
             -camM.columns.2.x,
             -camM.columns.2.y,

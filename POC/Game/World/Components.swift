@@ -10,7 +10,7 @@ import Foundation
 import RealityKit
 import SonarCore
 
-/// Components are value types, so the session goes behind a weak box.
+/// Components are value types, so the session goes behind a weak box
 final class ARSessionRef {
     weak var value: ARSession?
 
@@ -24,16 +24,16 @@ struct SessComp: Component {
     var lidarOK = false
     var spawning = false
 
-    /// Battiw is mid-explanation: guidance stays quiet.
+    /// Battiw is mid-explanation: guidance stays quiet
     var teaching = false
 }
 
-/// A faded-out ping, kept briefly so recent pings still hint at the room.
+/// A faded-out ping, kept briefly so recent pings still hint at the room
 struct TraceComp: Component {
     let createdAt: TimeInterval
 }
 
-/// One ping in flight, and how far through its reveal it is.
+/// One ping in flight, and how far through its reveal it is
 struct RevealComp: Component {
     enum Stage {
         case waiting(attempt: Int, nextAt: TimeInterval)

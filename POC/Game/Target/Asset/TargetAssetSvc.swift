@@ -12,8 +12,7 @@ import UIKit
 
 @MainActor
 final class TargetAssetSvc: TargetMaking {
-    /// Shared so the loading screen can warm the same maker `ECSWorld`
-    /// later uses — see `RootView`.
+    /// Shared, so the loading screen warms the maker `ECSWorld` uses
     static let shared = TargetAssetSvc()
 
     private let sceneName: String
@@ -25,7 +24,7 @@ final class TargetAssetSvc: TargetMaking {
     private var sceneTpl: Entity?
     private var task: Task<Entity, Error>?
 
-    /// One target built in advance, handed out by `make`.
+    /// Built in advance, handed out by `make`
     private var spare: TargetPart?
 
     private(set) var loadError: String?
@@ -61,10 +60,8 @@ final class TargetAssetSvc: TargetMaking {
         return await finish(newTask)
     }
 
-    /// The room is deliberately unlit, so ARKit's light estimate leaves
-    /// the revealed tree and mango nearly black. A short-range light on
-    /// the target lights those and nothing else — the room's own mesh is
-    /// occlusion-only and takes no light.
+    /// ARKit's estimate of an unlit room leaves the tree nearly black,
+    /// and the room mesh is occlusion-only, so this lights nothing else
     private func makeLight(height: Float) -> Entity {
         let entity = Entity()
 
@@ -81,12 +78,11 @@ final class TargetAssetSvc: TargetMaking {
         return entity
     }
 
-    /// Builds the next target during a quiet moment — the room scan, or
-    /// Battiw's explanation — so spawning is just a reparent.
+    /// Built during the scan or the lesson, so spawning is a reparent
     func prewarm() async {
         guard spare == nil, sceneTpl != nil else { return }
 
-        // Off this runloop turn, so a caller mid-frame is not stalled.
+        // Off this runloop turn, so a mid-frame caller is not stalled
         await Task.yield()
 
         guard spare == nil else { return }
@@ -133,17 +129,17 @@ final class TargetAssetSvc: TargetMaking {
         sceneSvc.noShadow(real)
         sceneSvc.muteParticles(real)
 
-        // Clone sonar before changing real model color.
+        // Clone sonar before changing real model color
         let pulse = real.clone(recursive: true)
         let trace = real.clone(recursive: true)
 
-        // Real target above mission shade.
+        // Real target above mission shade
         RealityShade.keepBright(
             real,
             order: 1
         )
 
-        // Darker RGB only. Opacity stays unchanged.
+        // Darker RGB only. Opacity stays unchanged
         sceneSvc.dim(
             real,
             factor: TargetCfg.Tree.realDim

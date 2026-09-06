@@ -7,14 +7,11 @@
 
 import SwiftUI
 
-/// Darkens the whole screen except the control the coach is asking for.
+/// Darkens everything but the control being asked for. A ring alone is
+/// easy to miss on a camera feed
 ///
-/// A ring on its own is easy to miss on a busy camera feed; punching a
-/// hole in a scrim leaves the child with exactly one lit thing to press.
-///
-/// The hole starts wide and closes onto the button rather than the screen
-/// simply going dark, which would read as a glitch. Closing in carries
-/// the eye to the thing being asked for.
+/// The hole closes onto the button rather than the screen just going
+/// dark, which reads as a glitch
 struct CoachSpotlight: View {
     let rect: CGRect
 
@@ -27,7 +24,7 @@ struct CoachSpotlight: View {
         max(rect.width, rect.height) * 1.15
     }
 
-    /// How wide the hole starts before it closes in.
+    /// How wide it starts before closing in
     private var openScale: CGFloat {
         focused ? 1 : 4.2
     }
@@ -53,7 +50,7 @@ struct CoachSpotlight: View {
                 )
                 .position(x: rect.midX, y: rect.midY)
 
-            // Only starts once the hole has landed.
+            // Only starts once the hole has landed
             if focused {
                 Circle()
                     .stroke(violet.opacity(pulse ? 0 : 0.6), lineWidth: 3)
@@ -85,7 +82,7 @@ struct CoachSpotlight: View {
 }
 
 private extension View {
-    /// Cuts the shape out of the view instead of keeping it.
+    /// Cuts the shape out instead of keeping it
     func reverseMask<Mask: View>(
         @ViewBuilder _ mask: () -> Mask
     ) -> some View {

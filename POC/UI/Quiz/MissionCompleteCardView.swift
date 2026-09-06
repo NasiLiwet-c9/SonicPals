@@ -158,7 +158,7 @@ private struct ConfettiBurstView: View {
                 }
             }
             .task {
-                // Draw the gathered state once, then let the burst animate.
+                // Draw the gathered state once, then let the burst animate
                 await Task.yield()
                 go = true
             }

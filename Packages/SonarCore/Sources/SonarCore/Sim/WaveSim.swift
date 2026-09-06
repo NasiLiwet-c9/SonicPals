@@ -8,7 +8,7 @@
 import simd
 
 /// Probes for the nearest surface, picks a matching beam, then casts the
-/// full ray fan and scores every return.
+/// full ray fan and scores every return
 @MainActor
 public final class WaveSim: WaveSimulating {
     private let set: WaveSet

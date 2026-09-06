@@ -134,9 +134,9 @@ final class SessSvc: SessServing {
         print("ARSession: stopped")
     }
     
-    /// The `ARSession`-backed overload ships only in the device SDK.
+    /// The `ARSession`-backed overload ships only in the device SDK
     /// Unreachable on the simulator anyway (no scene reconstruction), but
-    /// keeping it compiling lets the menu screens run there.
+    /// keeping it compiling lets the menu screens run there
     private func runSpatial(
         _ config: SpatialTrackingSession.Configuration,
         arConfig: ARWorldTrackingConfiguration

@@ -8,15 +8,12 @@
 import Foundation
 import RealityKit
 
-/// Runs the "find three mangoes" quest: dialogue, when the next tree is
-/// requested, and when the run is over.
-///
-/// Split from `ECSWorld`, which owns the AR session and the scene.
+/// The "find three mangoes" quest: dialogue, spawns, and when it ends
 @MainActor
 final class MissionSvc {
     private unowned var world: ECSWorld!
 
-    /// The one in-flight mission step, spawn retry or bite pause.
+    /// One step at a time: spawn retry or bite pause
     private var task: Task<Void, Never>?
 
     private var model: AppModel { world.model }
@@ -38,8 +35,7 @@ final class MissionSvc {
         model.dimOn = true
         world.lastTargetPos = nil
 
-        // First run, the coach covers this over the live camera and holds
-        // the hunt back until the lesson is done — see `startHunt`.
+        // First run, the coach holds the hunt back, see `startHunt`
         if world.coach.isDone {
             say(["Let's find \(model.missionMangoTarget) more mangoes!"])
             spawnNextTarget(delayMs: 120)
@@ -95,7 +91,7 @@ final class MissionSvc {
 
     // MARK: - Progress
 
-    /// Holds off tree removal until the bite animation has played.
+    /// Waits for the bite animation before removing the tree
     func completeBite(removing eaten: Entity?) {
         cancel()
 
@@ -139,14 +135,14 @@ final class MissionSvc {
         dismissDialogue()
         model.missionComplete = true
 
-        // Final mango success sound plays immediately.
+        // Success sound plays straight away
         world.sfx.missionDone()
         world.sfx.stopBgm()
 
         world.clearActiveWave()
         world.clearTraces()
 
-        // Wait 0.5 seconds after Mango 3 before showing completion.
+        // Wait 0.5 seconds after Mango 3 before showing completion
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(500))
 
@@ -167,18 +163,16 @@ final class MissionSvc {
         let hold: Duration
     }
 
-    /// Everything Battiw says queues here. Writing to the model directly
-    /// meant a cue firing mid-sentence wiped the line underneath it.
+    /// Queued, or a cue mid-sentence wipes the line underneath it
     private var queue: [Beat] = []
     private var speakTask: Task<Void, Never>?
 
-    /// Bumped when a run is abandoned, so a cancelled run cannot clear
-    /// the handle of the run that replaced it.
+    /// Bumped on abandon, so a cancelled run cannot clear its successor
     private var speakGen = 0
 
     nonisolated static let beat = Duration.milliseconds(2400)
 
-    /// New-goal lines earn a longer look.
+    /// New-goal lines earn a longer look
     nonisolated static let goalBeat = Duration.milliseconds(4800)
 
     func dismissDialogue() {
@@ -196,8 +190,7 @@ final class MissionSvc {
     func showFoundTreeDialogue() {
         guard canSpeak else { return }
 
-        // Cuts in: waiting out a now-stale "close" cue would delay the
-        // one line the player must not miss.
+        // Cuts in, a stale "close" cue would delay it
         say(
             ["Now find the mango!"],
             hold: Self.goalBeat,
@@ -205,7 +198,7 @@ final class MissionSvc {
         )
 
 #if DEBUG
-        print("[MISSION DEBUG] TREE FOUND — FIND MANGO")
+        print("[MISSION DEBUG] TREE FOUND, FIND MANGO")
 #endif
     }
 
@@ -225,12 +218,23 @@ final class MissionSvc {
     }
 
     private var canSpeak: Bool {
-        model.hudStage == .mission
-            && !model.missionComplete
-            && !model.coachStep.locksInput
+        Self.canSpeak(
+            stage: model.hudStage,
+            complete: model.missionComplete,
+            coachStep: model.coachStep
+        )
     }
 
-    /// `interrupt` drops anything queued or mid-sentence.
+    /// A plain function, so the rule can be checked without a world
+    nonisolated static func canSpeak(
+        stage: AppModel.HUDStage,
+        complete: Bool,
+        coachStep: CoachStep
+    ) -> Bool {
+        stage == .mission && !complete && !coachStep.locksInput
+    }
+
+    /// `interrupt` drops anything queued or mid-sentence
     private func say(
         _ lines: [String],
         hold: Duration = MissionSvc.beat,
@@ -251,7 +255,7 @@ final class MissionSvc {
         }
     }
 
-    /// Walks the queue one line at a time, skipping nothing.
+    /// One line at a time, skipping nothing
     private func drain(gen: Int) async {
         defer {
             if gen == speakGen {
@@ -281,14 +285,14 @@ final class MissionSvc {
 
     // MARK: - Spawning
 
-    /// Starts the hunt once the coach has finished teaching.
+    /// Called by the coach when the lesson ends
     func startHunt() {
         guard model.missionStarted, world.targetEntity == nil else { return }
 
         spawnNextTarget(delayMs: 120)
     }
 
-    /// Used by the respawn button.
+    /// Used by the respawn button
     func requestTarget() {
         if canSpeak {
             say(["Let me listen again...", "Look around for a new spot!"])
@@ -297,7 +301,7 @@ final class MissionSvc {
         spawnNextTarget(delayMs: 200)
     }
 
-    /// Retries until a safe pose turns up.
+    /// Retries until a safe pose turns up
     private func spawnNextTarget(delayMs: Int) {
         cancel()
 

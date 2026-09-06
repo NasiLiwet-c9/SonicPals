@@ -10,7 +10,7 @@ import RealityKit
 import SonarCore
 import simd
 
-/// Turns one ping into the layered mesh the reveal system animates.
+/// Turns one ping into the layered mesh the reveal system animates
 @MainActor
 protocol FPMeshBuilding {
     func make(
@@ -19,7 +19,7 @@ protocol FPMeshBuilding {
     ) -> [FPMeshLayer]
 }
 
-/// Pulls candidate triangles out of the ARKit room mesh.
+/// Pulls candidate triangles out of the ARKit room mesh
 @MainActor
 protocol FPMeshReadPort {
     func read(
@@ -29,7 +29,7 @@ protocol FPMeshReadPort {
     ) -> [FPTri]
 }
 
-/// Turns one packed bucket into a drawable layer.
+/// Turns one packed bucket into a drawable layer
 @MainActor
 protocol FPMeshMakePort {
     func make(

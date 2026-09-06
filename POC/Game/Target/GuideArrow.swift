@@ -11,38 +11,27 @@ import simd
 
 struct GuideComp: Component {}
 
-/// A 3D arrow pointing at the tree, riding the camera anchor so it stays
-/// on screen even when the tree is behind the player.
-///
-/// A tilted dial: the arrow rolls to the bearing, and the whole dial
-/// leans away from the viewer so the arrow reads as pointing into the
-/// scene rather than flat up the screen.
+/// Rides the camera anchor, so it stays on screen even with the tree
+/// behind the player. A tilted dial: the arrow rolls to the bearing
 @MainActor
 enum GuideArrow {
     private static let name = "treeGuideArrow"
 
-    /// Visibility is toggled here, not on the `GuideComp` node:
-    /// `performQuery` skips disabled entities, so hiding that node would
-    /// leave the system unable to find it again.
+    /// Toggled here, not on the `GuideComp` node: `performQuery` skips
+    /// disabled entities
     static let bodyName = "treeGuideArrowBody"
 
-    /// Tips the whole dial away from the viewer, so at bearing 0 the
-    /// arrow leans into the scene instead of lying flat pointing up the
-    /// screen. Applied in the anchor's frame, outside the roll.
-    ///
-    /// 34°: enough that the arrow visibly leans into the scene instead
-    /// of lying flat up the screen, but not so steep that pointing away
-    /// foreshortens it into a mushroom.
+    /// Applied in the anchor's frame, outside the roll. Steeper than
+    /// this and pointing away foreshortens into a mushroom
     static let dialPitch = simd_quatf(
         angle: -0.60,
         axis: SIMD3<Float>(1, 0, 0)
     )
 
-    /// Sits between the reticle and the dialogue bubble, which used to
-    /// cover it. Mesh sizes are tuned against this 42cm distance.
+    /// Between the reticle and the bubble. Mesh sizes assume 42cm
     private static let seat = SIMD3<Float>(0, -0.055, -0.42)
 
-    /// How far the plate is squashed along its normal.
+    /// How far the plate is squashed along its normal
     private static let plateFlatten: Float = 0.24
 
     private static let violet = UIColor(
@@ -73,7 +62,7 @@ enum GuideArrow {
 
     // MARK: - Mesh
 
-    /// Points along +Y, so aiming is a single roll about the view axis.
+    /// Points along +Y, so aiming is a single roll about the view axis
     private static func makeArrow() -> Entity {
         let root = Entity()
 
@@ -101,8 +90,8 @@ enum GuideArrow {
         return root
     }
 
-    /// Its own light, so it looks the same in any room. The short
-    /// attenuation radius keeps it off the reveal mesh.
+    /// Its own light, so any room looks the same. Short radius keeps it
+    /// off the reveal mesh
     private static func makeLight() -> Entity {
         let entity = Entity()
 
@@ -114,14 +103,13 @@ enum GuideArrow {
             )
         )
 
-        // Raking: a frontal light flattens the cone into a triangle.
+        // Raking, a frontal light flattens the cone
         entity.position = SIMD3<Float>(0.13, 0.05, 0.07)
 
         return entity
     }
 
-    /// Lightly emissive to survive the mission shade, but dim enough
-    /// that the light still shades it — full emissive blows it flat.
+    /// Emissive enough to survive the shade, dim enough to still shade
     private static func material(bright: Bool) -> PhysicallyBasedMaterial {
         var material = PhysicallyBasedMaterial()
 

@@ -20,16 +20,14 @@ final class ECSWorld {
     let sessEntity = Entity()
     let scanEntity = Entity()
 
-    /// Rides the camera, so it needs its own anchor. `TargetGuideSys`
-    /// aims it; `RealitySceneView` adds it to the scene.
+    /// Rides the camera, so it needs its own anchor
     let guideAnchor = GuideArrow.makeAnchor()
 
     var targetEntity: Entity?
     var eatCandidate: Entity?
 
-    /// A target already built and parented, sitting disabled in the scene
-    /// so spawning is only a move and an enable. Carries no `TargetComp`,
-    /// so no system can see it until it is installed.
+    /// Built and parented but disabled, so spawning is a move and an
+    /// enable. No `TargetComp`, so no system sees it yet
     var stagedTarget: TargetPart?
     var lastTargetPos: SIMD3<Float>?
 
@@ -40,10 +38,10 @@ final class ECSWorld {
     private var scanTask: Task<Void, Never>?
     private var cueTask: Task<Void, Never>?
 
-    /// Quest rules, kept out of this type.
+    /// Quest rules, kept out of this type
     let mission = MissionSvc()
 
-    /// First-run coaching, woven into the live session.
+    /// First-run coaching, woven into the live session
     let coach = CoachSvc()
 
     let sess: any SessServing
@@ -179,7 +177,7 @@ final class ECSWorld {
         }
     }
 
-    /// Lets the ECS systems see that a lesson is running.
+    /// Lets the ECS systems see a lesson is running
     func setTeaching(_ on: Bool) {
         guard var comp = sessEntity.components[SessComp.self] else { return }
 
@@ -288,5 +286,17 @@ final class ECSWorld {
                 }
             }
         }
+    }
+}
+
+// MARK: - CoachHost
+
+extension ECSWorld: CoachHost {
+    func startHunt() {
+        mission.startHunt()
+    }
+
+    func playCoachCue() {
+        sfx.dialogue()
     }
 }

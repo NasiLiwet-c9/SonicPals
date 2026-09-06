@@ -8,7 +8,7 @@
 import simd
 
 extension simd_float4x4 {
-    /// Translation column as a position.
+    /// Translation column as a position
     public var pos3: SIMD3<Float> {
         SIMD3<Float>(
             columns.3.x,

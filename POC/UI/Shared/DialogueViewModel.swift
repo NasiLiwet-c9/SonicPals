@@ -8,9 +8,9 @@
 import Foundation
 import Observation
 
-/// Walks dialogue lines one at a time. Lines appear whole — the views
-/// pop them in, keyed on ``currentLineIndex`` — advance after
-/// ``autoAdvance``, and skip on tap.
+/// Walks dialogue lines one at a time. Lines appear whole, the views
+/// pop them in, keyed on ``currentLineIndex``, advance after
+/// ``autoAdvance``, and skip on tap
 @MainActor
 @Observable
 final class DialogueViewModel {
@@ -19,7 +19,7 @@ final class DialogueViewModel {
     let lines: [String]
     let loops: Bool
 
-    /// `nil` waits for a tap instead.
+    /// `nil` waits for a tap instead
     let autoAdvance: Duration?
 
     @ObservationIgnored var onFinishedAllLines: (() -> Void)?

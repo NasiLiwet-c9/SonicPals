@@ -121,7 +121,7 @@ final class FPMeshFact: FPMeshMakePort {
         mat.triangleFillMode = lines ? .lines : .fill
         mat.faceCulling = .none
 
-        // Normal sonar respects RealityKit depth + scene occlusion.
+        // Normal sonar respects RealityKit depth + scene occlusion
         mat.readsDepth = true
         mat.writesDepth = false
 

@@ -9,12 +9,12 @@ import Foundation
 import RealityKit
 import simd
 
-/// Posted by `TargetSys` as `.targetCue` so Battiw can react.
+/// Posted by `TargetSys` as `.targetCue` so Battiw can react
 enum TargetCue {
-    /// A guidance haptic fired for the first time on this tree.
+    /// A guidance haptic fired for the first time on this tree
     case sensed
 
-    /// The player has closed to within `TargetCfg.Cue.closeM`.
+    /// The player has closed to within `TargetCfg.Cue.closeM`
     case close
 }
 
@@ -45,11 +45,11 @@ struct TargetComp: Component {
     var found = false
     var bestM: Float?
 
-    /// A guidance haptic has fired — enough to show the arrow even
-    /// before an echo has drawn anything.
+    /// A guidance haptic has fired, enough to show the arrow even
+    /// before an echo has drawn anything
     var felt = false
 
-    /// Cues already spoken for this tree.
+    /// Cues already spoken for this tree
     var saidSensed = false
     var saidClose = false
 

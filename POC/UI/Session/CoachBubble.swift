@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Battiw teaching, over the live camera. One short line at a time.
+/// Battiw teaching, over the live camera. One short line at a time
 struct CoachBubble: View {
     let line: String
     let lineID: Int

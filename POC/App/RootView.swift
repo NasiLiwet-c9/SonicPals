@@ -62,7 +62,7 @@ struct RootView: View {
         .task(id: stage) {
             // The loading screen is here to cover this: pulling in the
             // tree scene and building the first target both stall the
-            // main actor, and doing it later stalls the spawn instead.
+            // main actor, and doing it later stalls the spawn instead
             guard stage == .splash else { return }
 
             if await TargetAssetSvc.shared.prepare() {

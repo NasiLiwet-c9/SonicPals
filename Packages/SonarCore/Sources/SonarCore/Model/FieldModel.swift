@@ -7,7 +7,7 @@
 
 import simd
 
-/// Distance band an echo landed in. Drives colour.
+/// Distance band an echo landed in. Drives colour
 public enum FPBand: Int, CaseIterable, Sendable {
     case hot
     case near
@@ -15,14 +15,14 @@ public enum FPBand: Int, CaseIterable, Sendable {
     case far
 }
 
-/// How central to the beam an echo was. Drives opacity and reveal delay.
+/// How central to the beam an echo was. Drives opacity and reveal delay
 public enum FPZone: Int, CaseIterable, Sendable {
     case edge
     case soft
     case core
 }
 
-/// Everything sharing a band and zone is drawn as one mesh.
+/// Everything sharing a band and zone is drawn as one mesh
 public struct FPKey: Hashable, Sendable {
     public let band: FPBand
     public let zone: FPZone
@@ -33,7 +33,7 @@ public struct FPKey: Hashable, Sendable {
     }
 }
 
-/// Accumulated triangles for one `FPKey`.
+/// Accumulated triangles for one `FPKey`
 public struct FPMeshData: Sendable {
     public var pos: [SIMD3<Float>] = []
     public var idx: [UInt32] = []

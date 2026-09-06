@@ -34,9 +34,8 @@ struct TargetWaveSvc:
                 comp.parts[index]
 
             let nearM =
-                nearestDistance(
-                    from:
-                        localStart,
+                TargetWaveMath.nearestDistance(
+                    from: localStart,
                     to: part
                 )
 
@@ -71,49 +70,8 @@ struct TargetWaveSvc:
         return hits
     }
 
-    private func nearestDistance(
-        from point: SIMD3<Float>,
-        to part: TargetEchoPart
-    ) -> Float {
-        let minP =
-            part.center
-            - part.half
-
-        let maxP =
-            part.center
-            + part.half
-
-        let closest =
-            SIMD3<Float>(
-                min(
-                    max(
-                        point.x,
-                        minP.x
-                    ),
-                    maxP.x
-                ),
-                min(
-                    max(
-                        point.y,
-                        minP.y
-                    ),
-                    maxP.y
-                ),
-                min(
-                    max(
-                        point.z,
-                        minP.z
-                    ),
-                    maxP.z
-                )
-            )
-
-        return simd_distance(
-            point,
-            closest
-        )
-    }
-
+    /// The beam test plus a line-of-sight check: something solid in
+    /// front of the part means the ping never reached it
     private func hitsCone(
         center: SIMD3<Float>,
         radius: Float,
@@ -121,119 +79,30 @@ struct TargetWaveSvc:
         data: WaveData,
         in scene: Scene
     ) -> Bool {
-        let delta =
-            center
-            - data.start.pos
-
-        let dist =
-            simd_length(delta)
-
-        guard dist > 0.001 else {
-            return true
-        }
-
-        let side =
-            simd_dot(
-                delta,
-                data.start.right
-            )
-
-        let up =
-            simd_dot(
-                delta,
-                data.start.up
-            )
-
-        let forward =
-            simd_dot(
-                delta,
-                data.start.forward
-            )
-
-        guard forward + radius
-                > 0.05 else {
+        guard TargetWaveMath.isInCone(
+            center: center,
+            radius: radius,
+            data: data
+        ) else {
             return false
         }
 
-        let hTan =
-            tan(
-                data.setting
-                    .hAngleDeg
-                * Float.pi
-                / 180
-            )
+        let delta = center - data.start.pos
+        let dist = simd_length(delta)
 
-        let vTan =
-            tan(
-                data.setting
-                    .vAngleDeg
-                * Float.pi
-                / 180
-            )
+        guard dist > 0.001 else { return true }
 
-        let width = max(
-            (
-                max(
-                    forward,
-                    0.05
-                )
-                * hTan
-            )
-            + radius,
-            0.01
+        let hit = scene.raycast(
+            origin: data.start.pos,
+            direction: delta / dist,
+            length: min(dist, data.fpRange),
+            query: .nearest,
+            mask: .sceneUnderstanding,
+            relativeTo: nil
         )
+        .first
 
-        let height = max(
-            (
-                max(
-                    forward,
-                    0.05
-                )
-                * vTan
-            )
-            + radius,
-            0.01
-        )
-
-        let x =
-            side / width
-
-        let y =
-            up / height
-
-        guard sqrt(
-            (x * x)
-            + (y * y)
-        ) <= 1 else {
-            return false
-        }
-
-        let dir =
-            delta / dist
-
-        let hit =
-            scene.raycast(
-                origin:
-                    data.start.pos,
-                direction:
-                    dir,
-                length:
-                    min(
-                        dist,
-                        data.fpRange
-                    ),
-                query:
-                    .nearest,
-                mask:
-                    .sceneUnderstanding,
-                relativeTo:
-                    nil
-            )
-            .first
-
-        if let hit,
-           hit.distance
-            < nearM - 0.06 {
+        if let hit, hit.distance < nearM - 0.06 {
             return false
         }
 
