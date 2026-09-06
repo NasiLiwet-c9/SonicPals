@@ -8,9 +8,14 @@
 import Foundation
 import RealityKit
 import RealityKitContent
+import UIKit
 
 @MainActor
 final class TargetAssetSvc: TargetMaking {
+    /// Shared so the loading screen can warm the same maker `ECSWorld`
+    /// later uses — see `RootView`.
+    static let shared = TargetAssetSvc()
+
     private let sceneName: String
     private let sceneSvc: TargetSceneSvc
     private let mangoSvc = TargetMangoSvc()
@@ -19,6 +24,9 @@ final class TargetAssetSvc: TargetMaking {
 
     private var sceneTpl: Entity?
     private var task: Task<Entity, Error>?
+
+    /// One target built in advance, handed out by `make`.
+    private var spare: TargetPart?
 
     private(set) var loadError: String?
 
@@ -53,7 +61,54 @@ final class TargetAssetSvc: TargetMaking {
         return await finish(newTask)
     }
 
+    /// The room is deliberately unlit, so ARKit's light estimate leaves
+    /// the revealed tree and mango nearly black. A short-range light on
+    /// the target lights those and nothing else — the room's own mesh is
+    /// occlusion-only and takes no light.
+    private func makeLight(height: Float) -> Entity {
+        let entity = Entity()
+
+        entity.components.set(
+            PointLightComponent(
+                color: .white,
+                intensity: 2400,
+                attenuationRadius: max(height * 2.2, 2.4)
+            )
+        )
+
+        entity.position = SIMD3<Float>(0, height * 0.75, 0.35)
+
+        return entity
+    }
+
+    /// Builds the next target during a quiet moment — the room scan, or
+    /// Battiw's explanation — so spawning is just a reparent.
+    func prewarm() async {
+        guard spare == nil, sceneTpl != nil else { return }
+
+        // Off this runloop turn, so a caller mid-frame is not stalled.
+        await Task.yield()
+
+        guard spare == nil else { return }
+
+        spare = build()
+    }
+
     func make() -> TargetPart? {
+        if let ready = spare {
+            spare = nil
+
+            Task { @MainActor [weak self] in
+                await self?.prewarm()
+            }
+
+            return ready
+        }
+
+        return build()
+    }
+
+    private func build() -> TargetPart? {
         guard let sceneTpl else {
             return fail("Target assets are not ready")
         }
@@ -110,6 +165,8 @@ final class TargetAssetSvc: TargetMaking {
 
         let root = Entity()
         root.name = "target"
+
+        real.addChild(makeLight(height: size.y))
 
         root.addChild(real)
         root.addChild(pulse)

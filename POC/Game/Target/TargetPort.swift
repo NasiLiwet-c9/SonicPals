@@ -42,6 +42,12 @@ protocol TargetMaking: AnyObject {
     var loadError: String? { get }
 
     func prepare() async -> Bool
+
+    /// Builds the next target ahead of time. `make` is several recursive
+    /// clones plus a material walk, which visibly stalls the frame if it
+    /// runs at the moment of spawning.
+    func prewarm() async
+
     func make() -> TargetPart?
 }
 

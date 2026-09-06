@@ -30,7 +30,7 @@ final class TargetSys: System {
         )
 
     private let haptic =
-        HapticSvc()
+        HapticSvc.shared
 
     private let foundM: Float = 0.72
     private let nearStepM: Float = 0.12
@@ -47,13 +47,13 @@ final class TargetSys: System {
         context:
             SceneUpdateContext
     ) {
-        guard let camM =
-            cameraMatrix(
-                in:
-                    context.scene
-            ) else {
+        guard let sess = sessState(
+            in: context.scene
+        ) else {
             return
         }
+
+        let camM = sess.camera
 
         let now =
             Date()
@@ -130,6 +130,14 @@ final class TargetSys: System {
                         object:
                             entity
                     )
+
+                continue
+            }
+
+            guard !sess.teaching else {
+                entity.components[
+                    TargetComp.self
+                ] = comp
 
                 continue
             }
@@ -258,9 +266,9 @@ final class TargetSys: System {
         )
     }
 
-    private func cameraMatrix(
+    private func sessState(
         in scene: Scene
-    ) -> simd_float4x4? {
+    ) -> (camera: simd_float4x4, teaching: Bool)? {
         for entity
         in scene.performQuery(
             Self.sessQuery
@@ -276,9 +284,10 @@ final class TargetSys: System {
                 continue
             }
 
-            return frame
-                .camera
-                .transform
+            return (
+                frame.camera.transform,
+                comp.teaching
+            )
         }
 
         return nil

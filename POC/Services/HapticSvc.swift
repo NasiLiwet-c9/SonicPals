@@ -10,6 +10,8 @@ import UIKit
 
 @MainActor
 final class HapticSvc {
+    static let shared = HapticSvc()
+
     let supported: Bool
 
     private let dir =
@@ -119,6 +121,30 @@ final class HapticSvc {
             )
 
             strong.prepare()
+        }
+    }
+
+    /// Two quick knocks, for biting the mango.
+    func munch() {
+        guard supported else {
+            return
+        }
+
+        strong.impactOccurred(intensity: 0.9)
+        strong.prepare()
+
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(110))
+
+            guard let self else {
+                return
+            }
+
+            strong.impactOccurred(intensity: 0.7)
+            success.notificationOccurred(.success)
+
+            strong.prepare()
+            success.prepare()
         }
     }
 

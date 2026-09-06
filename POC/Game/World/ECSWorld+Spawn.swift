@@ -46,13 +46,39 @@ extension ECSWorld {
             return false
         }
 
-        guard let part = targetMaker.make() else {
+        guard let part = nextTargetPart() else {
             if showError { setMsg(targetMaker.loadError ?? "Target could not load") }
             return false
         }
 
         installTarget(part, pose: pose)
         return true
+    }
+
+    /// Prefers the target already staged in the scene; only builds one if
+    /// staging has not caught up.
+    private func nextTargetPart() -> TargetPart? {
+        if let staged = stagedTarget {
+            stagedTarget = nil
+            return staged
+        }
+
+        return targetMaker.make()
+    }
+
+    /// Parents the next target now, disabled, so the work of putting it in
+    /// the scene does not land on the frame where it appears.
+    func stageTarget() {
+        guard stagedTarget == nil,
+              model.lidarOK,
+              let part = targetMaker.make() else {
+            return
+        }
+
+        part.root.isEnabled = false
+        anchor.addChild(part.root)
+
+        stagedTarget = part
     }
 
     private func nextTargetPose(scene: Scene) -> TargetPose? {
@@ -80,7 +106,10 @@ extension ECSWorld {
         clearActiveWave()
         clearTraces()
 
-        targetEntity?.removeFromParent()
+        if targetEntity !== part.root {
+            targetEntity?.removeFromParent()
+        }
+
         part.root.stopAllAnimations(recursive: true)
 
         part.root.components[TargetComp.self] = TargetComp(
@@ -90,7 +119,11 @@ extension ECSWorld {
             lockYaw: pose.yaw
         )
 
-        anchor.addChild(part.root)
+        // Already parented when it was staged.
+        if part.root.parent !== anchor {
+            anchor.addChild(part.root)
+        }
+
         part.root.setPosition(pose.pos, relativeTo: nil)
 
         part.root.setOrientation(
@@ -98,12 +131,22 @@ extension ECSWorld {
             relativeTo: nil
         )
 
+        part.root.isEnabled = true
+
         targetEntity = part.root
         lastTargetPos = pose.pos
         model.hasTarget = true
         model.targetFound = false
         model.mangoEatReady = false
         model.msg = ""
+
+        // Stage the next one while the player hunts this one.
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            await targetMaker.prewarm()
+            stageTarget()
+        }
 
 #if DEBUG
         let p = part.root.position(relativeTo: nil)
@@ -116,8 +159,14 @@ extension ECSWorld {
         simd_length(SIMD2<Float>(a.x - b.x, a.z - b.z))
     }
 
-    /// The player-facing respawn. Unlike the dev force-spawn, this still
-    /// goes through the normal safe-pose search.
+    /// The player-facing respawn: sweeps the room again and puts the tree
+    /// somewhere new.
+    ///
+    /// Unlike the dev force-spawn this still goes through the normal
+    /// safe-pose search, and it re-arms the floor scan first so the search
+    /// runs on freshly sampled floor rather than whatever was found on the
+    /// way in. `lastTargetPos` is deliberately kept, so `repeatDistance`
+    /// pushes the new tree away from the one the player just gave up on.
     func respawnTarget() {
         guard model.hudStage == .mission,
               !model.missionComplete else {
@@ -126,21 +175,32 @@ extension ECSWorld {
 
         clearActiveWave()
         clearTraces()
-        targetReserve.clear()
 
         targetEntity?.removeFromParent()
         targetEntity = nil
         eatCandidate = nil
-
-        // Let the next search reuse the spot we just vacated.
-        lastTargetPos = nil
 
         model.hasTarget = false
         model.targetFound = false
         model.mangoEatReady = false
         model.msg = ""
 
+        rescanFloor()
         mission.requestTarget()
+    }
+
+    /// Restarts the floor sampling without disturbing the HUD, so the next
+    /// pose comes from a fresh look at the room.
+    private func rescanFloor() {
+        guard var comp = scanEntity.components[FPScanComp.self] else { return }
+
+        targetReserve.clear()
+
+        comp.resetID += 1
+        comp.active = true
+
+        scanEntity.components[FPScanComp.self] = comp
+        scanEntity.isEnabled = true
     }
 
     // MARK: - Scan preflight

@@ -33,10 +33,14 @@ final class TargetGuideSys: System {
     required init(scene: Scene) {}
 
     func update(context: SceneUpdateContext) {
-        guard let camM = cameraMatrix(in: context.scene) else {
+        guard let sess = sessState(in: context.scene),
+              !sess.teaching
+        else {
             aim(in: context.scene, bearing: nil)
             return
         }
+
+        let camM = sess.camera
 
         for entity in context.scene.performQuery(Self.query) {
             guard entity.isEnabled,
@@ -78,9 +82,10 @@ final class TargetGuideSys: System {
                 axis: SIMD3<Float>(0, 0, 1)
             )
 
-            // Post-multiply: keeps the screen angle exactly `roll`.
+            // Pitch outside the roll: the dial leans away from the
+            // viewer, and the arrow turns within it.
             arrow.setOrientation(
-                roll * GuideArrow.lean,
+                GuideArrow.dialPitch * roll,
                 relativeTo: anchor
             )
         }
@@ -148,7 +153,9 @@ final class TargetGuideSys: System {
             + (flatUp * sign * (1 - weight))
     }
 
-    private func cameraMatrix(in scene: Scene) -> simd_float4x4? {
+    private func sessState(
+        in scene: Scene
+    ) -> (camera: simd_float4x4, teaching: Bool)? {
         for entity in scene.performQuery(Self.sessQuery) {
             guard let comp = entity.components[SessComp.self],
                   let frame = comp.session.value?.currentFrame
@@ -156,7 +163,7 @@ final class TargetGuideSys: System {
                 continue
             }
 
-            return frame.camera.transform
+            return (frame.camera.transform, comp.teaching)
         }
 
         return nil

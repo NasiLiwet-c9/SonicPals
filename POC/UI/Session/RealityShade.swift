@@ -28,16 +28,16 @@ enum RealityShade {
 
         let dark = await makePlane(
             name: darkName,
-            center: 0.93,
-            middle: 0.96,
-            edge: 0.98
+            center: UICfg.Shade.darkMid,
+            middle: UICfg.Shade.darkHalf,
+            edge: UICfg.Shade.darkEdge
         )
 
         let light = await makePlane(
             name: lightName,
-            center: 0.10,
-            middle: 0.20,
-            edge: 0.32
+            center: UICfg.Shade.liteMid,
+            middle: UICfg.Shade.liteHalf,
+            edge: UICfg.Shade.liteEdge
         )
 
         dark.isEnabled = false

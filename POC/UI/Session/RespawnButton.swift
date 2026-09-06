@@ -64,12 +64,12 @@ struct RespawnButton: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Move the tree somewhere else")
-        .accessibilityHint("Use this if you have searched the room and found nothing")
+        .accessibilityLabel("Hide the tree somewhere new")
+        .accessibilityHint("Sweeps the room again and moves the tree")
     }
 
     private var hint: some View {
-        Text("Swept the whole room?\nI'll try listening elsewhere.")
+        Text("Can't find the tree?\nTap to hide it somewhere new!")
             .font(
                 .system(
                     size: UICfg.Respawn.txt * uiScale,

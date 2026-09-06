@@ -41,6 +41,58 @@ nonisolated enum UICfg {
         static let bottom: CGFloat = 210   // Bottom gap.
     }
 
+    enum Intro {
+        static let cardH: CGFloat = 430    // Pager height.
+        static let mascot: CGFloat = 168   // Battiw size.
+        static let bubW: CGFloat = 300     // Bubble width.
+        static let gap: CGFloat = 6        // Mascot/bubble gap.
+
+        static let titleTxt: CGFloat = 21  // Title size.
+        static let bodyTxt: CGFloat = 15   // Body size.
+        static let textGap: CGFloat = 7    // Title/body gap.
+        static let textPadX: CGFloat = 34  // Text side padding.
+        static let textPadY: CGFloat = 26  // Text bottom padding.
+
+        static let badge: CGFloat = 34     // Badge icon size.
+        static let badgeX: CGFloat = 10    // Badge X offset.
+        static let badgeY: CGFloat = -6    // Badge Y offset.
+
+        static let dotTop: CGFloat = 6     // Dots top gap.
+        static let bottom: CGFloat = 40    // Button bottom gap.
+        static let skipTxt: CGFloat = 14   // Skip text size.
+        static let skipTop: CGFloat = 64   // Skip top gap.
+    }
+
+    /// How dark the mission gets. Nearly opaque on purpose — the room is
+    /// meant to be unreadable until a ping reveals it. What has to punch
+    /// through is the revealed geometry, which `RealityShade.keepBright`
+    /// puts in front of the shade rather than under it.
+    enum Shade {
+        static let darkMid: CGFloat = 0.93     // Dark, centre.
+        static let darkHalf: CGFloat = 0.96    // Dark, mid.
+        static let darkEdge: CGFloat = 0.98    // Dark, edge.
+
+        static let liteMid: CGFloat = 0.10     // Lit, centre.
+        static let liteHalf: CGFloat = 0.20    // Lit, mid.
+        static let liteEdge: CGFloat = 0.32    // Lit, edge.
+    }
+
+    /// Speech-bubble art carries its tail in the bottom of the frame, so
+    /// the visual body sits above the frame centre. Text lifts by this
+    /// fraction of the frame height to land in the body.
+    enum Bubble {
+        static let aspect: CGFloat = 400.0 / 925.0
+        static let tailLift: CGFloat = 0.09
+
+        static func textLift(width: CGFloat) -> CGFloat {
+            width * aspect * tailLift
+        }
+    }
+
+    enum Coach {
+        static let top: CGFloat = 8        // Coach bubble top gap.
+    }
+
     enum Credits {
         static let txt: CGFloat = 9        // Credits text size.
         static let gap: CGFloat = 2        // Line gap.
@@ -129,6 +181,7 @@ nonisolated enum UICfg {
         static let topBatX: CGFloat = 52   // Top Battiw X.
         static let topBatY: CGFloat = 14   // Top Battiw Y.
         static let topPadX: CGFloat = 20   // Top text padding.
+        static let topPadMascot: CGFloat = 64 // Right inset, under Battiw.
         static let topPadY: CGFloat = 20   // Top text Y.
 
         static let botW: CGFloat = 270     // Mission bubble width.

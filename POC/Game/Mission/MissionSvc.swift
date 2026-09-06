@@ -38,16 +38,18 @@ final class MissionSvc {
         model.dimOn = true
         world.lastTargetPos = nil
 
-        say([
-            "I smell \(model.missionMangoTarget) mangoes here!",
-            "Tap the button to send a ping."
-        ])
+        // First run, the coach covers this over the live camera and holds
+        // the hunt back until the lesson is done — see `startHunt`.
+        if world.coach.isDone {
+            say(["Let's find \(model.missionMangoTarget) more mangoes!"])
+            spawnNextTarget(delayMs: 120)
+        }
+
+        world.coach.noteMissionStart()
 
 #if DEBUG
         print("[MISSION DEBUG] MISSION STARTED")
 #endif
-
-        spawnNextTarget(delayMs: 120)
     }
 
     func restart() async {
@@ -223,7 +225,9 @@ final class MissionSvc {
     }
 
     private var canSpeak: Bool {
-        model.hudStage == .mission && !model.missionComplete
+        model.hudStage == .mission
+            && !model.missionComplete
+            && !model.coachStep.locksInput
     }
 
     /// `interrupt` drops anything queued or mid-sentence.
@@ -277,10 +281,17 @@ final class MissionSvc {
 
     // MARK: - Spawning
 
+    /// Starts the hunt once the coach has finished teaching.
+    func startHunt() {
+        guard model.missionStarted, world.targetEntity == nil else { return }
+
+        spawnNextTarget(delayMs: 120)
+    }
+
     /// Used by the respawn button.
     func requestTarget() {
         if canSpeak {
-            say(["Okay! Let's try somewhere new."])
+            say(["Let me listen again...", "Look around for a new spot!"])
         }
 
         spawnNextTarget(delayMs: 200)

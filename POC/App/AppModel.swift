@@ -20,6 +20,11 @@ final class AppModel {
     var mangoEatReady = false
     var mangoEatenCount = 0
 
+    /// First-run coaching, shown over the live camera. Driven by `CoachSvc`.
+    var coachStep: CoachStep = .idle
+    var coachLine = ""
+    var coachLineID = 0
+
 
     var canWave: Bool {
         lidarOK

@@ -32,6 +32,7 @@ extension ECSWorld {
         )
 
         model.waveSeq += 1
+        coach.notePing()
 
         showFP(data)
         scanTarget(with: data, in: scene)

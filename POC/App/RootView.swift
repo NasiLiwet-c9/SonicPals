@@ -12,7 +12,6 @@ struct RootView: View {
         case splash
         case home
         case map
-//        case onboard
         case main
     }
 
@@ -49,14 +48,6 @@ struct RootView: View {
                 }
                 .transition(.opacity)
 
-//            case .onboard:
-//                OnboardView(
-//                    buttonText: "Start"
-//                ) {
-//                    move(to: .main)
-//                }
-//                .transition(.opacity)
-
             case .main:
                 MainView {
                     move(to: .home)
@@ -67,6 +58,16 @@ struct RootView: View {
         .sonicPalsTypography()
         .task {
             sfx.menuBgm()
+        }
+        .task(id: stage) {
+            // The loading screen is here to cover this: pulling in the
+            // tree scene and building the first target both stall the
+            // main actor, and doing it later stalls the spawn instead.
+            guard stage == .splash else { return }
+
+            if await TargetAssetSvc.shared.prepare() {
+                await TargetAssetSvc.shared.prewarm()
+            }
         }
     }
 

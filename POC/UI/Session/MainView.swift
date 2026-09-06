@@ -13,7 +13,6 @@ struct MainView: View {
     let onBack: () -> Void
 
     @State private var world = ECSWorld()
-    @State private var showInfo = false
 
     var body: some View {
         ZStack {
@@ -37,13 +36,7 @@ struct MainView: View {
                 WaveRings(seq: world.model.waveSeq)
             }
 
-            HUDView(
-                world: world,
-                onBack: onBack,
-                onInfo: {
-                    showInfo = true
-                }
-            )
+            HUDView(world: world, onBack: onBack)
         }
         .debugForceSpawn(world: world)
         .animation(
@@ -55,11 +48,6 @@ struct MainView: View {
             value: world.model.missionComplete
         )
         .preferredColorScheme(.dark)
-        .sheet(isPresented: $showInfo) {
-            OnboardView(buttonText: "Done") {
-                showInfo = false
-            }
-        }
         .task {
             for await _ in NotificationCenter.default.notifications(
                 named: UIApplication.didReceiveMemoryWarningNotification

@@ -120,7 +120,7 @@ struct DialogueBubbleView: View {
                         weight: .bold
                     )
                 )
-                .multilineTextAlignment(.leading)
+                .multilineTextAlignment(.center)
                 .lineLimit(isCurrentLineShort ? 1 : 4)
                 .minimumScaleFactor(0.75)
                 .foregroundStyle(.black)
@@ -128,13 +128,10 @@ struct DialogueBubbleView: View {
                     .horizontal,
                     UICfg.Dlg.padX * uiScale
                 )
-                .padding(
-                    .bottom,
-                    (isCurrentLineShort ? 18 : 20) * uiScale
-                )
-                .frame(
-                    maxWidth: .infinity,
-                    alignment: .topLeading
+                .offset(
+                    y: -UICfg.Bubble.textLift(
+                        width: UICfg.Dlg.bubW * uiScale
+                    )
                 )
         }
         .frame(

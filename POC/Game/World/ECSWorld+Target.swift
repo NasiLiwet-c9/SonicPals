@@ -82,6 +82,7 @@ extension ECSWorld {
         let eatenTarget = targetEntity
 
         sfx.eat()
+        haptic.munch()
 
         // Particle FX disabled for stability.
         // let mangoWorldPos = mango.position(relativeTo: nil)
@@ -90,6 +91,7 @@ extension ECSWorld {
         // Mango disappears immediately when bitten.
         mango.removeFromParent()
 
+        coach.noteEaten()
         model.mangoEatenCount += 1
         model.mangoEatReady = false
         eatCandidate = nil

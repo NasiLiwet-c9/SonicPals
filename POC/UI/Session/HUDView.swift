@@ -8,13 +8,25 @@
 
 import SwiftUI
 
+/// Reports where the bottom controls ended up, so the coach spotlight can
+/// be punched out at exactly that spot.
+private struct ControlBounds: PreferenceKey {
+    static let defaultValue: Anchor<CGRect>? = nil
+
+    static func reduce(
+        value: inout Anchor<CGRect>?,
+        nextValue: () -> Anchor<CGRect>?
+    ) {
+        value = nextValue() ?? value
+    }
+}
+
 struct HUDView: View {
     let world: ECSWorld
 
     let onBack: () -> Void
-    let onInfo: () -> Void
 
-    @State private var scanIntroDone = false
+    @State private var controlBounds: Anchor<CGRect>?
 
     private let sfx = SfxSvc.shared
 
@@ -88,23 +100,7 @@ struct HUDView: View {
 
                 switch world.model.hudStage {
                 case .scanning:
-                    if !scanIntroDone {
-                        ScanDialogueBubbleView(
-                            lines: [
-                                "Turn around slowly!",
-                                "I need to hear the whole room."
-                            ],
-                            mascotName: "fly",
-                            bubbleImageName: "long-bubble-card",
-                            uiScale: scale,
-                            onFinishedAllLines: {
-                                withAnimation {
-                                    scanIntroDone = true
-                                }
-                            }
-                        )
-                        .transition(.opacity)
-                    }
+                    EmptyView()
 
                 case .scanCompletePrompt:
                     Color.clear
@@ -158,6 +154,35 @@ struct HUDView: View {
                     EmptyView()
                 }
 
+                if let controlBounds,
+                   world.model.coachStep.spotlight != .none {
+                    CoachSpotlight(
+                        // The scrim ignores the safe area, so it draws in
+                        // screen space; the anchor resolves in the HUD's.
+                        rect: geo[controlBounds].offsetBy(
+                            dx: geo.frame(in: .global).minX,
+                            dy: geo.frame(in: .global).minY
+                        )
+                    )
+                        .transition(.opacity)
+                        .zIndex(5)
+                }
+
+                if !world.model.coachLine.isEmpty {
+                    VStack {
+                        CoachBubble(
+                            line: world.model.coachLine,
+                            lineID: world.model.coachLineID,
+                            uiScale: scale
+                        )
+                        .padding(.top, UICfg.Coach.top * scale)
+
+                        Spacer()
+                    }
+                    .transition(.opacity)
+                    .zIndex(6)
+                }
+
                 VStack {
                     topBar(scale)
 
@@ -183,6 +208,10 @@ struct HUDView: View {
                     if world.model.hudStage == .mission,
                        !world.model.missionComplete {
                         controls
+                            .anchorPreference(
+                                key: ControlBounds.self,
+                                value: .bounds
+                            ) { $0 }
                     }
                 }
                 .padding(
@@ -205,6 +234,13 @@ struct HUDView: View {
             .frame(
                 width: size.width,
                 height: size.height
+            )
+            .onPreferenceChange(ControlBounds.self) { bounds in
+                controlBounds = bounds
+            }
+            .animation(
+                .easeInOut(duration: 0.35),
+                value: world.model.coachStep.spotlight
             )
         }
         .onChange(
@@ -310,7 +346,8 @@ struct HUDView: View {
 
             if world.model.hudStage == .mission,
                !world.model.missionComplete,
-               !world.model.showQuiz {
+               !world.model.showQuiz,
+               !world.model.coachStep.locksInput {
                 RespawnButton(uiScale: scale) {
                     sfx.tap()
                     world.respawnTarget()
@@ -371,6 +408,7 @@ struct HUDView: View {
                     )
             }
         }
+
         .animation(
             .easeInOut(duration: 0.2),
             value: world.model.mangoEatReady
@@ -378,7 +416,10 @@ struct HUDView: View {
     }
 
     private var waveButton: some View {
-        PingButton(enabled: world.model.canWave) {
+        PingButton(
+            enabled: world.model.canWave
+                && !world.model.coachStep.locksInput
+        ) {
             sfx.tap()
             world.perform(.sendWave)
         }
@@ -402,6 +443,7 @@ struct HUDView: View {
         }
         .buttonStyle(.plain)
         .glassEffect()
+        .disabled(world.model.coachStep.locksInput)
         .accessibilityLabel("Eat mango")
     }
 
@@ -589,10 +631,6 @@ struct HUDView: View {
     }
 
     private func restartMission() {
-        withAnimation {
-            scanIntroDone = false
-        }
-
         Task { @MainActor in
             await world.mission.restart()
         }

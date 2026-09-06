@@ -15,19 +15,19 @@ struct FPShade: View {
             stops: [
                 .init(
                     color: .black.opacity(
-                        dim ? 0.93 : 0.10
+                        dim ? UICfg.Shade.darkMid : UICfg.Shade.liteMid
                     ),
                     location: 0
                 ),
                 .init(
                     color: .black.opacity(
-                        dim ? 0.96 : 0.20
+                        dim ? UICfg.Shade.darkHalf : UICfg.Shade.liteHalf
                     ),
                     location: 0.58
                 ),
                 .init(
                     color: .black.opacity(
-                        dim ? 0.98 : 0.32
+                        dim ? UICfg.Shade.darkEdge : UICfg.Shade.liteEdge
                     ),
                     location: 1
                 )

@@ -23,6 +23,9 @@ struct SessComp: Component {
     let session: ARSessionRef
     var lidarOK = false
     var spawning = false
+
+    /// Battiw is mid-explanation: guidance stays quiet.
+    var teaching = false
 }
 
 /// A faded-out ping, kept briefly so recent pings still hint at the room.

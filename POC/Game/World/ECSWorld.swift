@@ -26,6 +26,11 @@ final class ECSWorld {
 
     var targetEntity: Entity?
     var eatCandidate: Entity?
+
+    /// A target already built and parented, sitting disabled in the scene
+    /// so spawning is only a move and an enable. Carries no `TargetComp`,
+    /// so no system can see it until it is installed.
+    var stagedTarget: TargetPart?
     var lastTargetPos: SIMD3<Float>?
 
     private var started = false
@@ -38,8 +43,12 @@ final class ECSWorld {
     /// Quest rules, kept out of this type.
     let mission = MissionSvc()
 
+    /// First-run coaching, woven into the live session.
+    let coach = CoachSvc()
+
     let sess: any SessServing
     let sfx = SfxSvc.shared
+    let haptic = HapticSvc.shared
     let waveSim: any WaveSimulating
     let targetMaker: any TargetMaking
     let targetSpawn: any TargetSpawning
@@ -51,7 +60,7 @@ final class ECSWorld {
         self.sess = sess
 
         waveSim = WaveSim(rayMaker: RayMaker(rings: 5), maxDistance: 1.5)
-        targetMaker = TargetAssetSvc(sceneName: "Mango+Tree", treeH: TargetCfg.Tree.height)
+        targetMaker = TargetAssetSvc.shared
         targetSpawn = TargetSpawnSvc()
         targetWave = TargetWaveSvc()
 
@@ -63,6 +72,7 @@ final class ECSWorld {
         anchor.addChild(scanEntity)
 
         mission.attach(to: self)
+        coach.attach(to: self)
 
         watchTarget()
         watchMangoEat()
@@ -85,8 +95,14 @@ final class ECSWorld {
             started = true
             model.msg = ""
             sfx.startAmbience()
+            coach.noteSessionReady()
             startScan()
-            _ = await targetMaker.prepare()
+
+            if await targetMaker.prepare() {
+                await targetMaker.prewarm()
+            }
+
+            stageTarget()
         } else {
             started = false
             model.msg = "Camera or LiDAR unavailable"
@@ -98,6 +114,7 @@ final class ECSWorld {
 
         started = false
         mission.cancel()
+        coach.suspend()
 
         targetReserve.clear()
         clearActiveWave()
@@ -162,6 +179,14 @@ final class ECSWorld {
         }
     }
 
+    /// Lets the ECS systems see that a lesson is running.
+    func setTeaching(_ on: Bool) {
+        guard var comp = sessEntity.components[SessComp.self] else { return }
+
+        comp.teaching = on
+        sessEntity.components[SessComp.self] = comp
+    }
+
     func setMsg(_ text: String) {
         model.msg = text
     }
@@ -223,6 +248,7 @@ final class ECSWorld {
 
                 eatCandidate = mango
                 model.mangoEatReady = true
+                coach.noteEatReady()
             }
         }
 
@@ -253,6 +279,7 @@ final class ECSWorld {
 
                 model.scanProgress = hud.progress
                 model.scanTurn = hud.turn
+                coach.noteScan(progress: hud.progress)
 
                 if hud.ready {
                     await finishScanTarget()

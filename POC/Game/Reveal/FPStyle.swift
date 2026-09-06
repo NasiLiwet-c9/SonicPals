@@ -67,11 +67,11 @@ extension FPKey {
 
         switch zone {
         case .edge:
-            zoneA = 0.42
+            zoneA = 0.58
             delay = 0
 
         case .soft:
-            zoneA = 0.72
+            zoneA = 0.85
             delay = 35
 
         case .core:
@@ -82,7 +82,7 @@ extension FPKey {
         return FPStyle(
             color: color,
             wireA: min(bandA * zoneA * 1.02, 1),
-            fillA: min(0.20 * bandA * zoneA, 0.20),
+            fillA: min(0.46 * bandA * zoneA, 0.46),
             delayMs: delay
         )
     }

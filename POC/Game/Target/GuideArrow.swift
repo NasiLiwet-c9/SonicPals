@@ -14,8 +14,9 @@ struct GuideComp: Component {}
 /// A 3D arrow pointing at the tree, riding the camera anchor so it stays
 /// on screen even when the tree is behind the player.
 ///
-/// Faces the camera and rolls to the bearing: a cone pointing away from
-/// the viewer would just render as a circle.
+/// A tilted dial: the arrow rolls to the bearing, and the whole dial
+/// leans away from the viewer so the arrow reads as pointing into the
+/// scene rather than flat up the screen.
 @MainActor
 enum GuideArrow {
     private static let name = "treeGuideArrow"
@@ -25,17 +26,24 @@ enum GuideArrow {
     /// leave the system unable to find it again.
     static let bodyName = "treeGuideArrowBody"
 
-    /// Must be applied in the arrow's own frame (`roll * lean`). In the
-    /// anchor's frame it skews the apparent direction when the arrow
-    /// points up or down.
-    static let lean = simd_quatf(
-        angle: -0.40,
+    /// Tips the whole dial away from the viewer, so at bearing 0 the
+    /// arrow leans into the scene instead of lying flat pointing up the
+    /// screen. Applied in the anchor's frame, outside the roll.
+    ///
+    /// 34°: enough that the arrow visibly leans into the scene instead
+    /// of lying flat up the screen, but not so steep that pointing away
+    /// foreshortens it into a mushroom.
+    static let dialPitch = simd_quatf(
+        angle: -0.60,
         axis: SIMD3<Float>(1, 0, 0)
     )
 
     /// Sits between the reticle and the dialogue bubble, which used to
     /// cover it. Mesh sizes are tuned against this 42cm distance.
     private static let seat = SIMD3<Float>(0, -0.055, -0.42)
+
+    /// How far the plate is squashed along its normal.
+    private static let plateFlatten: Float = 0.24
 
     private static let violet = UIColor(
         red: 0.62,
@@ -84,7 +92,7 @@ enum GuideArrow {
             materials: [material(bright: false)]
         )
 
-        shaft.position = SIMD3<Float>(0, -0.018, 0)
+        shaft.position = SIMD3<Float>(0, -0.022, 0)
 
         root.addChild(head)
         root.addChild(shaft)
@@ -128,7 +136,7 @@ enum GuideArrow {
         material.metallic = .init(floatLiteral: 0)
 
         material.blending = .transparent(
-            opacity: .init(floatLiteral: 0.8)
+            opacity: .init(floatLiteral: 0.7)
         )
 
         return material
