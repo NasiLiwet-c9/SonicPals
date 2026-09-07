@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 /// A real `ECSWorld` listens for global notifications, which made these
 /// tests hostage to whatever else was running

@@ -9,7 +9,7 @@ import SonarCore
 import Testing
 import UIKit
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("Quiz")
 struct QuizTests {

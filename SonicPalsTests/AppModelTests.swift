@@ -7,7 +7,7 @@
 
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("App model")
 struct AppModelTests {

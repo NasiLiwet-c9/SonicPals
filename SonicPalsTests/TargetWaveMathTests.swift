@@ -10,7 +10,7 @@ import SonarCore
 import Testing
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("Target wave maths")
 struct TargetWaveMathTests {

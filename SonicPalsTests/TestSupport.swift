@@ -11,7 +11,7 @@ import RealityKit
 import SonarCore
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 // MARK: - Notifications
 

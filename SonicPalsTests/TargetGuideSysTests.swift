@@ -9,7 +9,7 @@ import RealityKit
 import Testing
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 /// Real entities and components, only the scene query is bypassed
 @Suite("Guide arrow")

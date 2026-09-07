@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		74481D5B304E440700D1394C /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = 74481D5A304E440700D1394C /* PRIVACY.md */; };
+		74481D5C304E440700D1394C /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = 74481D5A304E440700D1394C /* PRIVACY.md */; };
+		74849B3D304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */ = {isa = PBXBuildFile; fileRef = 74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */; };
+		74849B3E304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */ = {isa = PBXBuildFile; fileRef = 74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */; };
 		79B5432D302BBAEA009E3E7E /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432C302BBAEA009E3E7E /* RealityKitContent */; };
 		79B54330302BBAEA009E3E7E /* SonarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432F302BBAEA009E3E7E /* SonarCore */; };
 /* End PBXBuildFile section */
@@ -22,19 +26,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		747491C8301BE3CD0012A049 /* POC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = POC.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7A10000000000000000000AB /* POCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = POCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		74481D5A304E440700D1394C /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIVACY.md; sourceTree = "<group>"; };
+		747491C8301BE3CD0012A049 /* SonicPals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SonicPals.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ARCHITECTURE.md; sourceTree = "<group>"; };
+		7A10000000000000000000AB /* SonicPalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SonicPalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		747491CA301BE3CD0012A049 /* POC */ = {
+		747491CA301BE3CD0012A049 /* SonicPals */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = POC;
+			path = SonicPals;
 			sourceTree = "<group>";
 		};
-		7A10000000000000000000A2 /* POCTests */ = {
+		7A10000000000000000000A2 /* SonicPalsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = POCTests;
+			path = SonicPalsTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -62,8 +68,9 @@
 		747491BF301BE3CD0012A049 = {
 			isa = PBXGroup;
 			children = (
-				747491CA301BE3CD0012A049 /* POC */,
-				7A10000000000000000000A2 /* POCTests */,
+				74849B3B304E3E12009DF4B4 /* Documentations */,
+				747491CA301BE3CD0012A049 /* SonicPals */,
+				7A10000000000000000000A2 /* SonicPalsTests */,
 				747491C9301BE3CD0012A049 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,18 +78,27 @@
 		747491C9301BE3CD0012A049 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				747491C8301BE3CD0012A049 /* POC.app */,
-				7A10000000000000000000AB /* POCTests.xctest */,
+				747491C8301BE3CD0012A049 /* SonicPals.app */,
+				7A10000000000000000000AB /* SonicPalsTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		74849B3B304E3E12009DF4B4 /* Documentations */ = {
+			isa = PBXGroup;
+			children = (
+				74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */,
+				74481D5A304E440700D1394C /* PRIVACY.md */,
+			);
+			path = Documentations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		747491C7301BE3CD0012A049 /* POC */ = {
+		747491C7301BE3CD0012A049 /* SonicPals */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 747491D5301BE3CE0012A049 /* Build configuration list for PBXNativeTarget "POC" */;
+			buildConfigurationList = 747491D5301BE3CE0012A049 /* Build configuration list for PBXNativeTarget "SonicPals" */;
 			buildPhases = (
 				747491C4301BE3CD0012A049 /* Sources */,
 				747491C5301BE3CD0012A049 /* Frameworks */,
@@ -93,20 +109,20 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				747491CA301BE3CD0012A049 /* POC */,
+				747491CA301BE3CD0012A049 /* SonicPals */,
 			);
-			name = POC;
+			name = SonicPals;
 			packageProductDependencies = (
 				79B5432C302BBAEA009E3E7E /* RealityKitContent */,
 				79B5432F302BBAEA009E3E7E /* SonarCore */,
 			);
 			productName = POC;
-			productReference = 747491C8301BE3CD0012A049 /* POC.app */;
+			productReference = 747491C8301BE3CD0012A049 /* SonicPals.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7A10000000000000000000A1 /* POCTests */ = {
+		7A10000000000000000000A1 /* SonicPalsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7A10000000000000000000A6 /* Build configuration list for PBXNativeTarget "POCTests" */;
+			buildConfigurationList = 7A10000000000000000000A6 /* Build configuration list for PBXNativeTarget "SonicPalsTests" */;
 			buildPhases = (
 				7A10000000000000000000A3 /* Sources */,
 				7A10000000000000000000A4 /* Frameworks */,
@@ -118,13 +134,13 @@
 				7A10000000000000000000A9 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				7A10000000000000000000A2 /* POCTests */,
+				7A10000000000000000000A2 /* SonicPalsTests */,
 			);
-			name = POCTests;
+			name = SonicPalsTests;
 			packageProductDependencies = (
 			);
 			productName = POCTests;
-			productReference = 7A10000000000000000000AB /* POCTests.xctest */;
+			productReference = 7A10000000000000000000AB /* SonicPalsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -147,7 +163,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 747491C3301BE3CD0012A049 /* Build configuration list for PBXProject "POC" */;
+			buildConfigurationList = 747491C3301BE3CD0012A049 /* Build configuration list for PBXProject "SonicPals" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -165,8 +181,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				747491C7301BE3CD0012A049 /* POC */,
-				7A10000000000000000000A1 /* POCTests */,
+				747491C7301BE3CD0012A049 /* SonicPals */,
+				7A10000000000000000000A1 /* SonicPalsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -176,6 +192,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74481D5B304E440700D1394C /* PRIVACY.md in Resources */,
+				74849B3D304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,6 +201,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74849B3E304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */,
+				74481D5C304E440700D1394C /* PRIVACY.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,7 +228,7 @@
 /* Begin PBXTargetDependency section */
 		7A10000000000000000000A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 747491C7301BE3CD0012A049 /* POC */;
+			target = 747491C7301BE3CD0012A049 /* SonicPals */;
 			targetProxy = 7A10000000000000000000AA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -350,7 +370,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sonic Pals";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the objects (such as trees) and detect nearby surfaces.";
 				INFOPLIST_KEY_NSWorldSensingUsageDescription = "LiDAR and world sensing are used to detect surfaces and reconstruct nearby geometry for ultrasonic visualization.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -363,7 +383,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.shan.ultrasonicar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shan.sonicpals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -392,7 +412,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sonic Pals";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
-				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the robot and detect nearby surfaces.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera and LiDAR scanner are used to place the objects (such as trees) and detect nearby surfaces.";
 				INFOPLIST_KEY_NSWorldSensingUsageDescription = "LiDAR and world sensing are used to detect surfaces and reconstruct nearby geometry for ultrasonic visualization.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -405,7 +425,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.shan.ultrasonicar;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shan.sonicpals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -439,7 +459,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/POC.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/POC";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SonicPals.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SonicPals";
 			};
 			name = Debug;
 		};
@@ -462,14 +482,14 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/POC.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/POC";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SonicPals.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SonicPals";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		747491C3301BE3CD0012A049 /* Build configuration list for PBXProject "POC" */ = {
+		747491C3301BE3CD0012A049 /* Build configuration list for PBXProject "SonicPals" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				747491D3301BE3CE0012A049 /* Debug */,
@@ -478,7 +498,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		747491D5301BE3CE0012A049 /* Build configuration list for PBXNativeTarget "POC" */ = {
+		747491D5301BE3CE0012A049 /* Build configuration list for PBXNativeTarget "SonicPals" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				747491D6301BE3CE0012A049 /* Debug */,
@@ -487,7 +507,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7A10000000000000000000A6 /* Build configuration list for PBXNativeTarget "POCTests" */ = {
+		7A10000000000000000000A6 /* Build configuration list for PBXNativeTarget "SonicPalsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7A10000000000000000000A7 /* Debug */,

@@ -11,7 +11,7 @@ import SonarCore
 import Testing
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("World waves")
 struct WorldWaveTests {

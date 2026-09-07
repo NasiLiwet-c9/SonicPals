@@ -9,7 +9,7 @@ import RealityKit
 import Testing
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 /// Real entities, the mango is found by name under the target's model,
 /// exactly as in the game

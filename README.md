@@ -1,32 +1,63 @@
 # Sonic Pals
 
-iOS LiDAR AR application for interactive ultrasonic wave visualization and
-simulation.
+Sonic Pals is an augmented reality (AR) game for iPhone and iPad. Using your
+device's camera and LiDAR sensor, you explore your real room to find a
+hidden robot pal using sound-based "ping" scanning, complete simple quizzes,
+and collect mangoes along the way.
 
-## Layout
+## What you need
 
-| Path | What is in it |
-| --- | --- |
-| `POC/` | The app: `App/`, `Game/`, `Services/`, `UI/`, `Debug/` |
-| `POCTests/` | Unit tests for the app |
-| `Packages/SonarCore` | The pure sonar simulation, and its own tests |
-| `Packages/RealityKitContent` | Reality Composer Pro assets |
+- A Mac with Xcode 26 or later
+- An iPhone or iPad with a LiDAR scanner (for the full AR experience — the
+  app builds and runs without one, but the room-scanning features need it)
+- An Apple Developer Program membership (for running on a real device and
+  for App Store submission later)
 
-## Tests
+## Opening the project
 
-```bash
-xcodebuild test -project POC.xcodeproj -scheme POC \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-```
+1. Clone this repository.
+2. Open the `.xcodeproj` file in Xcode.
+3. Under Signing & Capabilities, select your Apple Developer account.
+4. Plug in a real iPhone or iPad and select it as the run destination.
+5. Press the Run button (▶) or `Cmd+R`.
 
-The `SonarCore` package has its own suite, which needs no simulator:
+## Running the tests
 
-```bash
-cd Packages/SonarCore && swift test
-```
+1. Pick any iPhone Simulator as the run destination — a real device isn't
+   needed just to run the tests (see note below).
+2. Press `Cmd+U`, or open the Test Navigator (flask icon, `Cmd+6`) to run
+   individual tests.
 
-Both use [Swift Testing](https://developer.apple.com/documentation/testing).
+Note: the automated tests are written so they don't need a live camera
+session, so a Simulator is enough to run them — even though the actual game
+needs a real device to play properly.
 
-A LiDAR device is still required to actually play: the simulator has no
-scene reconstruction, so the AR session refuses to start there. The menu,
-HUD and tutorial screens do run on a simulator.
+## Project structure
+
+- `App/` — the app's entry point and shared app-wide state
+- `Game/` — the actual gameplay logic, split by feature:
+  - `Game/World/` — the core ECS (Entity-Component-System) engine driving
+    the game
+  - `Game/Scan/` — floor and room scanning
+  - `Game/Reveal/` — progressively revealing the world as you explore
+  - `Game/Target/` — spawning, finding, and guiding you to the hidden target
+  - `Game/Mission/` — mission and quiz progress/scoring
+  - `Game/Tutorial/` — onboarding/coaching hints for new players
+- `Services/` — small standalone helpers (sound effects, haptics, AR session
+  handling)
+- `UI/` — all the SwiftUI screens, grouped by area (Home, Session/HUD, Quiz,
+  Splash, and Shared reusable views)
+- `Debug/` — developer-only tools, never included in release builds
+- `Resources/` — audio files
+- `Assets.xcassets/` — images and the app icon
+
+See `Documentation/ARCHITECTURE.md` for a deeper look at how these pieces
+fit together.
+
+## Credits
+
+**Art Direction & World Building:** Rio Ardi Ferdian, Michelle Gravielle
+Benedicta Roring
+
+**Technical Direction & AR Space:** Shanon Giuly Istanto, James Richard
+Renaldo, Jayvin Tiya Silo

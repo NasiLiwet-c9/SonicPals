@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("Dialogue")
 struct DialogueViewModelTests {

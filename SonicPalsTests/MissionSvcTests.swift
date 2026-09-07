@@ -8,7 +8,7 @@
 import Foundation
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 /// Spawning is a no-op without LiDAR, so this covers the bookkeeping
 @Suite("Mission")

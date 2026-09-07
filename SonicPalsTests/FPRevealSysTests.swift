@@ -11,7 +11,7 @@ import RealityKit
 import SonarCore
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 /// Real entities, with a stub builder for the geometry ARKit supplies
 @Suite("Reveal system")

@@ -8,7 +8,7 @@
 import Testing
 import simd
 
-@testable import POC
+@testable import SonicPals
 
 @Suite("Scan coverage")
 struct ScanCoverageTests {

@@ -7,7 +7,7 @@
 
 import Testing
 
-@testable import POC
+@testable import SonicPals
 
 /// Relationships that have to hold, rather than the literals restated
 @Suite("Target config")
