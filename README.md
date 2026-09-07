@@ -1,6 +1,6 @@
 # Sonic Pals
 
-Sonic Pals is an augmented reality (AR) game for iPhone and iPad. Using your
+Sonic Pals is an augmented reality (AR) game for iPhone. Using your
 device's camera and LiDAR sensor, you explore your real room to find a
 hidden robot pal using sound-based "ping" scanning, complete simple quizzes,
 and collect mangoes along the way.
@@ -8,7 +8,7 @@ and collect mangoes along the way.
 ## What you need
 
 - A Mac with Xcode 26 or later
-- An iPhone or iPad with a LiDAR scanner (for the full AR experience — the
+- An iPhone or iPad with a LiDAR scanner (for the full AR experience, the
   app builds and runs without one, but the room-scanning features need it)
 - An Apple Developer Program membership (for running on a real device and
   for App Store submission later)
@@ -18,18 +18,18 @@ and collect mangoes along the way.
 1. Clone this repository.
 2. Open the `.xcodeproj` file in Xcode.
 3. Under Signing & Capabilities, select your Apple Developer account.
-4. Plug in a real iPhone or iPad and select it as the run destination.
-5. Press the Run button (▶) or `Cmd+R`.
+4. Plug in a real iPhone and select it as the run destination.
+5. Press the Run button or `Cmd+R`.
 
 ## Running the tests
 
-1. Pick any iPhone Simulator as the run destination — a real device isn't
+1. Pick any iPhone Simulator as the run destination, a real device isn't
    needed just to run the tests (see note below).
 2. Press `Cmd+U`, or open the Test Navigator (flask icon, `Cmd+6`) to run
    individual tests.
 
 Note: the automated tests are written so they don't need a live camera
-session, so a Simulator is enough to run them — even though the actual game
+session, so a Simulator is enough to run them, even though the actual game
 needs a real device to play properly.
 
 ## Project structure
