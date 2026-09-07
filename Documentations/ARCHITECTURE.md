@@ -70,3 +70,5 @@ systems get tested against a real but detached RealityKit scene where
 possible, or by pulling out the core logic into something testable on its
 own. Anything that needs a live camera is tested by hand on a device
 instead.
+
+<!-- Test #1 PR & Merge change auto test trigger -->

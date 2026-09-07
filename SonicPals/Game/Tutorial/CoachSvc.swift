@@ -8,7 +8,7 @@
 import Foundation
 
 /// Current beat, `.idle` is nothing showing
-enum CoachStep: Equatable {
+nonisolated enum CoachStep: Equatable {
     case idle
 
     // Scan
@@ -63,7 +63,7 @@ protocol CoachHost: AnyObject {
 }
 
 /// The control a beat points at
-enum CoachTarget {
+nonisolated enum CoachTarget {
     case none
     case ping
     case eat

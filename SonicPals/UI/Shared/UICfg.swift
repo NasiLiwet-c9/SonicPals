@@ -172,6 +172,21 @@ nonisolated enum UICfg {
         static let padX: CGFloat = 20      // Text padding.
     }
 
+    /// The screen shown while the session comes up, or when it cannot
+    enum Gate {
+        static let mascot: CGFloat = 150   // Battiw size.
+        static let titleTxt: CGFloat = 22  // Title size.
+        static let bodyTxt: CGFloat = 16   // Body size.
+        static let gap: CGFloat = 14       // Stack gap.
+        static let padX: CGFloat = 40      // Body side padding.
+
+        static let btnW: CGFloat = 220     // Button width.
+        static let btnH: CGFloat = 54      // Button height.
+        static let btnTxt: CGFloat = 17    // Button text size.
+        static let btnGap: CGFloat = 12    // Button gap.
+        static let btnTop: CGFloat = 12    // Buttons top gap.
+    }
+
     enum Sess {
         static let topW: CGFloat = 250     // Top bubble width.
         static let topH: CGFloat = 108     // Top bubble height.

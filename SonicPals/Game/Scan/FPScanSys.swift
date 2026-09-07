@@ -337,10 +337,6 @@ final class FPScanSys: System {
                     .worldTransform
                     .pos3
 
-                let drop =
-                    cameraY
-                    - pos.y
-
                 guard ScanGeometry.isPlausibleFloor(
                     y: pos.y,
                     cameraY: cameraY
