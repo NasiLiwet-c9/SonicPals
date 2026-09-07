@@ -1,0 +1,19 @@
+//
+//  SimdExt.swift
+//  SonarCore
+//
+//  Created by Shan Newcastle on 10/08/26.
+//
+
+import simd
+
+extension simd_float4x4 {
+    /// Translation column as a position
+    public var pos3: SIMD3<Float> {
+        SIMD3<Float>(
+            columns.3.x,
+            columns.3.y,
+            columns.3.z
+        )
+    }
+}
