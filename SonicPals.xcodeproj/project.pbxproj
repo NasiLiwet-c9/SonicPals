@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		74481D5B304E440700D1394C /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = 74481D5A304E440700D1394C /* PRIVACY.md */; };
-		74481D5C304E440700D1394C /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = 74481D5A304E440700D1394C /* PRIVACY.md */; };
-		74849B3D304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */ = {isa = PBXBuildFile; fileRef = 74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */; };
-		74849B3E304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */ = {isa = PBXBuildFile; fileRef = 74849B3C304E3E72009DF4B4 /* ARCHITECTURE.md */; };
 		79B5432D302BBAEA009E3E7E /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432C302BBAEA009E3E7E /* RealityKitContent */; };
 		79B54330302BBAEA009E3E7E /* SonarCore in Frameworks */ = {isa = PBXBuildFile; productRef = 79B5432F302BBAEA009E3E7E /* SonarCore */; };
 /* End PBXBuildFile section */
@@ -192,8 +188,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74481D5B304E440700D1394C /* PRIVACY.md in Resources */,
-				74849B3D304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,8 +195,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74849B3E304E3E72009DF4B4 /* ARCHITECTURE.md in Resources */,
-				74481D5C304E440700D1394C /* PRIVACY.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
