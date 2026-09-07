@@ -81,30 +81,43 @@ final class ECSWorld {
     func start() async {
         guard !started else { return }
 
-        let supported = await sess.start()
+        let result = await sess.start()
+        let supported = result == .ok
 
-        guard var comp = sessEntity.components[SessComp.self] else { return }
+        if var comp = sessEntity.components[SessComp.self] {
+            comp.lidarOK = supported
+            sessEntity.components[SessComp.self] = comp
+        }
 
-        comp.lidarOK = supported
-        sessEntity.components[SessComp.self] = comp
         model.lidarOK = supported
 
-        if supported {
-            started = true
-            model.msg = ""
-            sfx.startAmbience()
-            coach.noteSessionReady()
-            startScan()
-
-            if await targetMaker.prepare() {
-                await targetMaker.prewarm()
-            }
-
-            stageTarget()
-        } else {
+        guard supported else {
             started = false
-            model.msg = "Camera or LiDAR unavailable"
+            model.sessionState = result == .noCamera ? .noCamera : .noLiDAR
+            return
         }
+
+        started = true
+        model.sessionState = .ready
+        model.msg = ""
+        sfx.startAmbience()
+        coach.noteSessionReady()
+        startScan()
+
+        if await targetMaker.prepare() {
+            await targetMaker.prewarm()
+        }
+
+        stageTarget()
+    }
+
+    /// Runs again once the player is back from Settings, so granting the
+    /// camera there does not need a relaunch
+    func retryStart() async {
+        guard !started else { return }
+
+        model.sessionState = .starting
+        await start()
     }
 
     func stop() async {

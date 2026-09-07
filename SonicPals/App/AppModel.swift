@@ -34,7 +34,18 @@ final class AppModel {
         lidarOK
     }
 
-    enum HUDStage {
+    /// Why the live session is or is not up, so the UI can explain
+    /// itself instead of sitting on a black screen
+    nonisolated enum SessionState: Equatable {
+        case starting
+        case ready
+        case noCamera
+        case noLiDAR
+    }
+
+    var sessionState: SessionState = .starting
+
+    nonisolated enum HUDStage {
         case scanning
         case scanCompletePrompt
         case transitioning

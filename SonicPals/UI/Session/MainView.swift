@@ -13,6 +13,7 @@ struct MainView: View {
     let onBack: () -> Void
 
     @State private var world = ECSWorld()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
@@ -37,6 +38,15 @@ struct MainView: View {
             }
 
             HUDView(world: world, onBack: onBack)
+
+            if world.model.sessionState != .ready {
+                SessionGateView(
+                    state: world.model.sessionState,
+                    onBack: onBack
+                )
+                .transition(.opacity)
+                .zIndex(30)
+            }
         }
         .debugForceSpawn(world: world)
         .animation(
@@ -47,6 +57,17 @@ struct MainView: View {
             .easeInOut(duration: 0.3),
             value: world.model.missionComplete
         )
+        .animation(
+            .easeInOut(duration: 0.3),
+            value: world.model.sessionState
+        )
+        .onChange(of: scenePhase) { _, phase in
+            // Back from Settings, so the camera may have been granted
+            guard phase == .active,
+                  world.model.sessionState == .noCamera else { return }
+
+            Task { await world.retryStart() }
+        }
         .preferredColorScheme(.dark)
         .task {
             for await _ in NotificationCenter.default.notifications(

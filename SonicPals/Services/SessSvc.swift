@@ -9,11 +9,19 @@ import ARKit
 import AVFoundation
 import RealityKit
 
+/// Why the session would not come up, so the caller can say which of
+/// the two it was
+nonisolated enum SessStart: Equatable {
+    case ok
+    case noCamera
+    case noLiDAR
+}
+
 @MainActor
 protocol SessServing: AnyObject {
     var session: ARSession { get }
     
-    func start() async -> Bool
+    func start() async -> SessStart
     func stop() async
 }
 
@@ -24,14 +32,14 @@ final class SessSvc: SessServing {
     private let spatial = SpatialTrackingSession()
     private var running = false
     
-    func start() async -> Bool {
+    func start() async -> SessStart {
         guard !running else {
-            return true
+            return .ok
         }
         
         guard await cameraAccess() else {
             print("CAMERA: permission denied")
-            return false
+            return .noCamera
         }
         
         let classified = ARWorldTrackingConfiguration.supportsSceneReconstruction(
@@ -44,7 +52,7 @@ final class SessSvc: SessServing {
         
         guard classified || plain else {
             print("LIDAR: scene reconstruction unsupported")
-            return false
+            return .noLiDAR
         }
         
         let arConfig = makeARConfig(
@@ -84,19 +92,19 @@ final class SessSvc: SessServing {
             if unavailable.missingCameraAuthorization == true {
                 print("SPATIAL: camera authorization missing")
                 session.pause()
-                return false
+                return .noCamera
             }
             
             if unavailable.anchor.contains(.camera) {
                 print("SPATIAL: camera capability unavailable")
                 session.pause()
-                return false
+                return .noCamera
             }
             
             if unavailable.anchor.contains(.world) {
                 print("SPATIAL: world tracking unavailable")
                 session.pause()
-                return false
+                return .noLiDAR
             }
             
             if unavailable.anchor.contains(.plane) {
@@ -117,7 +125,7 @@ final class SessSvc: SessServing {
         print("ARSession: running")
         print("SpatialTrackingSession: running")
         
-        return true
+        return .ok
     }
     
     func stop() async {
