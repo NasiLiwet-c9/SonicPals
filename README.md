@@ -1,14 +1,13 @@
 # Sonic Pals
 
 Sonic Pals is an augmented reality (AR) game for iPhone. Using your
-device's camera and LiDAR sensor, you explore your real room to find a
-hidden robot pal using sound-based "ping" scanning, complete simple quizzes,
-and collect mangoes along the way.
+device's camera and LiDAR sensor, you explore your real room to learn about ultrasonic using sound-based "ping" scanning, complete simple quizzes,
+and finish objectives along the way.
 
 ## What you need
 
 - A Mac with Xcode 26 or later
-- An iPhone or iPad with a LiDAR scanner (for the full AR experience, the
+- An iPhone with a LiDAR scanner (for the full AR experience, the
   app builds and runs without one, but the room-scanning features need it)
 - An Apple Developer Program membership (for running on a real device and
   for App Store submission later)
