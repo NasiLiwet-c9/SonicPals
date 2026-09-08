@@ -39,7 +39,8 @@ final class TargetSys: System {
         guard let sess = sessState(
             in: context.scene
         ) else {
-            return }
+            return
+        }
 
         step(
             targets: context.scene.performQuery(Self.query),
@@ -275,17 +276,20 @@ final class TargetSys: System {
         guard let best =
             comp.bestM else {
             comp.bestM = dist
-            return }
+            return
+        }
 
         guard dist
                 <= best - nearStepM else {
-            return }
+            return
+        }
 
         comp.bestM = dist
 
         guard now - comp.lastNearAt
                 >= nearCooldown else {
-            return }
+            return
+        }
 
         comp.lastNearAt = now
 
@@ -310,7 +314,8 @@ final class TargetSys: System {
         guard aim.dist <= dirMaxM,
               now - comp.lastDirAt
                 >= dirCooldown else {
-            return }
+            return
+        }
 
         var forward =
             SIMD3<Float>(
@@ -332,7 +337,8 @@ final class TargetSys: System {
         simd_length(
             toTarget
         ) > 0.001 else {
-            return }
+            return
+        }
 
         forward = simd_normalize(forward)
 
@@ -353,7 +359,8 @@ final class TargetSys: System {
         let deg = acos(dot) * 180 / Float.pi
 
         guard deg <= dirDeg else {
-            return }
+            return
+        }
 
         comp.lastDirAt = now
 
@@ -381,7 +388,8 @@ final class TargetSys: System {
         guard !comp.saidClose,
               comp.felt || comp.seen,
               dist <= TargetCfg.Cue.closeM else {
-            return }
+            return
+        }
 
         comp.saidClose = true
         post(.close)

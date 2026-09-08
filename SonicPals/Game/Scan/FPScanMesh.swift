@@ -53,7 +53,8 @@ final class FPScanMesh {
         guard now - lastAddAt >= minAddS,
               !source.isEmpty,
               count < maxTris else {
-            return }
+            return
+        }
 
         lastAddAt = now
 

@@ -94,7 +94,8 @@ final class ECSWorld {
         guard supported else {
             started = false
             model.sessionState = result == .noCamera ? .noCamera : .noLiDAR
-            return }
+            return
+        }
 
         started = true
         model.sessionState = .ready

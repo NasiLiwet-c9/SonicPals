@@ -84,12 +84,14 @@ final class DialogueViewModel {
         if lines.indices.contains(nextIndex) {
             currentLineIndex = nextIndex
             showCurrentLine()
-            return }
+            return
+        }
 
         if loops, !lines.isEmpty {
             currentLineIndex = 0
             showCurrentLine()
-            return }
+            return
+        }
 
         holdTask?.cancel()
         onFinishedAllLines?()

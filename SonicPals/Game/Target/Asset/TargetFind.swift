@@ -56,7 +56,8 @@ enum TargetFind {
         into out: inout [Entity]
     ) {
         if entity.name == "MangoXRay" {
-            return }
+            return
+        }
 
         if entity.components.has(ModelComponent.self) {
             out.append(entity)

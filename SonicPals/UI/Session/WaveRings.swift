@@ -51,7 +51,8 @@ struct WaveRings: View {
         .allowsHitTesting(false)
         .task(id: seq) {
             guard seq > 0 else {
-                return }
+                return
+            }
 
             show = true
             pulse = false
@@ -64,7 +65,8 @@ struct WaveRings: View {
             try? await Task.sleep(for: .milliseconds(1250))
 
             guard !Task.isCancelled else {
-                return }
+                return
+            }
 
             show = false
             pulse = false

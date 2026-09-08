@@ -17,7 +17,8 @@ extension ECSWorld {
               let scene = anchor.scene,
               let frame = sess.session.currentFrame
         else {
-            return }
+            return
+        }
 
         clearActiveWave()
         trimTraces(max: 3)
@@ -91,7 +92,8 @@ extension ECSWorld {
             }
 
         guard traces.count > max else {
-            return }
+            return
+        }
 
         for trace in traces.prefix(traces.count - max) {
             trace.removeFromParent()

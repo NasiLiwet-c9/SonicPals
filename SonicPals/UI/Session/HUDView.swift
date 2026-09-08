@@ -210,7 +210,8 @@ struct HUDView: View {
             of: world.model.scanReady
         ) { _, isReady in
             guard world.model.hudStage == .scanning else {
-                return }
+                return
+            }
 
             if isReady {
                 sfx.scanDone()

@@ -122,7 +122,8 @@ final class SessSvc: SessServing {
     
     func stop() async {
         guard running else {
-            return }
+            return
+        }
         
         running = false
         

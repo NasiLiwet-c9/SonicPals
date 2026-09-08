@@ -143,7 +143,8 @@ final class FPRevealSys: System {
         guard now >= retry.nextAt,
               let session
         else {
-            return }
+            return
+        }
 
         let layers = mesh.make(session: session, from: comp.data)
 
@@ -161,12 +162,14 @@ final class FPRevealSys: System {
 
             comp.stage = .revealing(index: 0, startedAt: now)
 
-            return }
+            return
+        }
 
         if retry.attempt >= maxAttempts {
             comp.stage = .empty(until: now + emptyS)
 
-            return }
+            return
+        }
 
         comp.stage = .waiting(
             attempt: retry.attempt + 1,
@@ -205,13 +208,15 @@ final class FPRevealSys: System {
         now: TimeInterval
     ) {
         guard now - lastAt >= fadeStepS else {
-            return }
+            return
+        }
 
         guard zoneIndex < fadeOrder.count else {
             entity.components[TraceComp.self] = TraceComp(createdAt: now)
 
             entity.components.remove(RevealComp.self)
-            return }
+            return
+        }
 
         let zone = fadeOrder[zoneIndex]
 
