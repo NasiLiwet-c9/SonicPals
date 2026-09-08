@@ -13,24 +13,11 @@ import simd
 
 @MainActor
 final class TargetSys: System {
-    static let query =
-        EntityQuery(
-            where:
-                .has(
-                    TargetComp.self
-                )
-        )
+    static let query = EntityQuery(where: .has(TargetComp.self))
 
-    static let sessQuery =
-        EntityQuery(
-            where:
-                .has(
-                    SessComp.self
-                )
-        )
+    static let sessQuery = EntityQuery(where: .has(SessComp.self))
 
-    private let haptic =
-        HapticSvc.shared
+    private let haptic = HapticSvc.shared
 
     private let foundM: Float = 0.72
     private let nearStepM: Float = 0.12
@@ -47,14 +34,12 @@ final class TargetSys: System {
     init() {}
 
     func update(
-        context:
-            SceneUpdateContext
+        context: SceneUpdateContext
     ) {
         guard let sess = sessState(
             in: context.scene
         ) else {
-            return
-        }
+            return }
 
         step(
             targets: context.scene.performQuery(Self.query),
@@ -71,8 +56,7 @@ final class TargetSys: System {
         teaching: Bool,
         now: TimeInterval
     ) {
-        let cam =
-            camM.pos3
+        let cam = camM.pos3
 
         for entity
         in targets {
@@ -84,20 +68,11 @@ final class TargetSys: System {
                 continue
             }
 
-            lockPose(
-                entity,
-                comp: comp
-            )
+            lockPose(entity, comp: comp)
 
-            activateScheduled(
-                comp: &comp,
-                now: now
-            )
+            activateScheduled(comp: &comp, now: now)
 
-            fadePulses(
-                comp: &comp,
-                now: now
-            )
+            fadePulses(comp: &comp, now: now)
 
             if comp.found {
                 entity.components[
@@ -107,24 +82,15 @@ final class TargetSys: System {
                 continue
             }
 
-            let target =
-                entity.position(
-                    relativeTo: nil
-                )
+            let target = entity.position(relativeTo: nil)
 
-            let dist =
-                horizontalDistance(
-                    cam,
-                    target
-                )
+            let dist = horizontalDistance(cam, target)
 
             if comp.seen,
                dist <= foundM {
                 comp.found = true
 
-                showReal(
-                    comp: &comp
-                )
+                showReal(comp: &comp)
 
                 haptic.found()
 
@@ -134,12 +100,7 @@ final class TargetSys: System {
 
                 NotificationCenter
                     .default
-                    .post(
-                        name:
-                            .targetFound,
-                        object:
-                            entity
-                    )
+                    .post(name: .targetFound, object: entity)
 
                 continue
             }
@@ -152,25 +113,15 @@ final class TargetSys: System {
                 continue
             }
 
-            guideCloser(
-                comp: &comp,
-                dist: dist,
-                now: now
-            )
+            guideCloser(comp: &comp, dist: dist, now: now)
 
             guideDirection(
                 comp: &comp,
-                camM: camM,
-                cam: cam,
-                target: target,
-                dist: dist,
+                aim: Aim(camM: camM, cam: cam, target: target, dist: dist),
                 now: now
             )
 
-            cueDistance(
-                comp: &comp,
-                dist: dist
-            )
+            cueDistance(comp: &comp, dist: dist)
 
             entity.components[
                 TargetComp.self
@@ -182,8 +133,7 @@ final class TargetSys: System {
         comp: inout TargetComp,
         now: TimeInterval
     ) {
-        let due =
-            comp.pendingRevealAt
+        let due = comp.pendingRevealAt
                 .filter {
                     now >= $0.value
                 }
@@ -201,15 +151,11 @@ final class TargetSys: System {
                 continue
             }
 
-            comp.seenParts.insert(
-                index
-            )
+            comp.seenParts.insert(index)
 
             comp.pulseUntil[
                 index
-            ] =
-                now
-                + TargetCfg
+            ] = now + TargetCfg
                     .Echo
                     .pulseHoldS
 
@@ -241,36 +187,24 @@ final class TargetSys: System {
             .removeAll()
 
         for part in comp.parts {
-            part.pulse.isEnabled =
-                false
+            part.pulse.isEnabled = false
 
-            part.trace.isEnabled =
-                false
+            part.trace.isEnabled = false
         }
 
-        comp.real.isEnabled =
-            true
+        comp.real.isEnabled = true
     }
 
     private func lockPose(
         _ entity: Entity,
         comp: TargetComp
     ) {
-        entity.setPosition(
-            comp.lockPos,
-            relativeTo: nil
-        )
+        entity.setPosition(comp.lockPos, relativeTo: nil)
 
         entity.setOrientation(
             simd_quatf(
-                angle:
-                    comp.lockYaw,
-                axis:
-                    SIMD3<Float>(
-                        0,
-                        1,
-                        0
-                    )
+                angle: comp.lockYaw,
+                axis: SIMD3<Float>(0, 1, 0)
             ),
             relativeTo: nil
         )
@@ -287,17 +221,13 @@ final class TargetSys: System {
                 entity.components[
                     SessComp.self
                 ],
-            let frame =
-                comp.session
+            let frame = comp.session
                     .value?
                     .currentFrame else {
                 continue
             }
 
-            return (
-                frame.camera.transform,
-                comp.teaching
-            )
+            return (frame.camera.transform, comp.teaching)
         }
 
         return nil
@@ -307,8 +237,7 @@ final class TargetSys: System {
         comp: inout TargetComp,
         now: TimeInterval
     ) {
-        let expired =
-            comp.pulseUntil
+        let expired = comp.pulseUntil
                 .filter {
                     now >= $0.value
                 }
@@ -346,59 +275,55 @@ final class TargetSys: System {
         guard let best =
             comp.bestM else {
             comp.bestM = dist
-            return
-        }
+            return }
 
         guard dist
                 <= best - nearStepM else {
-            return
-        }
+            return }
 
         comp.bestM = dist
 
-        guard now
-                - comp.lastNearAt
+        guard now - comp.lastNearAt
                 >= nearCooldown else {
-            return
-        }
+            return }
 
         comp.lastNearAt = now
 
-        haptic.closer(
-            strong:
-                comp.seen
-        )
+        haptic.closer(strong: comp.seen)
 
         markFelt(&comp)
     }
 
+    /// Where the player is standing relative to the tree, for one frame
+    private struct Aim {
+        let camM: simd_float4x4
+        let cam: SIMD3<Float>
+        let target: SIMD3<Float>
+        let dist: Float
+    }
+
     private func guideDirection(
         comp: inout TargetComp,
-        camM: simd_float4x4,
-        cam: SIMD3<Float>,
-        target: SIMD3<Float>,
-        dist: Float,
+        aim: Aim,
         now: TimeInterval
     ) {
-        guard dist <= dirMaxM,
-              now
-                - comp.lastDirAt
+        guard aim.dist <= dirMaxM,
+              now - comp.lastDirAt
                 >= dirCooldown else {
-            return
-        }
+            return }
 
         var forward =
             SIMD3<Float>(
-                -camM.columns.2.x,
+                -aim.camM.columns.2.x,
                 0,
-                -camM.columns.2.z
+                -aim.camM.columns.2.z
             )
 
         var toTarget =
             SIMD3<Float>(
-                target.x - cam.x,
+                aim.target.x - aim.cam.x,
                 0,
-                target.z - cam.z
+                aim.target.z - aim.cam.z
             )
 
         guard simd_length(
@@ -407,18 +332,11 @@ final class TargetSys: System {
         simd_length(
             toTarget
         ) > 0.001 else {
-            return
-        }
+            return }
 
-        forward =
-            simd_normalize(
-                forward
-            )
+        forward = simd_normalize(forward)
 
-        toTarget =
-            simd_normalize(
-                toTarget
-            )
+        toTarget = simd_normalize(toTarget)
 
         let dot =
             min(
@@ -432,14 +350,10 @@ final class TargetSys: System {
                 1
             )
 
-        let deg =
-            acos(dot)
-            * 180
-            / Float.pi
+        let deg = acos(dot) * 180 / Float.pi
 
         guard deg <= dirDeg else {
-            return
-        }
+            return }
 
         comp.lastDirAt = now
 
@@ -467,29 +381,20 @@ final class TargetSys: System {
         guard !comp.saidClose,
               comp.felt || comp.seen,
               dist <= TargetCfg.Cue.closeM else {
-            return
-        }
+            return }
 
         comp.saidClose = true
         post(.close)
     }
 
     private func post(_ cue: TargetCue) {
-        NotificationCenter.default.post(
-            name: .targetCue,
-            object: cue
-        )
+        NotificationCenter.default.post(name: .targetCue, object: cue)
     }
 
     private func horizontalDistance(
         _ a: SIMD3<Float>,
         _ b: SIMD3<Float>
     ) -> Float {
-        simd_length(
-            SIMD2<Float>(
-                a.x - b.x,
-                a.z - b.z
-            )
-        )
+        simd_length(SIMD2<Float>(a.x - b.x, a.z - b.z))
     }
 }

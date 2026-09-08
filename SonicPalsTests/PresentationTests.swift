@@ -20,21 +20,26 @@ struct QuizTests {
     }
 }
 
-/// The tutorial tells a child "red is close, blue is far", so that had
-/// better be what the mesh does
+/// The tutorial tells a child "red is close, blue is far", so that had better be what the mesh does
 @Suite("Reveal style")
 struct FPStyleTests {
     private func style(_ band: FPBand, _ zone: FPZone = .core) -> FPStyle {
         FPKey(band: band, zone: zone).style
     }
 
-    private func rgb(_ color: UIColor) -> (r: CGFloat, g: CGFloat, b: CGFloat) {
+    private struct RGB {
+        let r: CGFloat
+        let g: CGFloat
+        let b: CGFloat
+    }
+
+    private func rgb(_ color: UIColor) -> RGB {
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
         color.getRed(&r, green: &g, blue: &b, alpha: &a)
-        return (r, g, b)
+        return RGB(r: r, g: g, b: b)
     }
 
     @Test("The closest band really is red")

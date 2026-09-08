@@ -18,26 +18,16 @@ struct MapView: View {
         GeometryReader { geo in
             let size = geo.size
 
-            let bgW = UICfg.v(
-                UICfg.Map.bgW,
-                size
-            )
+            let bgW = UICfg.v(UICfg.Map.bgW, size)
 
-            let bgH = UICfg.v(
-                UICfg.Map.bgH,
-                size
-            )
+            let bgH = UICfg.v(UICfg.Map.bgH, size)
 
             let sx = bgW / UICfg.refW
             let sy = bgH / UICfg.refH
             let sc = min(sx, sy)
 
             ZStack {
-                Color(
-                    red: 0.08,
-                    green: 0.07,
-                    blue: 0.18
-                )
+                Color(red: 0.08, green: 0.07, blue: 0.18)
                 .ignoresSafeArea()
 
                 ZStack {
@@ -45,15 +35,10 @@ struct MapView: View {
                         name: "bg-map-animation",
                         contentMode: .scaleAspectFit
                     )
-                    .frame(
-                        width: bgW,
-                        height: bgH
-                    )
+                    .frame(width: bgW, height: bgH)
                     .allowsHitTesting(false)
 
-                    GIFImageView(
-                        name: "flying-animation-mascot"
-                    )
+                    GIFImageView(name: "flying-animation-mascot")
                     .frame(
                         width: UICfg.Map.bat * sc,
                         height: UICfg.Map.bat * sc
@@ -64,15 +49,9 @@ struct MapView: View {
                     )
                     .allowsHitTesting(false)
 
-                    levelOneButton(
-                        sx: sx,
-                        sy: sy
-                    )
+                    levelOneButton(sx: sx, sy: sy)
 
-                    lockButton(
-                        sx: sx,
-                        sy: sy
-                    )
+                    lockButton(sx: sx, sy: sy)
 
                     if lockMsg {
                         lockBubble(scale: sc)
@@ -80,23 +59,12 @@ struct MapView: View {
                                 x: UICfg.Map.msgX * sx,
                                 y: UICfg.Map.msgY * sy
                             )
-                            .transition(
-                                .scale(scale: 0.75)
-                                .combined(with: .opacity)
-                            )
+                            .transition(.scale(scale: 0.75) .combined(with: .opacity))
                             .zIndex(5)
                     }
                 }
-                .frame(
-                    width: bgW,
-                    height: bgH
-                )
-                .offset(
-                    y: UICfg.y(
-                        UICfg.Map.bgY,
-                        size
-                    )
-                )
+                .frame(width: bgW, height: bgH)
+                .offset(y: UICfg.y(UICfg.Map.bgY, size))
 
                 Button {
                     sfx.tap()
@@ -104,18 +72,13 @@ struct MapView: View {
                 } label: {
                     Image("arrow-left")
                         .resizable()
-                        .aspectRatio(
-                            contentMode: .fit
-                        )
+                        .scaledToFit()
                         .frame(
                             width: UICfg.v(
                                 UICfg.Map.backW,
                                 size
                             ),
-                            height: UICfg.v(
-                                UICfg.Map.backH,
-                                size
-                            )
+                            height: UICfg.v(UICfg.Map.backH, size)
                         )
                 }
                 .buttonStyle(.plain)
@@ -124,17 +87,11 @@ struct MapView: View {
                         UICfg.Map.backX,
                         size
                     ),
-                    y: UICfg.y(
-                        UICfg.Map.backY,
-                        size
-                    )
+                    y: UICfg.y(UICfg.Map.backY, size)
                 )
                 .accessibilityLabel("Back")
             }
-            .frame(
-                width: size.width,
-                height: size.height
-            )
+            .frame(width: size.width, height: size.height)
         }
         .ignoresSafeArea()
         .preferredColorScheme(.dark)
@@ -149,9 +106,7 @@ struct MapView: View {
             onBack()
         } label: {
             Rectangle()
-                .fill(
-                    Color.white.opacity(0.001)
-                )
+                .fill(Color.white.opacity(0.001))
                 .frame(
                     width: UICfg.Map.oneW * sx,
                     height: UICfg.Map.oneH * sy
@@ -177,18 +132,13 @@ struct MapView: View {
             }
 
             withAnimation(
-                .spring(
-                    response: 0.38,
-                    dampingFraction: 0.72
-                )
+                .spring(response: 0.38, dampingFraction: 0.72)
             ) {
                 lockMsg.toggle()
             }
         } label: {
             Rectangle()
-                .fill(
-                    Color.white.opacity(0.001)
-                )
+                .fill(Color.white.opacity(0.001))
                 .frame(
                     width: UICfg.Map.lockW * sx,
                     height: UICfg.Map.lockH * sy
@@ -211,13 +161,9 @@ struct MapView: View {
         return ZStack {
             Image("long-bubble-card")
                 .resizable()
-                .aspectRatio(
-                    contentMode: .fit
-                )
+                .scaledToFit()
 
-            Text(
-                "Whelson will be\navailable soon"
-            )
+            Text("Whelson will be\navailable soon")
             .font(
                 .system(
                     size: UICfg.Map.msgTxt * scale,
@@ -226,18 +172,10 @@ struct MapView: View {
             )
             .multilineTextAlignment(.center)
             .foregroundStyle(.black)
-            .padding(
-                .horizontal,
-                20 * scale
-            )
-            .offset(
-                y: UICfg.Map.msgTxtY * scale
-            )
+            .padding(.horizontal, 20 * scale)
+            .offset(y: UICfg.Map.msgTxtY * scale)
         }
-        .frame(
-            width: w,
-            height: h
-        )
+        .frame(width: w, height: h)
         .contentShape(Rectangle())
         .onTapGesture {
             withAnimation(

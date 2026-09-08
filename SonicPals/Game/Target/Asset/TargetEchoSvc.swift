@@ -42,15 +42,9 @@ struct TargetEchoSvc {
         )
 
         // Sonar above full-color target
-        RealityShade.keepBright(
-            pulse,
-            order: 2
-        )
+        RealityShade.keepBright(pulse, order: 2)
 
-        RealityShade.keepBright(
-            trace,
-            order: 2
-        )
+        RealityShade.keepBright(trace, order: 2)
     }
 
     private func set(
@@ -66,10 +60,7 @@ struct TargetEchoSvc {
         }
 
         for child in entity.children {
-            set(
-                on: child,
-                alpha: alpha
-            )
+            set(on: child, alpha: alpha)
         }
     }
 
@@ -83,10 +74,7 @@ struct TargetEchoSvc {
         if entity.name == "MangoTarget" {
             entity.scale *= SIMD3<Float>(repeating: scale)
 
-            let frontAlpha = frontAlpha(
-                total: totalAlpha,
-                behind: behindAlpha
-            )
+            let frontAlpha = frontAlpha(total: totalAlpha, behind: behindAlpha)
 
             setMangoModels(
                 on: entity,
@@ -95,8 +83,7 @@ struct TargetEchoSvc {
                 fill: fill
             )
 
-            return
-        }
+            return }
 
         for child in entity.children {
             setMango(
@@ -133,9 +120,7 @@ struct TargetEchoSvc {
             xray.name = "MangoXRay"
             xray.transform = .identity
 
-            xray.scale = SIMD3<Float>(
-                repeating: TargetCfg.Echo.mangoXrayScale
-            )
+            xray.scale = SIMD3<Float>(repeating: TargetCfg.Echo.mangoXrayScale)
 
             if var xrayModel = xray.components[ModelComponent.self] {
                 let xrayCount = max(xrayModel.materials.count, 1)
@@ -190,9 +175,7 @@ struct TargetEchoSvc {
         mat.writesDepth = false
 
         mat.blending = .transparent(
-            opacity: .init(
-                floatLiteral: min(max(alpha, 0), 1)
-            )
+            opacity: .init(floatLiteral: min(max(alpha, 0), 1))
         )
 
         return mat
@@ -218,9 +201,7 @@ struct TargetEchoSvc {
         mat.writesDepth = false
 
         mat.blending = .transparent(
-            opacity: .init(
-                floatLiteral: min(max(alpha, 0), 1)
-            )
+            opacity: .init(floatLiteral: min(max(alpha, 0), 1))
         )
 
         return mat

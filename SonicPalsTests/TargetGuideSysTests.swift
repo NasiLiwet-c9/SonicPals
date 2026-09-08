@@ -33,25 +33,25 @@ struct TargetGuideSysTests {
     }
 
     @Test("An echo that drew part of the tree earns the arrow")
-    func shownOnceSeen() {
+    func shownOnceSeen() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) { $0.seenParts = [0] }
+        try TestTarget.setComp(target.entity) { $0.seenParts = [0] }
 
         #expect(sys.guideBearing(targets: [target.entity], sess: sess()) != nil)
     }
 
     @Test("A guidance buzz earns the arrow even with nothing drawn yet")
-    func shownOnceFelt() {
+    func shownOnceFelt() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) { $0.felt = true }
+        try TestTarget.setComp(target.entity) { $0.felt = true }
 
         #expect(sys.guideBearing(targets: [target.entity], sess: sess()) != nil)
     }
 
     @Test("The arrow goes away once the tree is found")
-    func hiddenOnceFound() {
+    func hiddenOnceFound() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) {
+        try TestTarget.setComp(target.entity) {
             $0.seenParts = [0]
             $0.found = true
         }
@@ -60,9 +60,9 @@ struct TargetGuideSysTests {
     }
 
     @Test("Nothing points anywhere while Battiw is still teaching")
-    func hiddenWhileTeaching() {
+    func hiddenWhileTeaching() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) { $0.seenParts = [0] }
+        try TestTarget.setComp(target.entity) { $0.seenParts = [0] }
 
         #expect(
             sys.guideBearing(
@@ -73,18 +73,18 @@ struct TargetGuideSysTests {
     }
 
     @Test("A disabled target is ignored")
-    func hiddenWhenDisabled() {
+    func hiddenWhenDisabled() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) { $0.seenParts = [0] }
+        try TestTarget.setComp(target.entity) { $0.seenParts = [0] }
         target.entity.isEnabled = false
 
         #expect(sys.guideBearing(targets: [target.entity], sess: sess()) == nil)
     }
 
     @Test("With no session there is nothing to aim from")
-    func hiddenWithoutSession() {
+    func hiddenWithoutSession() throws {
         let target = TestTarget.make()
-        TestTarget.setComp(target.entity) { $0.seenParts = [0] }
+        try TestTarget.setComp(target.entity) { $0.seenParts = [0] }
 
         #expect(sys.guideBearing(targets: [target.entity], sess: nil) == nil)
     }
@@ -100,23 +100,22 @@ struct TargetGuideSysTests {
             (SIMD3<Float>(0, 0, 2), Float.pi)             // behind
         ]
     )
-    func bearingPointsAtTheTree(target: SIMD3<Float>, expected: Float) {
-        let bearing = sys.bearing(to: target, camM: TestCamera.level())
+    func bearingPointsAtTheTree(target: SIMD3<Float>, expected: Float) throws {
+        let bearing = try #require(sys.bearing(to: target, camM: TestCamera.level()))
 
-        #expect(bearing != nil)
-        #expect(abs(abs(bearing!) - abs(expected)) < 0.01)
+        #expect(abs(abs(bearing) - abs(expected)) < 0.01)
 
         if expected != 0, abs(expected) < Float.pi {
-            #expect((bearing! > 0) == (expected > 0))
+            #expect((bearing > 0) == (expected > 0))
         }
     }
 
     @Test("Height is ignored, the player walks on the floor")
-    func heightIsIgnored() {
-        let low = sys.bearing(to: SIMD3<Float>(2, 0, 0), camM: TestCamera.level())
-        let high = sys.bearing(to: SIMD3<Float>(2, 5, 0), camM: TestCamera.level())
+    func heightIsIgnored() throws {
+        let low = try #require(sys.bearing(to: SIMD3<Float>(2, 0, 0), camM: TestCamera.level()))
+        let high = try #require(sys.bearing(to: SIMD3<Float>(2, 5, 0), camM: TestCamera.level()))
 
-        #expect(abs(low! - high!) < 0.0001)
+        #expect(abs(low - high) < 0.0001)
     }
 
     @Test("Standing on the tree has no direction to give")
@@ -128,22 +127,20 @@ struct TargetGuideSysTests {
         "The bearing survives the phone being tilted steeply",
         arguments: [Float(0), 0.5, 1.0, 1.3, 1.5, -1.0, -1.5]
     )
-    func bearingSurvivesPitch(pitch: Float) {
+    func bearingSurvivesPitch(pitch: Float) throws {
         // Flattening forward collapses near vertical
         let camM = TestCamera.posed(pitch: pitch)
-        let bearing = sys.bearing(to: SIMD3<Float>(0, 0, -2), camM: camM)
+        let bearing = try #require(sys.bearing(to: SIMD3<Float>(0, 0, -2), camM: camM))
 
-        #expect(bearing != nil)
-        #expect(abs(bearing!) < 0.01)
+        #expect(abs(bearing) < 0.01)
     }
 
     @Test("A steeply tilted phone still knows right from left")
-    func sidesSurvivePitch() {
+    func sidesSurvivePitch() throws {
         let camM = TestCamera.posed(pitch: 1.45)
-        let bearing = sys.bearing(to: SIMD3<Float>(2, 0, 0), camM: camM)
+        let bearing = try #require(sys.bearing(to: SIMD3<Float>(2, 0, 0), camM: camM))
 
-        #expect(bearing != nil)
-        #expect(abs(bearing! - .pi / 2) < 0.01)
+        #expect(abs(bearing - .pi / 2) < 0.01)
     }
 
     @Test("Heading never collapses to nothing, whatever the pitch")

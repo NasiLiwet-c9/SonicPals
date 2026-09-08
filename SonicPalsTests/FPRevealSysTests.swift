@@ -31,7 +31,7 @@ struct FPRevealSysTests {
     // MARK: - Waiting for geometry
 
     @Test("A ping that finds geometry starts revealing it")
-    func geometryStartsTheReveal() {
+    func geometryStartsTheReveal() throws {
         let layers = [
             TestReveal.layer(delayMs: 70, zone: .core),
             TestReveal.layer(delayMs: 0, zone: .edge)
@@ -44,10 +44,9 @@ struct FPRevealSysTests {
 
         guard case .revealing = stage(entity) else {
             Issue.record("expected revealing, got \(String(describing: stage(entity)))")
-            return
-        }
+            return }
 
-        let comp = entity.components[RevealComp.self]!
+        let comp = try #require(entity.components[RevealComp.self])
 
         #expect(comp.layers.map(\.delayMs) == [0, 70])
         #expect(entity.children.count == 2)
@@ -75,8 +74,7 @@ struct FPRevealSysTests {
 
         guard case let .waiting(attempt, _) = stage(entity) else {
             Issue.record("expected waiting")
-            return
-        }
+            return }
 
         #expect(attempt == 1)
         #expect(builder.callCount == 1)
@@ -97,8 +95,7 @@ struct FPRevealSysTests {
 
         guard case .empty = stage(entity) else {
             Issue.record("expected empty, got \(String(describing: stage(entity)))")
-            return
-        }
+            return }
     }
 
     @Test("Nothing happens before the retry delay is up")
@@ -106,10 +103,7 @@ struct FPRevealSysTests {
         let builder = StubMeshBuilder(layers: [])
         let sys = FPRevealSys(mesh: builder)
         let entity = ping()
-        entity.components[RevealComp.self]?.stage = .waiting(
-            attempt: 0,
-            nextAt: 500
-        )
+        entity.components[RevealComp.self]?.stage = .waiting(attempt: 0, nextAt: 500)
 
         sys.step(entities: [entity], session: session, now: 100)
 
@@ -158,8 +152,7 @@ struct FPRevealSysTests {
 
         guard case .holding = stage(entity) else {
             Issue.record("expected holding, got \(String(describing: stage(entity)))")
-            return
-        }
+            return }
     }
 
     // MARK: - Fading
@@ -174,8 +167,7 @@ struct FPRevealSysTests {
 
         guard case let .fading(zoneIndex, _) = stage(entity) else {
             Issue.record("expected fading")
-            return
-        }
+            return }
 
         #expect(zoneIndex == 0)
     }
@@ -190,10 +182,7 @@ struct FPRevealSysTests {
 
         sys.step(entities: [entity], session: session, now: 100)
 
-        entity.components[RevealComp.self]?.stage = .fading(
-            zoneIndex: 0,
-            lastAt: 100
-        )
+        entity.components[RevealComp.self]?.stage = .fading(zoneIndex: 0, lastAt: 100)
 
         sys.step(entities: [entity], session: session, now: 101)
 
@@ -208,10 +197,7 @@ struct FPRevealSysTests {
         let entity = ping()
 
         // Past the last zone
-        entity.components[RevealComp.self]?.stage = .fading(
-            zoneIndex: 3,
-            lastAt: 100
-        )
+        entity.components[RevealComp.self]?.stage = .fading(zoneIndex: 3, lastAt: 100)
 
         sys.step(entities: [entity], session: session, now: 101)
 
@@ -223,17 +209,13 @@ struct FPRevealSysTests {
     func fadeStepsAreSpaced() {
         let sys = FPRevealSys(mesh: StubMeshBuilder())
         let entity = ping()
-        entity.components[RevealComp.self]?.stage = .fading(
-            zoneIndex: 0,
-            lastAt: 100
-        )
+        entity.components[RevealComp.self]?.stage = .fading(zoneIndex: 0, lastAt: 100)
 
         sys.step(entities: [entity], session: session, now: 100.01)
 
         guard case let .fading(zoneIndex, _) = stage(entity) else {
             Issue.record("expected fading")
-            return
-        }
+            return }
 
         #expect(zoneIndex == 0)
     }

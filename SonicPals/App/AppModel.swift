@@ -25,7 +25,6 @@ final class AppModel {
     var coachLine = ""
     var coachLineID = 0
 
-
     var canWave: Bool {
         lidarOK
     }

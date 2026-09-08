@@ -29,12 +29,9 @@ public struct FPHitScan: Sendable {
         mode = data.setting.mode
 
         hits = data.hits.compactMap { hit in
-            let delta =
-                hit.point
-                - data.start.pos
+            let delta = hit.point - data.start.pos
 
-            let length =
-                simd_length(delta)
+            let length = simd_length(delta)
 
             guard length > 0.001 else {
                 return nil
@@ -52,25 +49,16 @@ public struct FPHitScan: Sendable {
         at point: SIMD3<Float>,
         distanceM: Float
     ) -> Float? {
-        let delta =
-            point - start.pos
+        let delta = point - start.pos
 
         guard distanceM > 0.001 else {
             return nil
         }
 
-        let dir =
-            delta / distanceM
+        let dir = delta / distanceM
 
-        let match =
-            rayMatch(
-                direction: dir,
-                distanceM: distanceM
-            )
-            ?? nearbyMatch(
-                point: point,
-                distanceM: distanceM
-            )
+        let match = rayMatch(direction: dir, distanceM: distanceM)
+            ?? nearbyMatch(point: point, distanceM: distanceM)
 
         guard let match else {
             return nil
@@ -79,38 +67,20 @@ public struct FPHitScan: Sendable {
         let angleFade =
             smoothFade(
                 value: match.angle,
-                fullUntil:
-                    rayAngle * 0.24,
-                zeroAt:
-                    rayAngle
+                fullUntil: rayAngle * 0.24,
+                zeroAt: rayAngle
             )
 
         let depthFade =
             max(
                 1
                 - (
-                    abs(match.depth)
-                    / max(
-                        match.limit,
-                        0.001
-                    )
+                    abs(match.depth) / max(match.limit, 0.001)
                 ),
                 0
             )
 
-        return
-            (
-                0.42
-                + (
-                    angleFade * 0.58
-                )
-            )
-            * (
-                0.68
-                + (
-                    depthFade * 0.32
-                )
-            )
+        return (0.42 + (angleFade * 0.58)) * (0.68 + (depthFade * 0.32))
     }
 
     private func rayMatch(
@@ -119,8 +89,7 @@ public struct FPHitScan: Sendable {
     ) -> Match? {
         var best: Match?
 
-        var bestScore =
-            Float.greatestFiniteMagnitude
+        var bestScore = Float.greatestFiniteMagnitude
 
         for hit in hits {
             let dot =
@@ -141,29 +110,18 @@ public struct FPHitScan: Sendable {
                 continue
             }
 
-            let depth =
-                distanceM
-                - hit.distanceM
+            let depth = distanceM - hit.distanceM
 
-            let frontLimit =
-                0.45
-                + (
-                    distanceM * 0.04
-                )
+            let frontLimit = 0.45 + (distanceM * 0.04)
 
-            let backLimit =
-                0.12
-                + (
-                    distanceM * 0.015
-                )
+            let backLimit = 0.12 + (distanceM * 0.015)
 
             guard depth >= -frontLimit,
                   depth <= backLimit else {
                 continue
             }
 
-            let limit =
-                depth < 0
+            let limit = depth < 0
                 ? frontLimit
                 : backLimit
 
@@ -173,26 +131,20 @@ public struct FPHitScan: Sendable {
                     / max(
                         rayAngle,
                         0.001
-                    )
-                    * 0.65
+                    ) * 0.65
                 )
                 + (
                     abs(depth)
                     / max(
                         limit,
                         0.001
-                    )
-                    * 0.35
+                    ) * 0.35
                 )
 
             if score < bestScore {
                 bestScore = score
 
-                best = Match(
-                    angle: angle,
-                    depth: depth,
-                    limit: limit
-                )
+                best = Match(angle: angle, depth: depth, limit: limit)
             }
         }
 
@@ -206,41 +158,24 @@ public struct FPHitScan: Sendable {
         guard let hit =
             hits.min(
                 by: {
-                    simd_distance_squared(
-                        $0.point,
-                        point
-                    )
+                    simd_distance_squared($0.point, point)
                     <
-                    simd_distance_squared(
-                        $1.point,
-                        point
-                    )
+                    simd_distance_squared($1.point, point)
                 }
             )
         else {
             return nil
         }
 
-        let worldDistance =
-            simd_distance(
-                hit.point,
-                point
-            )
+        let worldDistance = simd_distance(hit.point, point)
 
-        let radius =
-            0.34
-            + min(
-                distanceM * 0.08,
-                0.12
-            )
+        let radius = 0.34 + min(distanceM * 0.08, 0.12)
 
         guard worldDistance <= radius else {
             return nil
         }
 
-        let depth =
-            distanceM
-            - hit.distanceM
+        let depth = distanceM - hit.distanceM
 
         let frontLimit: Float = 0.45
         let backLimit: Float = 0.12
@@ -253,8 +188,7 @@ public struct FPHitScan: Sendable {
         return Match(
             angle: rayAngle * 0.70,
             depth: depth,
-            limit:
-                depth < 0
+            limit: depth < 0
                 ? frontLimit
                 : backLimit
         )
@@ -274,9 +208,7 @@ public struct FPHitScan: Sendable {
             degrees = 20
         }
 
-        return degrees
-            * Float.pi
-            / 180
+        return degrees * Float.pi / 180
     }
 
     private func smoothFade(
@@ -292,16 +224,8 @@ public struct FPHitScan: Sendable {
             return 0
         }
 
-        let step =
-            (value - fullUntil)
-            / (zeroAt - fullUntil)
+        let step = (value - fullUntil) / (zeroAt - fullUntil)
 
-        return
-            1
-            - (
-                step
-                * step
-                * (3 - (2 * step))
-            )
+        return 1 - (step * step * (3 - (2 * step)))
     }
 }

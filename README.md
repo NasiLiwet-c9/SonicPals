@@ -15,7 +15,9 @@ and finish objectives along the way.
 ## Opening the project
 
 1. Clone this repository.
-2. Open the `.xcodeproj` file in Xcode.
+2. Open the `.xcodeproj` file in Xcode and let it fetch the Swift
+   packages. If it asks whether to trust the SwiftLint plugin, say yes,
+   it checks the code style on every build.
 3. Under Signing & Capabilities, select your Apple Developer account.
 4. Plug in a real iPhone and select it as the run destination.
 5. Press the Run button or `Cmd+R`.
@@ -50,7 +52,14 @@ needs a real device to play properly.
 - `Resources/` — audio files
 - `Assets.xcassets/` — images and the app icon
 
-See `Documentation/ARCHITECTURE.md` for a deeper look at how these pieces
+Alongside the app folder:
+
+- `Packages/SonarCore/` — the ultrasonic simulation as plain Swift, no
+  RealityKit or ARKit, so it can be tested without a device
+- `Packages/RealityKitContent/` — the 3D models for the tree and mango
+- `Documentations/` — this README's companion notes
+
+See `Documentations/ARCHITECTURE.md` for a deeper look at how these pieces
 fit together.
 
 ## Credits

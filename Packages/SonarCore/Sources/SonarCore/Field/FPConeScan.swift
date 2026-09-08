@@ -19,28 +19,15 @@ public struct FPConeScan: Sendable {
     public init(data: WaveData) {
         start = data.start
 
-        range = min(
-            data.fpRange,
-            data.maxDistance
-        )
+        range = min(data.fpRange, data.maxDistance)
 
         hTan = max(
-            tan(
-                data.setting.hAngleDeg
-                * Float.pi
-                / 180
-            )
-            * scale,
+            tan(data.setting.hAngleDeg * Float.pi / 180) * scale,
             0.01
         )
 
         vTan = max(
-            tan(
-                data.setting.vAngleDeg
-                * Float.pi
-                / 180
-            )
-            * scale,
+            tan(data.setting.vAngleDeg * Float.pi / 180) * scale,
             0.01
         )
     }
@@ -92,27 +79,9 @@ public struct FPConeScan: Sendable {
                 range
             )
 
-        let width =
-            max(
-                (
-                    forward
-                    * hTan
-                    * pad
-                )
-                + radius,
-                0.001
-            )
+        let width = max((forward * hTan * pad) + radius, 0.001)
 
-        let height =
-            max(
-                (
-                    forward
-                    * vTan
-                    * pad
-                )
-                + radius,
-                0.001
-            )
+        let height = max((forward * vTan * pad) + radius, 0.001)
 
         let x = local.side / width
         let y = local.up / height
@@ -146,11 +115,7 @@ public struct FPConeScan: Sendable {
             return nil
         }
 
-        let distance =
-            simd_distance(
-                point,
-                start.pos
-            )
+        let distance = simd_distance(point, start.pos)
 
         guard distance <= range else {
             return nil
@@ -163,34 +128,23 @@ public struct FPConeScan: Sendable {
                 zeroAt: 1.08
             )
 
-        return (
-            distance,
-            fade
-        )
+        return (distance, fade)
     }
 
-    private func localPos(
-        _ point: SIMD3<Float>
-    ) -> (
-        side: Float,
-        up: Float,
-        forward: Float
-    ) {
+    /// A point in the beam's own frame
+    private struct Local {
+        let side: Float
+        let up: Float
+        let forward: Float
+    }
+
+    private func localPos(_ point: SIMD3<Float>) -> Local {
         let delta = point - start.pos
 
-        return (
-            simd_dot(
-                delta,
-                start.right
-            ),
-            simd_dot(
-                delta,
-                start.up
-            ),
-            simd_dot(
-                delta,
-                start.forward
-            )
+        return Local(
+            side: simd_dot(delta, start.right),
+            up: simd_dot(delta, start.up),
+            forward: simd_dot(delta, start.forward)
         )
     }
 
@@ -199,24 +153,14 @@ public struct FPConeScan: Sendable {
         up: Float,
         forward: Float
     ) -> Float {
-        let width =
-            max(
-                forward * hTan,
-                0.001
-            )
+        let width = max(forward * hTan, 0.001)
 
-        let height =
-            max(
-                forward * vTan,
-                0.001
-            )
+        let height = max(forward * vTan, 0.001)
 
         let x = side / width
         let y = up / height
 
-        return sqrt(
-            (x * x) + (y * y)
-        )
+        return sqrt((x * x) + (y * y))
     }
 
     private func smoothFade(
@@ -232,14 +176,9 @@ public struct FPConeScan: Sendable {
             return 0
         }
 
-        let step =
-            (value - fullUntil)
-            / (zeroAt - fullUntil)
+        let step = (value - fullUntil) / (zeroAt - fullUntil)
 
-        let smooth =
-            step
-            * step
-            * (3 - (2 * step))
+        let smooth = step * step * (3 - (2 * step))
 
         return 1 - smooth
     }

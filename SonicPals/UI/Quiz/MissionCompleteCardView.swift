@@ -34,12 +34,8 @@ struct MissionCompleteCardView: View {
                         name: "mission-completed-animation",
                         contentMode: .scaleAspectFit
                     )
-                    .frame(
-                        width: UICfg.v(UICfg.Done.cardW, size)
-                    )
-                    .offset(
-                        y: UICfg.y(UICfg.Done.cardY, size)
-                    )
+                    .frame(width: UICfg.v(UICfg.Done.cardW, size))
+                    .offset(y: UICfg.y(UICfg.Done.cardY, size))
 
                     Button {
                         sfx.tap()
@@ -48,48 +44,25 @@ struct MissionCompleteCardView: View {
                         ZStack {
                             Image("btn-sort")
                                 .resizable()
-                                .aspectRatio(
-                                    144.0 / 57.0,
-                                    contentMode: .fit
-                                )
-                                .frame(
-                                    width: UICfg.v(
-                                        UICfg.Done.nextW,
-                                        size
-                                    )
-                                )
+                                .aspectRatio(144.0 / 57.0, contentMode: .fit)
+                                .frame(width: UICfg.v(UICfg.Done.nextW, size))
 
                             Text("Next")
                                 .font(
-                                    .system(
-                                        size: UICfg.v(20, size),
-                                        weight: .heavy
-                                    )
+                                    .system(size: UICfg.v(20, size), weight: .heavy)
                                 )
                                 .foregroundStyle(.black)
                         }
                     }
                     .buttonStyle(.plain)
-                    .padding(
-                        .leading,
-                        UICfg.x(UICfg.Done.nextX, size)
-                    )
-                    .padding(
-                        .bottom,
-                        UICfg.y(UICfg.Done.nextY, size)
-                    )
+                    .padding(.leading, UICfg.x(UICfg.Done.nextX, size))
+                    .padding(.bottom, UICfg.y(UICfg.Done.nextY, size))
                 }
-                .padding(
-                    .bottom,
-                    UICfg.y(UICfg.Done.bottom, size)
-                )
+                .padding(.bottom, UICfg.y(UICfg.Done.bottom, size))
                 .scaleEffect(show ? 1 : 0.72)
                 .opacity(show ? 1 : 0)
             }
-            .frame(
-                width: size.width,
-                height: size.height
-            )
+            .frame(width: size.width, height: size.height)
         }
         .ignoresSafeArea()
         .onAppear {
@@ -99,10 +72,7 @@ struct MissionCompleteCardView: View {
             confetti = true
 
             withAnimation(
-                .spring(
-                    response: 0.48,
-                    dampingFraction: 0.72
-                )
+                .spring(response: 0.48, dampingFraction: 0.72)
             ) {
                 show = true
             }
@@ -140,13 +110,7 @@ private struct ConfettiBurstView: View {
                             x: go ? xOffset(i) : 0,
                             y: go ? yOffset(i) : 0
                         )
-                        .rotationEffect(
-                            .degrees(
-                                go
-                                    ? Double(i * 61 + 180)
-                                    : 0
-                            )
-                        )
+                        .rotationEffect(.degrees(go ? Double(i * 61 + 180) : 0))
                         .opacity(go ? 0 : 1)
                         .animation(
                             .easeOut(duration: 1.25)

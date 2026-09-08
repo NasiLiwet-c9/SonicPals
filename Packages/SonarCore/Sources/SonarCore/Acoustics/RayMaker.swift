@@ -25,25 +25,11 @@ public final class RayMaker: Sendable {
         for setting: WaveSetting,
         ringCount: Int? = nil
     ) -> [WaveRay] {
-        let total =
-            max(
-                ringCount ?? rings,
-                0
-            )
+        let total = max(ringCount ?? rings, 0)
 
-        let hScale =
-            tan(
-                toRad(
-                    setting.hAngleDeg
-                )
-            )
+        let hScale = tan(toRad(setting.hAngleDeg))
 
-        let vScale =
-            tan(
-                toRad(
-                    setting.vAngleDeg
-                )
-            )
+        let vScale = tan(toRad(setting.vAngleDeg))
 
         var rays = [
             WaveRay(
@@ -58,39 +44,20 @@ public final class RayMaker: Sendable {
         }
 
         for ring in 1...total {
-            let radius =
-                Float(ring)
-                / Float(total)
+            let radius = Float(ring) / Float(total)
 
             let count = ring * 8
 
             for index in 0..<count {
-                let angle =
-                    2
-                    * Float.pi
-                    * Float(index)
-                    / Float(count)
+                let angle = 2 * Float.pi * Float(index) / Float(count)
 
-                let x =
-                    cos(angle)
-                    * hScale
-                    * radius
+                let x = cos(angle) * hScale * radius
 
-                let y =
-                    sin(angle)
-                    * vScale
-                    * radius
+                let y = sin(angle) * vScale * radius
 
-                let dir = simd_normalize(
-                    SIMD3<Float>(x, y, 1)
-                )
+                let dir = simd_normalize(SIMD3<Float>(x, y, 1))
 
-                let offAxis = acos(
-                    min(
-                        max(dir.z, -1),
-                        1
-                    )
-                )
+                let offAxis = acos(min(max(dir.z, -1), 1))
 
                 let power = pow(
                     max(
@@ -104,16 +71,10 @@ public final class RayMaker: Sendable {
                     atan2(
                         dir.x,
                         dir.z
-                    )
-                    * 180
-                    / Float.pi
+                    ) * 180 / Float.pi
 
                 rays.append(
-                    WaveRay(
-                        dir: dir,
-                        power: power,
-                        sideDeg: sideDeg
-                    )
+                    WaveRay(dir: dir, power: power, sideDeg: sideDeg)
                 )
             }
         }

@@ -65,18 +65,12 @@ enum RealityShade {
     ) {
         if entity.components.has(ModelComponent.self) {
             entity.components.set(
-                ModelSortGroupComponent(
-                    group: group,
-                    order: order
-                )
+                ModelSortGroupComponent(group: group, order: order)
             )
         }
 
         for child in entity.children {
-            keepBright(
-                child,
-                order: order
-            )
+            keepBright(child, order: order)
         }
     }
 
@@ -86,10 +80,7 @@ enum RealityShade {
         middle: CGFloat,
         edge: CGFloat
     ) async -> ModelEntity {
-        let mesh = MeshResource.generatePlane(
-            width: 1.2,
-            depth: 2.2
-        )
+        let mesh = MeshResource.generatePlane(width: 1.2, depth: 2.2)
 
         let material = await makeMaterial(
             name: name,
@@ -106,16 +97,10 @@ enum RealityShade {
         plane.name = name
         plane.position = SIMD3<Float>(0, 0, -0.12)
 
-        plane.orientation = simd_quatf(
-            angle: -.pi / 2,
-            axis: SIMD3<Float>(1, 0, 0)
-        )
+        plane.orientation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
 
         plane.components.set(
-            ModelSortGroupComponent(
-                group: group,
-                order: 0
-            )
+            ModelSortGroupComponent(group: group, order: 0)
         )
 
         return plane
@@ -141,18 +126,14 @@ enum RealityShade {
         ) {
             material = UnlitMaterial(texture: texture)
         } else {
-            material = UnlitMaterial(
-                color: UIColor.black.withAlphaComponent(middle)
-            )
+            material = UnlitMaterial(color: UIColor.black.withAlphaComponent(middle))
         }
 
         material.faceCulling = .none
         material.readsDepth = false
         material.writesDepth = false
 
-        material.blending = .transparent(
-            opacity: .init(floatLiteral: 1)
-        )
+        material.blending = .transparent(opacity: .init(floatLiteral: 1))
 
         return material
     }
@@ -185,13 +166,9 @@ enum RealityShade {
                 colors: colors,
                 locations: locations
             ) else {
-                return
-            }
+                return }
 
-            let point = CGPoint(
-                x: size.width * 0.5,
-                y: size.height * 0.5
-            )
+            let point = CGPoint(x: size.width * 0.5, y: size.height * 0.5)
 
             let radius = hypot(
                 size.width,

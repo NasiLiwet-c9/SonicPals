@@ -19,17 +19,13 @@ enum TargetCue {
 }
 
 extension Notification.Name {
-    static let targetFound =
-        Notification.Name("targetFound")
+    static let targetFound = Notification.Name("targetFound")
 
-    static let targetCue =
-        Notification.Name("targetCue")
+    static let targetCue = Notification.Name("targetCue")
 
-    static let mangoEatReady =
-        Notification.Name("mangoEatReady")
+    static let mangoEatReady = Notification.Name("mangoEatReady")
 
-    static let mangoEatLost =
-        Notification.Name("mangoEatLost")
+    static let mangoEatLost = Notification.Name("mangoEatLost")
 }
 
 struct TargetComp: Component {

@@ -31,7 +31,7 @@ struct MissionChatBubbleView: View {
         ZStack {
             Image(bubbleImageName)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
 
             Text(text)
                 .font(
@@ -44,11 +44,7 @@ struct MissionChatBubbleView: View {
                 .minimumScaleFactor(0.7)
                 .foregroundStyle(.black)
                 .padding(.horizontal, UICfg.Sess.botPadX * uiScale)
-                .offset(
-                    y: -UICfg.Bubble.textLift(
-                        width: UICfg.Sess.botW * uiScale
-                    )
-                )
+                .offset(y: -UICfg.Bubble.textLift(width: UICfg.Sess.botW * uiScale))
         }
         .frame(width: UICfg.Sess.botW * uiScale)
         .scaleEffect(popped ? 1 : 0.82)

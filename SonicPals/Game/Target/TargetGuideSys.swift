@@ -16,17 +16,11 @@ import simd
 /// Separate from `TargetSys`, which buzzes over the same data
 @MainActor
 final class TargetGuideSys: System {
-    static let query = EntityQuery(
-        where: .has(TargetComp.self)
-    )
+    static let query = EntityQuery(where: .has(TargetComp.self))
 
-    static let guideQuery = EntityQuery(
-        where: .has(GuideComp.self)
-    )
+    static let guideQuery = EntityQuery(where: .has(GuideComp.self))
 
-    static let sessQuery = EntityQuery(
-        where: .has(SessComp.self)
-    )
+    static let sessQuery = EntityQuery(where: .has(SessComp.self))
 
     required init(scene: Scene) {}
 
@@ -85,10 +79,7 @@ final class TargetGuideSys: System {
                   let anchor = arrow.parent else { continue }
 
             // Anticlockwise from the camera, so right is negative
-            let roll = simd_quatf(
-                angle: -bearing,
-                axis: SIMD3<Float>(0, 0, 1)
-            )
+            let roll = simd_quatf(angle: -bearing, axis: SIMD3<Float>(0, 0, 1))
 
             // Pitch outside the roll, so the arrow turns in the dial
             arrow.setOrientation(
@@ -107,11 +98,7 @@ final class TargetGuideSys: System {
 
         var forward = heading(camM)
 
-        var toTarget = SIMD3<Float>(
-            target.x - cam.x,
-            0,
-            target.z - cam.z
-        )
+        var toTarget = SIMD3<Float>(target.x - cam.x, 0, target.z - cam.z)
 
         guard simd_length(forward) > 0.001,
               simd_length(toTarget) > 0.001
@@ -124,9 +111,7 @@ final class TargetGuideSys: System {
 
         let dot = simd_dot(forward, toTarget)
 
-        let cross =
-            (forward.x * toTarget.z)
-            - (forward.z * toTarget.x)
+        let cross = (forward.x * toTarget.z) - (forward.z * toTarget.x)
 
         return atan2(cross, dot)
     }
@@ -142,18 +127,13 @@ final class TargetGuideSys: System {
 
         let flatForward = SIMD3<Float>(forward.x, 0, forward.z)
 
-        let flatUp = SIMD3<Float>(
-            camM.columns.1.x,
-            0,
-            camM.columns.1.z
-        )
+        let flatUp = SIMD3<Float>(camM.columns.1.x, 0, camM.columns.1.z)
 
         let sign: Float = forward.y < 0 ? 1 : -1
 
         let weight = min(simd_length(flatForward) / 0.35, 1)
 
-        return (flatForward * weight)
-            + (flatUp * sign * (1 - weight))
+        return (flatForward * weight) + (flatUp * sign * (1 - weight))
     }
 
     private func sessState(

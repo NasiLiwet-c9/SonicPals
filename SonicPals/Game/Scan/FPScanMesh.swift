@@ -16,27 +16,17 @@ final class FPScanMesh {
     private let maxTris = 1_200
     private let liftM: Float = 0.007
 
-    private let minAddS:
-        TimeInterval = 0.80
+    private let minAddS: TimeInterval = 0.80
 
-    private let doneColor =
-        UIColor(
-            red: 0.25,
-            green: 0.90,
-            blue: 0.42,
-            alpha: 1
-        )
+    private let doneColor = UIColor(red: 0.25, green: 0.90, blue: 0.42, alpha: 1)
 
-    private var root =
-        Entity()
+    private var root = Entity()
 
-    private var keys:
-        Set<FPScanKey> = []
+    private var keys: Set<FPScanKey> = []
 
     private var count = 0
 
-    private var lastAddAt:
-        TimeInterval = 0
+    private var lastAddAt: TimeInterval = 0
 
     func reset(
         on parent: Entity
@@ -50,98 +40,65 @@ final class FPScanMesh {
         count = 0
         lastAddAt = 0
 
-        parent.addChild(
-            root
-        )
+        parent.addChild(root)
     }
 
     func add(
         _ source: [FPTri],
         camera: SIMD3<Float>
     ) {
-        let now =
-            Date()
+        let now = Date()
             .timeIntervalSinceReferenceDate
 
-        guard now - lastAddAt
-                >= minAddS,
+        guard now - lastAddAt >= minAddS,
               !source.isEmpty,
               count < maxTris else {
-            return
-        }
+            return }
 
         lastAddAt = now
 
-        var fresh:
-            [FPTri] = []
+        var fresh: [FPTri] = []
 
-        fresh.reserveCapacity(
-            source.count
-        )
+        fresh.reserveCapacity(source.count)
 
         for tri in source {
-            guard count
-                    + fresh.count
+            guard count + fresh.count
                     < maxTris else {
                 break
             }
 
-            let key =
-                FPScanKey(
-                    tri.center
-                )
+            let key = FPScanKey(tri.center)
 
-            guard keys.insert(
-                key
-            ).inserted else {
+            guard keys.insert(key).inserted
+            else {
                 continue
             }
 
-            fresh.append(
-                lifted(
-                    tri,
-                    camera: camera
-                )
-            )
+            fresh.append(lifted(tri, camera: camera))
         }
 
         guard !fresh.isEmpty,
-              let batch =
-                makeBatch(
-                    fresh
-                ) else {
-            return
-        }
+              let batch = makeBatch(fresh)
+        else { return }
 
         count += fresh.count
 
-        root.addChild(
-            batch
-        )
+        root.addChild(batch)
     }
 
     private func makeBatch(
         _ tris: [FPTri]
     ) -> Entity? {
-        var pos:
-            [SIMD3<Float>] = []
+        var pos: [SIMD3<Float>] = []
 
-        var idx:
-            [UInt32] = []
+        var idx: [UInt32] = []
 
-        pos.reserveCapacity(
-            tris.count * 3
-        )
+        pos.reserveCapacity(tris.count * 3)
 
-        idx.reserveCapacity(
-            tris.count * 3
-        )
+        idx.reserveCapacity(tris.count * 3)
 
         for tri in tris {
-            let base =
-                UInt32(
-                    pos.count
-                )
+            let base = UInt32(pos.count)
 
             pos.append(
                 contentsOf: [
@@ -160,19 +117,13 @@ final class FPScanMesh {
             )
         }
 
-        var desc =
-            MeshDescriptor(
-                name: "scanBatch"
-            )
+        var desc = MeshDescriptor(name: "scanBatch")
 
-        desc.positions =
-            .init(pos)
+        desc.positions = .init(pos)
 
-        desc.primitives =
-            .triangles(idx)
+        desc.primitives = .triangles(idx)
 
-        guard let mesh =
-            try? MeshResource
+        guard let mesh = try? MeshResource
                 .generate(
                     from: [desc]
                 ) else {
@@ -183,12 +134,7 @@ final class FPScanMesh {
             ModelEntity(
                 mesh: mesh,
                 materials: [
-                    makeMat(
-                        color:
-                            doneColor,
-                        alpha:
-                            0.065
-                    )
+                    makeMat(color: doneColor, alpha: 0.065)
                 ]
             )
 
@@ -199,38 +145,20 @@ final class FPScanMesh {
         _ tri: FPTri,
         camera: SIMD3<Float>
     ) -> FPTri {
-        let delta =
-            camera
-            - tri.center
+        let delta = camera - tri.center
 
-        let length =
-            simd_length(
-                delta
-            )
+        let length = simd_length(delta)
 
         guard length > 0.001 else {
             return tri
         }
 
-        let offset =
-            (
-                delta
-                / length
-            )
-            * liftM
+        let offset = (delta / length) * liftM
 
         return FPTri(
-            a:
-                tri.a
-                + offset,
-
-            b:
-                tri.b
-                + offset,
-
-            c:
-                tri.c
-                + offset
+            a: tri.a + offset,
+            b: tri.b + offset,
+            c: tri.c + offset
         )
     }
 
@@ -238,36 +166,17 @@ final class FPScanMesh {
         color: UIColor,
         alpha: Float
     ) -> UnlitMaterial {
-        var mat =
-            UnlitMaterial(
-                color: color
-            )
+        var mat = UnlitMaterial(color: color)
 
-        mat.triangleFillMode =
-            .lines
+        mat.triangleFillMode = .lines
+        mat.faceCulling = .none
 
-        mat.faceCulling =
-            .none
-
-        mat.readsDepth =
-            true
-
-        mat.writesDepth =
-            false
+        mat.readsDepth = true
+        mat.writesDepth = false
 
         mat.blending =
             .transparent(
-                opacity:
-                    .init(
-                        floatLiteral:
-                            min(
-                                max(
-                                    alpha,
-                                    0
-                                ),
-                                1
-                            )
-                    )
+                opacity: .init(floatLiteral: min(max(alpha, 0), 1))
             )
 
         return mat

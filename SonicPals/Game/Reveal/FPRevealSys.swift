@@ -12,13 +12,9 @@ import SonarCore
 
 @MainActor
 final class FPRevealSys: System {
-    static let query = EntityQuery(
-        where: .has(RevealComp.self)
-    )
+    static let query = EntityQuery(where: .has(RevealComp.self))
 
-    static let sessQuery = EntityQuery(
-        where: .has(SessComp.self)
-    )
+    static let sessQuery = EntityQuery(where: .has(SessComp.self))
 
     private let mesh: any FPMeshBuilding
 
@@ -77,8 +73,7 @@ final class FPRevealSys: System {
                     entity: entity,
                     comp: &comp,
                     session: session,
-                    attempt: attempt,
-                    nextAt: nextAt,
+                    retry: Retry(attempt: attempt, nextAt: nextAt),
                     now: now
                 )
 
@@ -92,10 +87,7 @@ final class FPRevealSys: System {
 
             case let .holding(until):
                 if now >= until {
-                    comp.stage = .fading(
-                        zoneIndex: 0,
-                        lastAt: now
-                    )
+                    comp.stage = .fading(zoneIndex: 0, lastAt: now)
                 }
 
             case let .fading(zoneIndex, lastAt):
@@ -134,24 +126,26 @@ final class FPRevealSys: System {
         return nil
     }
 
+    /// Where a waiting reveal has got to: which try, and when the next
+    /// one is due
+    private struct Retry {
+        let attempt: Int
+        let nextAt: TimeInterval
+    }
+
     private func wait(
         entity: Entity,
         comp: inout RevealComp,
         session: ARSession?,
-        attempt: Int,
-        nextAt: TimeInterval,
+        retry: Retry,
         now: TimeInterval
     ) {
-        guard now >= nextAt,
+        guard now >= retry.nextAt,
               let session
         else {
-            return
-        }
+            return }
 
-        let layers = mesh.make(
-            session: session,
-            from: comp.data
-        )
+        let layers = mesh.make(session: session, from: comp.data)
 
         if !layers.isEmpty {
             for layer in layers {
@@ -165,24 +159,17 @@ final class FPRevealSys: System {
                 $0.delayMs < $1.delayMs
             }
 
-            comp.stage = .revealing(
-                index: 0,
-                startedAt: now
-            )
+            comp.stage = .revealing(index: 0, startedAt: now)
 
-            return
-        }
+            return }
 
-        if attempt >= maxAttempts {
-            comp.stage = .empty(
-                until: now + emptyS
-            )
+        if retry.attempt >= maxAttempts {
+            comp.stage = .empty(until: now + emptyS)
 
-            return
-        }
+            return }
 
         comp.stage = .waiting(
-            attempt: attempt + 1,
+            attempt: retry.attempt + 1,
             nextAt: now + retryS
         )
     }
@@ -193,9 +180,7 @@ final class FPRevealSys: System {
         startedAt: TimeInterval,
         now: TimeInterval
     ) {
-        let elapsed = Int64(
-            (now - startedAt) * 1_000
-        )
+        let elapsed = Int64((now - startedAt) * 1_000)
 
         var next = index
 
@@ -206,14 +191,9 @@ final class FPRevealSys: System {
         }
 
         if next >= comp.layers.count {
-            comp.stage = .holding(
-                until: now + holdS
-            )
+            comp.stage = .holding(until: now + holdS)
         } else {
-            comp.stage = .revealing(
-                index: next,
-                startedAt: startedAt
-            )
+            comp.stage = .revealing(index: next, startedAt: startedAt)
         }
     }
 
@@ -225,17 +205,13 @@ final class FPRevealSys: System {
         now: TimeInterval
     ) {
         guard now - lastAt >= fadeStepS else {
-            return
-        }
+            return }
 
         guard zoneIndex < fadeOrder.count else {
-            entity.components[TraceComp.self] = TraceComp(
-                createdAt: now
-            )
+            entity.components[TraceComp.self] = TraceComp(createdAt: now)
 
             entity.components.remove(RevealComp.self)
-            return
-        }
+            return }
 
         let zone = fadeOrder[zoneIndex]
 
@@ -246,9 +222,6 @@ final class FPRevealSys: System {
             layer.root.isEnabled = true
         }
 
-        comp.stage = .fading(
-            zoneIndex: zoneIndex + 1,
-            lastAt: now
-        )
+        comp.stage = .fading(zoneIndex: zoneIndex + 1, lastAt: now)
     }
 }

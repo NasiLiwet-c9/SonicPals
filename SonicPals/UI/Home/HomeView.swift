@@ -45,14 +45,11 @@ struct HomeView: View {
                             ZStack {
                                 Image("filled-button-border")
                                     .resizable()
-                                    .aspectRatio(contentMode: .fit)
+                                    .scaledToFit()
 
                                 Text(primaryButtonText.uppercased())
                                     .font(
-                                        .system(
-                                            size: UICfg.v(20, size),
-                                            weight: .heavy
-                                        )
+                                        .system(size: UICfg.v(20, size), weight: .heavy)
                                     )
                                     .foregroundStyle(.black)
                             }
@@ -66,7 +63,7 @@ struct HomeView: View {
                         Button(action: onSelectMode) {
                             Image("map-btn-yellow")
                                 .resizable()
-                                .aspectRatio(contentMode: .fit)
+                                .scaledToFit()
                                 .frame(
                                     width: UICfg.v(UICfg.Home.mapW, size),
                                     height: UICfg.v(UICfg.Home.mapH, size)
@@ -75,31 +72,19 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .accessibilityLabel("Open map")
                     }
-                    .padding(
-                        .bottom,
-                        UICfg.v(UICfg.Home.bottom, size)
-                    )
+                    .padding(.bottom, UICfg.v(UICfg.Home.bottom, size))
                 }
-                .padding(
-                    .horizontal,
-                    UICfg.v(20, size)
-                )
+                .padding(.horizontal, UICfg.v(20, size))
 
                 VStack {
                     Spacer()
 
                     CreditsView(uiScale: UICfg.s(size))
-                        .padding(
-                            .bottom,
-                            UICfg.v(UICfg.Credits.bottom, size)
-                        )
+                        .padding(.bottom, UICfg.v(UICfg.Credits.bottom, size))
                 }
                 .padding(.bottom, geo.safeAreaInsets.bottom)
             }
-            .frame(
-                width: size.width,
-                height: size.height
-            )
+            .frame(width: size.width, height: size.height)
         }
         .ignoresSafeArea()
         .preferredColorScheme(.light)
@@ -113,13 +98,8 @@ struct HomeView: View {
             name: "bg-main-animation",
             contentMode: .scaleAspectFit
         )
-        .frame(
-            width: bgW,
-            height: bgH
-        )
-        .offset(
-            y: UICfg.y(UICfg.Home.bgY, size)
-        )
+        .frame(width: bgW, height: bgH)
+        .offset(y: UICfg.y(UICfg.Home.bgY, size))
         .allowsHitTesting(false)
     }
 }

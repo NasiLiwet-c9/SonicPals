@@ -15,7 +15,7 @@ struct MangoCounterView: View {
         HStack(spacing: 6) {
             Image("mango-miniicon")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: 22, height: 22)
 
             Text("\(eatenCount)/\(target)")

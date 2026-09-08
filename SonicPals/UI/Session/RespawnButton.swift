@@ -23,9 +23,7 @@ struct RespawnButton: View {
         HStack(alignment: .top, spacing: UICfg.Respawn.gap * uiScale) {
             if showHint {
                 hint
-                    .transition(
-                        .move(edge: .trailing).combined(with: .opacity)
-                    )
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
             }
 
             button
