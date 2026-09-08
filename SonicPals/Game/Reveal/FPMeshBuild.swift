@@ -14,9 +14,9 @@ final class FPMeshBuild: FPMeshBuilding {
     private let read: any FPMeshReadPort
     private let pack: any FPMeshPackPort
     private let fact: any FPMeshMakePort
-    
+
     private let maxRead = 16_000
-    
+
     init(
         read: any FPMeshReadPort,
         pack: any FPMeshPackPort,

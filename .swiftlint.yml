@@ -1,0 +1,28 @@
+excluded:
+  - Packages/RealityKitContent/Sources/RealityKitContent/RealityKitContent.rkassets
+  - .build
+
+lenient: true
+
+disabled_rules:
+  - todo
+  - identifier_name
+
+opt_in_rules:
+  - force_unwrapping
+
+line_length:
+  warning: 160
+  error: 250
+
+function_body_length:
+  warning: 100
+
+type_body_length:
+  warning: 400
+
+file_length:
+  warning: 500
+
+trailing_whitespace:
+  ignores_empty_lines: true

@@ -103,6 +103,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				747A9161304FE59100C440AE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				747491CA301BE3CD0012A049 /* SonicPals */,
@@ -171,6 +172,7 @@
 			packageReferences = (
 				79B5432B302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/RealityKitContent" */,
 				79B5432E302BBAEA009E3E7E /* XCLocalSwiftPackageReference "Packages/SonarCore" */,
+				747A915D304FE56000C440AE /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 747491C9301BE3CD0012A049 /* Products */;
@@ -218,6 +220,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		747A9161304FE59100C440AE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 747A9160304FE59100C440AE /* SwiftLintBuildToolPlugin */;
+		};
 		7A10000000000000000000A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 747491C7301BE3CD0012A049 /* SonicPals */;
@@ -521,7 +527,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		747A915D304FE56000C440AE /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.65.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		747A9160304FE59100C440AE /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 747A915D304FE56000C440AE /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
 		79B5432C302BBAEA009E3E7E /* RealityKitContent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RealityKitContent;

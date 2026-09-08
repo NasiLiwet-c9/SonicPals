@@ -146,10 +146,8 @@ final class FPMeshRead: FPMeshReadPort {
             let source = min(
                 Int(
                     (
-                        Double(index)
-                        * step
-                    )
-                    .rounded(.down)
+                        Double(index) * step
+                    ).rounded(.down)
                 ),
                 tris.count - 1
             )
