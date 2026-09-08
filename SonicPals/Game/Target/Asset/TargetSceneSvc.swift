@@ -55,9 +55,7 @@ struct TargetSceneSvc {
     }
 
     func noShadow(_ root: Entity) {
-        root.components.set(
-            GroundingShadowComponent(castsShadow: false)
-        )
+        root.components.set(GroundingShadowComponent(castsShadow: false))
 
         for child in root.children {
             noShadow(child)
@@ -71,10 +69,7 @@ struct TargetSceneSvc {
                     return mat
                 }
 
-                pbr.baseColor.tint = dimColor(
-                    pbr.baseColor.tint,
-                    factor: factor
-                )
+                pbr.baseColor.tint = dimColor(pbr.baseColor.tint, factor: factor)
 
                 return pbr
             }
@@ -115,10 +110,7 @@ struct TargetSceneSvc {
         var w: CGFloat = 1
 
         if color.getWhite(&w, alpha: &a) {
-            return UIColor(
-                white: w * f,
-                alpha: a
-            )
+            return UIColor(white: w * f, alpha: a)
         }
 
         return color

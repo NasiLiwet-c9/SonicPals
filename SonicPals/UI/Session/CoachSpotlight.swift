@@ -7,11 +7,7 @@
 
 import SwiftUI
 
-/// Darkens everything but the control being asked for. A ring alone is
-/// easy to miss on a camera feed
-///
-/// The hole closes onto the button rather than the screen just going
-/// dark, which reads as a glitch
+/// Darkens everything but the control being asked for. 
 struct CoachSpotlight: View {
     let rect: CGRect
 

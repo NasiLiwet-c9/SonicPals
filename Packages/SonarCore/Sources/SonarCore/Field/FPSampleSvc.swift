@@ -25,25 +25,17 @@ public struct FPSampleSvc: Sendable {
     ) -> FPSample? {
         let point = tri.center
 
-        guard let coneSample =
-            cone.sample(point)
+        guard let coneSample = cone.sample(point)
         else {
             return nil
         }
 
-        guard let hitFade =
-            hit.fade(
-                at: point,
-                distanceM:
-                    coneSample.distanceM
-            )
+        guard let hitFade = hit.fade(at: point, distanceM: coneSample.distanceM)
         else {
             return nil
         }
 
-        let fade =
-            coneSample.fade
-            * hitFade
+        let fade = coneSample.fade * hitFade
 
         guard fade > 0.02 else {
             return nil
@@ -52,12 +44,10 @@ public struct FPSampleSvc: Sendable {
         return FPSample(
             key:
                 cls.key(
-                    distanceM:
-                        coneSample.distanceM,
+                    distanceM: coneSample.distanceM,
                     fade: fade
                 ),
-            distanceM:
-                coneSample.distanceM,
+            distanceM: coneSample.distanceM,
             fade: fade
         )
     }

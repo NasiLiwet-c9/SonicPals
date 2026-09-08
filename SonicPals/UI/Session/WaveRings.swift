@@ -13,11 +13,7 @@ struct WaveRings: View {
     @State private var pulse = false
     @State private var show = false
 
-    private let violet = Color(
-        red: 0.58,
-        green: 0.49,
-        blue: 1
-    )
+    private let violet = Color(red: 0.58, green: 0.49, blue: 1)
 
     var body: some View {
         GeometryReader { proxy in
@@ -30,25 +26,13 @@ struct WaveRings: View {
                         Circle()
                             .stroke(
                                 violet.opacity(
-                                    0.42
-                                    - (Double(index) * 0.10)
+                                    0.42 - (Double(index) * 0.10)
                                 ),
                                 lineWidth: 1.8
                             )
-                            .frame(
-                                width: 116,
-                                height: 116
-                            )
-                            .scaleEffect(
-                                pulse
-                                ? (3.2 + (CGFloat(index) * 0.55))
-                                : 0.78
-                            )
-                            .opacity(
-                                pulse
-                                ? 0
-                                : (0.75 - (Double(index) * 0.16))
-                            )
+                            .frame(width: 116, height: 116)
+                            .scaleEffect(pulse ? (3.2 + (CGFloat(index) * 0.55)) : 0.78)
+                            .opacity(pulse ? 0 : (0.75 - (Double(index) * 0.16)))
                             .animation(
                                 .easeOut(duration: 0.9)
                                     .delay(Double(index) * 0.12),
@@ -56,10 +40,7 @@ struct WaveRings: View {
                             )
                     }
                 }
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity
-                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .position(
                     x: proxy.size.width / 2,
                     y: proxy.size.height * 0.516
@@ -70,8 +51,7 @@ struct WaveRings: View {
         .allowsHitTesting(false)
         .task(id: seq) {
             guard seq > 0 else {
-                return
-            }
+                return }
 
             show = true
             pulse = false
@@ -84,8 +64,7 @@ struct WaveRings: View {
             try? await Task.sleep(for: .milliseconds(1250))
 
             guard !Task.isCancelled else {
-                return
-            }
+                return }
 
             show = false
             pulse = false

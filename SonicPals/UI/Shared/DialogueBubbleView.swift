@@ -111,28 +111,18 @@ struct DialogueBubbleView: View {
         ZStack {
             Image(bubbleImageName)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
 
             Text(controller.visibleText)
                 .font(
-                    .system(
-                        size: UICfg.Dlg.txt * uiScale,
-                        weight: .bold
-                    )
+                    .system(size: UICfg.Dlg.txt * uiScale, weight: .bold)
                 )
                 .multilineTextAlignment(.center)
                 .lineLimit(isCurrentLineShort ? 1 : 4)
                 .minimumScaleFactor(0.75)
                 .foregroundStyle(.black)
-                .padding(
-                    .horizontal,
-                    UICfg.Dlg.padX * uiScale
-                )
-                .offset(
-                    y: -UICfg.Bubble.textLift(
-                        width: UICfg.Dlg.bubW * uiScale
-                    )
-                )
+                .padding(.horizontal, UICfg.Dlg.padX * uiScale)
+                .offset(y: -UICfg.Bubble.textLift(width: UICfg.Dlg.bubW * uiScale))
         }
         .frame(
             width: UICfg.Dlg.bubW * uiScale,

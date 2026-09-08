@@ -86,14 +86,9 @@ final class FPMeshFact: FPMeshMakePort {
 
         RealityShade.keepBright(root)
 
-        let amount = min(
-            max(minM / max(range, 0.1), 0.03),
-            1
-        )
+        let amount = min(max(minM / max(range, 0.1), 0.03), 1)
 
-        let travelMs = Int64(
-            (amount * waveMs).rounded()
-        )
+        let travelMs = Int64((amount * waveMs).rounded())
 
         return FPMeshLayer(
             root: root,
@@ -105,10 +100,7 @@ final class FPMeshFact: FPMeshMakePort {
     }
 
     private func traceAlpha(_ source: Float) -> Float {
-        min(
-            max(source * 0.06, 0.02),
-            0.06
-        )
+        min(max(source * 0.06, 0.02), 0.06)
     }
 
     private func makeMat(
@@ -126,9 +118,7 @@ final class FPMeshFact: FPMeshMakePort {
         mat.writesDepth = false
 
         mat.blending = .transparent(
-            opacity: .init(
-                floatLiteral: min(max(alpha, 0), 1)
-            )
+            opacity: .init(floatLiteral: min(max(alpha, 0), 1))
         )
 
         return mat

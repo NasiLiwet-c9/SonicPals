@@ -70,7 +70,7 @@ struct PingButton: View {
             Image("ping-btn")
                 .renderingMode(.original)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
                 .frame(width: 108, height: 108)
 
             if ping.coolingDown {

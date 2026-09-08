@@ -25,31 +25,22 @@ struct TargetMangoSvc {
             in: root
         ),
         let parent = mango.parent else {
-            debug(
-                "MangoItem missing"
-            )
+            debug("MangoItem missing")
 
             return false
         }
 
         let pts = names.compactMap {
-            TargetFind.one(
-                named: $0,
-                in: root
-            )
+            TargetFind.one(named: $0, in: root)
         }
 
         guard let pt = pts.randomElement() else {
-            debug(
-                "No mango spawn points"
-            )
+            debug("No mango spawn points")
 
             return false
         }
 
-        mango.position = pt.position(
-            relativeTo: parent
-        )
+        mango.position = pt.position(relativeTo: parent)
 
         debug(
             "mango -> \(pt.name)"

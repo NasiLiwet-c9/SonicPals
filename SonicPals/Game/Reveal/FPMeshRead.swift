@@ -62,10 +62,7 @@ final class FPMeshRead: FPMeshReadPort {
                 
                 guard tri.points.contains(
                     where: {
-                        cone.contains(
-                            $0,
-                            pad: 1.10
-                        )
+                        cone.contains($0, pad: 1.10)
                     }
                 ) else {
                     continue
@@ -75,10 +72,7 @@ final class FPMeshRead: FPMeshReadPort {
             }
         }
         
-        return evenlyLimited(
-            tris,
-            limit: limit
-        )
+        return evenlyLimited(tris, limit: limit)
     }
     
     private func anchorIntersects(
@@ -92,13 +86,9 @@ final class FPMeshRead: FPMeshReadPort {
             return false
         }
         
-        var minP = SIMD3<Float>(
-            repeating: Float.greatestFiniteMagnitude
-        )
+        var minP = SIMD3<Float>(repeating: Float.greatestFiniteMagnitude)
         
-        var maxP = SIMD3<Float>(
-            repeating: -Float.greatestFiniteMagnitude
-        )
+        var maxP = SIMD3<Float>(repeating: -Float.greatestFiniteMagnitude)
         
         for index in 0..<count {
             let p = geo.vertex(at: UInt32(index))
@@ -123,11 +113,7 @@ final class FPMeshRead: FPMeshReadPort {
         
         let radius = simd_length(maxP - minP) * 0.5
         
-        return cone.intersectsSphere(
-            center: center,
-            radius: radius,
-            pad: 1.12
-        )
+        return cone.intersectsSphere(center: center, radius: radius, pad: 1.12)
     }
     
     private func evenlyLimited(
@@ -146,10 +132,8 @@ final class FPMeshRead: FPMeshReadPort {
             let source = min(
                 Int(
                     (
-                        Double(index)
-                        * step
-                    )
-                    .rounded(.down)
+                        Double(index) * step
+                    ).rounded(.down)
                 ),
                 tris.count - 1
             )
@@ -162,17 +146,8 @@ final class FPMeshRead: FPMeshReadPort {
         _ local: SIMD3<Float>,
         transform: simd_float4x4
     ) -> SIMD3<Float> {
-        let world = transform * SIMD4<Float>(
-            local.x,
-            local.y,
-            local.z,
-            1
-        )
+        let world = transform * SIMD4<Float>(local.x, local.y, local.z, 1)
         
-        return SIMD3<Float>(
-            world.x,
-            world.y,
-            world.z
-        )
+        return SIMD3<Float>(world.x, world.y, world.z)
     }
 }

@@ -46,19 +46,14 @@ final class SessSvc: SessServing {
             .meshWithClassification
         )
         
-        let plain = ARWorldTrackingConfiguration.supportsSceneReconstruction(
-            .mesh
-        )
+        let plain = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
         
         guard classified || plain else {
             print("LIDAR: scene reconstruction unsupported")
             return .noLiDAR
         }
         
-        let arConfig = makeARConfig(
-            classified: classified,
-            plain: plain
-        )
+        let arConfig = makeARConfig(classified: classified, plain: plain)
         
         let spatialConfig = SpatialTrackingSession.Configuration(
             tracking: [
@@ -81,10 +76,7 @@ final class SessSvc: SessServing {
             ]
         )
         
-        let unavailable = await runSpatial(
-            spatialConfig,
-            arConfig: arConfig
-        )
+        let unavailable = await runSpatial(spatialConfig, arConfig: arConfig)
         
         if let unavailable {
             print("SPATIAL: unavailable anchors \(unavailable.anchor)")
@@ -130,8 +122,7 @@ final class SessSvc: SessServing {
     
     func stop() async {
         guard running else {
-            return
-        }
+            return }
         
         running = false
         
@@ -171,11 +162,7 @@ final class SessSvc: SessServing {
             
             let granted = await AVCaptureDevice.requestAccess(for: .video)
             
-            print(
-                granted
-                ? "CAMERA permission: granted"
-                : "CAMERA permission: denied"
-            )
+            print(granted ? "CAMERA permission: granted" : "CAMERA permission: denied")
             
             return granted
             

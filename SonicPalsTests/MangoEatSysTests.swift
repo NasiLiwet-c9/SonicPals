@@ -11,14 +11,13 @@ import simd
 
 @testable import SonicPals
 
-/// Real entities, the mango is found by name under the target's model,
-/// exactly as in the game
+/// Real entities, the mango is found by name under the target's model, exactly as in the game
 @Suite("Mango eat system")
 struct MangoEatSysTests {
     private func target(
         mangoAt position: SIMD3<Float>,
         found: Bool = true
-    ) -> Entity {
+    ) throws -> Entity {
         let made = TestTarget.make(at: .zero)
 
         let mango = Entity()
@@ -26,7 +25,7 @@ struct MangoEatSysTests {
         mango.setPosition(position, relativeTo: nil)
         made.real.addChild(mango)
 
-        TestTarget.setComp(made.entity) { $0.found = found }
+        try TestTarget.setComp(made.entity) { $0.found = found }
 
         return made.entity
     }
@@ -99,12 +98,12 @@ struct MangoEatSysTests {
     // MARK: - Notifications
 
     @Test("Coming into reach announces the mango")
-    func comingIntoReachAnnounces() {
+    func comingIntoReachAnnounces() throws {
         let spy = NotificationSpy(.mangoEatReady, .mangoEatLost)
         let sys = MangoEatSys()
 
         sys.step(
-            targets: [target(mangoAt: SIMD3<Float>(0, 0, -0.3))],
+            targets: [try target(mangoAt: SIMD3<Float>(0, 0, -0.3))],
             camM: TestCamera.level()
         )
 
@@ -112,10 +111,10 @@ struct MangoEatSysTests {
     }
 
     @Test("Staying in reach does not announce it again")
-    func staysAnnouncedOnce() {
+    func staysAnnouncedOnce() throws {
         let spy = NotificationSpy(.mangoEatReady)
         let sys = MangoEatSys()
-        let entity = target(mangoAt: SIMD3<Float>(0, 0, -0.3))
+        let entity = try target(mangoAt: SIMD3<Float>(0, 0, -0.3))
 
         sys.step(targets: [entity], camM: TestCamera.level())
         sys.step(targets: [entity], camM: TestCamera.level())
@@ -124,10 +123,10 @@ struct MangoEatSysTests {
     }
 
     @Test("Walking away gives it up")
-    func walkingAwayIsLost() {
+    func walkingAwayIsLost() throws {
         let spy = NotificationSpy(.mangoEatReady, .mangoEatLost)
         let sys = MangoEatSys()
-        let entity = target(mangoAt: SIMD3<Float>(0, 0, -0.3))
+        let entity = try target(mangoAt: SIMD3<Float>(0, 0, -0.3))
 
         sys.step(targets: [entity], camM: TestCamera.level())
         sys.step(
@@ -140,12 +139,12 @@ struct MangoEatSysTests {
     }
 
     @Test("A tree that has not been found yet offers no mango")
-    func unfoundTreeIsIgnored() {
+    func unfoundTreeIsIgnored() throws {
         let spy = NotificationSpy(.mangoEatReady)
         let sys = MangoEatSys()
 
         sys.step(
-            targets: [target(mangoAt: SIMD3<Float>(0, 0, -0.3), found: false)],
+            targets: [try target(mangoAt: SIMD3<Float>(0, 0, -0.3), found: false)],
             camM: TestCamera.level()
         )
 
@@ -153,11 +152,11 @@ struct MangoEatSysTests {
     }
 
     @Test("A tree with no mango left offers nothing")
-    func noMangoIsIgnored() {
+    func noMangoIsIgnored() throws {
         let spy = NotificationSpy(.mangoEatReady)
         let sys = MangoEatSys()
         let made = TestTarget.make(at: .zero)
-        TestTarget.setComp(made.entity) { $0.found = true }
+        try TestTarget.setComp(made.entity) { $0.found = true }
 
         sys.step(targets: [made.entity], camM: TestCamera.level())
 
@@ -165,10 +164,10 @@ struct MangoEatSysTests {
     }
 
     @Test("A disabled target offers nothing")
-    func disabledIsIgnored() {
+    func disabledIsIgnored() throws {
         let spy = NotificationSpy(.mangoEatReady)
         let sys = MangoEatSys()
-        let entity = target(mangoAt: SIMD3<Float>(0, 0, -0.3))
+        let entity = try target(mangoAt: SIMD3<Float>(0, 0, -0.3))
         entity.isEnabled = false
 
         sys.step(targets: [entity], camM: TestCamera.level())

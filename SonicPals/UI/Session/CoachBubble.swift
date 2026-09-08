@@ -46,7 +46,7 @@ struct CoachBubble: View {
         ZStack {
             Image("long-bubble-card")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .scaledToFit()
 
             Text(line)
                 .font(
@@ -61,11 +61,7 @@ struct CoachBubble: View {
                 .foregroundStyle(.black)
                 .padding(.leading, UICfg.Sess.topPadX * uiScale)
                 .padding(.trailing, UICfg.Sess.topPadMascot * uiScale)
-                .offset(
-                    y: -UICfg.Bubble.textLift(
-                        width: UICfg.Sess.topW * uiScale
-                    )
-                )
+                .offset(y: -UICfg.Bubble.textLift(width: UICfg.Sess.topW * uiScale))
         }
         .frame(width: UICfg.Sess.topW * uiScale)
     }

@@ -147,8 +147,7 @@ struct WorldWaveTests {
         world.clear()
 
         #expect(world.anchor.children.allSatisfy {
-            !$0.components.has(RevealComp.self)
-                && !$0.components.has(TraceComp.self)
+            !$0.components.has(RevealComp.self) && !$0.components.has(TraceComp.self)
         })
 
         #expect(world.targetEntity == nil)

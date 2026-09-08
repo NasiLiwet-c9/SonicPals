@@ -37,10 +37,12 @@ final class TargetWallSvc: TargetWallChecking {
             .filter { $0.alignment == .vertical }
 
         for wall in walls {
-            for y in heights {
-                if intersects(wall, point: pos + SIMD3<Float>(0, y, 0), radius: radius) {
-                    return true
-                }
+            for y in heights where intersects(
+                wall,
+                point: pos + SIMD3<Float>(0, y, 0),
+                radius: radius
+            ) {
+                return true
             }
         }
 

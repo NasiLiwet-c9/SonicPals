@@ -41,10 +41,7 @@ struct TargetWaveMathTests {
     func measuresToTheFace() {
         // Box spans ±0.1, so 1.0 is 0.9 from the near face
         let p = part(center: .zero)
-        let d = TargetWaveMath.nearestDistance(
-            from: SIMD3<Float>(0, 0, 1),
-            to: p
-        )
+        let d = TargetWaveMath.nearestDistance(from: SIMD3<Float>(0, 0, 1), to: p)
 
         #expect(abs(d - 0.9) < 0.0001)
     }

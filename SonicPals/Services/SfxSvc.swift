@@ -58,7 +58,7 @@ final class SfxSvc {
         }
     }
 
-    private enum Fx: CaseIterable {
+    private enum Sfx: CaseIterable {
         case tap, dlg, sonar, tFnd, mDet, eat
         case ok, bad, done, scan, pop, lvl
 
@@ -102,7 +102,7 @@ final class SfxSvc {
     private let exts = ["mp3", "m4a", "wav", "caf", "aiff", "aac"]
 
     private var bgm: [Bgm: AVAudioPlayer] = [:]
-    private var fx: [Fx: AVAudioPlayer] = [:]
+    private var fx: [Sfx: AVAudioPlayer] = [:]
     private var amb: AVAudioPlayer?
     private var cur: Bgm?
     private var fadeTask: Task<Void, Never>?
@@ -210,8 +210,7 @@ final class SfxSvc {
                 p.volume = next.vol
                 p.play()
             }
-            return
-        }
+            return }
 
         fadeTask?.cancel()
         duckTask?.cancel()
@@ -276,7 +275,7 @@ final class SfxSvc {
     }
 
     private func loadFx() {
-        for key in Fx.allCases {
+        for key in Sfx.allCases {
             guard let p = make(key.file) else { continue }
 
             p.volume = key.vol
@@ -284,7 +283,7 @@ final class SfxSvc {
         }
     }
 
-    private func play(_ key: Fx) {
+    private func play(_ key: Sfx) {
         guard let p = fx[key] else { return }
 
         p.currentTime = 0

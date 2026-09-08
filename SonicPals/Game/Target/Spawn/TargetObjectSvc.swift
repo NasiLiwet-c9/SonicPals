@@ -53,17 +53,19 @@ final class TargetObjectSvc: TargetObjectChecking {
         for y in heights {
             let origin = pos + SIMD3<Float>(0, y, 0)
 
-            for direction in directions {
-                if scene.raycast(
+            let blocked = directions.contains { direction in
+                scene.raycast(
                     origin: origin,
                     direction: direction,
                     length: radius,
                     query: .nearest,
                     mask: .sceneUnderstanding,
                     relativeTo: nil
-                ).first != nil {
-                    return true
-                }
+                ).first != nil
+            }
+
+            if blocked {
+                return true
             }
         }
 

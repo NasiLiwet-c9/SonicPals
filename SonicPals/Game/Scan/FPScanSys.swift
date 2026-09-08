@@ -13,13 +13,9 @@ import simd
 
 @MainActor
 final class FPScanSys: System {
-    static let query = EntityQuery(
-        where: .has(FPScanComp.self)
-    )
+    static let query = EntityQuery(where: .has(FPScanComp.self))
 
-    static let sessQuery = EntityQuery(
-        where: .has(SessComp.self)
-    )
+    static let sessQuery = EntityQuery(where: .has(SessComp.self))
 
     private struct FloorHit {
         let pos: SIMD3<Float>
@@ -28,94 +24,66 @@ final class FPScanSys: System {
 
     private let sectors = 24
 
-    private let meshTickS:
-        TimeInterval = 0.45
+    private let meshTickS: TimeInterval = 0.45
 
-    private let floorTickS:
-        TimeInterval = 0.20
+    private let floorTickS: TimeInterval = 0.20
 
-    private let estimatedFloorDelayS:
-        TimeInterval = 0.75
+    private let estimatedFloorDelayS: TimeInterval = 0.75
 
-    private let turnDelayS:
-        TimeInterval = 0.85
+    private let turnDelayS: TimeInterval = 0.85
 
     private let read = FPScanRead()
 
-    private let mesh =
-        FPScanMesh()
+    private let mesh = FPScanMesh()
 
-    private let floorVis =
-        FPScanFloor(
-            sectors: 24,
-            radius: 0.90,
-            width: 0.045
-        )
+    private let floorVis = FPScanFloor(sectors: 24, radius: 0.90, width: 0.045)
 
     /// Sweep coverage and the turn cue, split out so both can be tested
     /// without a live session, see `ScanCoverage`
     private var coverage = ScanCoverage(sectors: 24)
 
-    private var lastMeshAt:
-        TimeInterval = 0
+    private var lastMeshAt: TimeInterval = 0
 
-    private var lastFloorAt:
-        TimeInterval = 0
+    private var lastFloorAt: TimeInterval = 0
 
-    private var resetAt:
-        TimeInterval = 0
+    private var resetAt: TimeInterval = 0
 
     private var lastReset = -1
 
-    private var lastHUD:
-        FPScanHUD?
+    private var lastHUD: FPScanHUD?
 
     required init(
         scene: Scene
     ) {}
 
-    func update(
-        context: SceneUpdateContext
-    ) {
-        guard let session = session(
-            in: context.scene
-        ),
-        let frame =
-            session.currentFrame else {
-            return
-        }
+    func update(context: SceneUpdateContext) {
+        guard let session = session(in: context.scene),
+              let frame = session.currentFrame else {
+            return }
 
-        let now =
-            Date()
-            .timeIntervalSinceReferenceDate
+        let camera = frame.camera.transform
+        let forward = ScanGeometry.forward(camera)
 
-        let camera =
-            frame.camera.transform
+        let sweep = Sweep(
+            session: session,
+            camera: camera,
+            forward: forward,
+            yaw: ScanGeometry.yaw(forward),
+            tracking: isTracking(frame.camera),
+            now: Date().timeIntervalSinceReferenceDate
+        )
 
-        let forward =
-            ScanGeometry.forward(camera)
-
-        let yaw =
-            ScanGeometry.yaw(forward)
-
-        for root in context.scene.performQuery(
-            Self.query
-        ) {
-            guard var comp =
-                root.components[
-                    FPScanComp.self
-                ] else {
+        for root in context.scene.performQuery(Self.query) {
+            guard var comp = root.components[FPScanComp.self] else {
                 continue
             }
 
-            if comp.resetID
-                != lastReset {
+            if comp.resetID != lastReset {
                 reset(
                     root: root,
                     camera: camera,
-                    resetID:
-                        comp.resetID,
-                    now: now
+                    resetID: comp.resetID,
+                    now: sweep.now
                 )
             }
 
@@ -123,140 +91,113 @@ final class FPScanSys: System {
                 continue
             }
 
-            if !floorVis.isPlaced,
-               now - lastFloorAt
-                >= floorTickS {
-                lastFloorAt = now
+            placeFloor(sweep)
+            drawFloor(sweep)
+            addMesh(sweep)
 
-                if let hit =
-                    findFloor(
-                        session: session,
-                        camera: camera,
-                        allowEstimated:
-                            now - resetAt
-                            >= estimatedFloorDelayS
-                    ) {
-                    floorVis.place(
-                        center:
-                            SIMD3<Float>(
-                                camera.pos3.x,
-                                hit.pos.y,
-                                camera.pos3.z
-                            ),
-                        normal:
-                            hit.normal,
-                        baseYaw:
-                            coverage.baseYaw
-                            ?? yaw
-                    )
-                }
-            }
-
-            if floorVis.isPlaced {
-                _ =
-                    floorVis
-                    .updateCursor(
-                        origin:
-                            camera.pos3,
-                        dir:
-                            forward
-                    )
-
-                floorVis
-                    .updateCoverage(
-                        seen: coverage.seen,
-                        yaw: yaw
-                    )
-            }
-
-            if now - lastMeshAt
-                >= meshTickS {
-                lastMeshAt = now
-
-                let tris =
-                    read.read(
-                        session:
-                            session,
-                        camera:
-                            camera,
-                        limit: 420
-                    )
-
-                mesh.add(
-                    tris,
-                    camera:
-                        camera.pos3
-                )
-            }
-
-            let canCount =
-                floorVis.isPlaced
-                && isTracking(
-                    frame.camera
-                )
-                && abs(
-                    forward.y
-                ) <= 0.72
-
-            let turn: FPScanTurn
-
-            if canCount {
-                let index =
-                    coverage.sector(
-                        yaw: yaw
-                    )
-
-                coverage.mark(
-                    sector: index,
-                    now: now
-                )
-
-                floorVis
-                    .showHead()
-
-                turn = coverage.turnCue(
-                    from: index,
-                    now: now,
-                    after: turnDelayS
-                )
-            } else {
-                floorVis
-                    .hideHead()
-
-                turn = .none
-            }
-
-            let ready =
-                coverage.isComplete
+            let turn = markSector(sweep)
+            let ready = coverage.isComplete
 
             post(
                 FPScanHUD(
-                    progress:
-                        coverage.progress,
-                    turn:
-                        ready
-                        ? .none
-                        : turn,
-                    ready:
-                        ready
+                    progress: coverage.progress,
+                    turn: ready ? .none : turn,
+                    ready: ready
                 )
             )
 
             if ready {
-                floorVis
-                    .hideHead()
+                floorVis.hideHead()
+                floorVis.hideCursor()
 
-                floorVis
-                    .hideCursor()
-
-                comp.active =
-                    false
-
-                root.components[
-                    FPScanComp.self
-                ] = comp
+                comp.active = false
+                root.components[FPScanComp.self] = comp
             }
         }
+    }
+
+    /// One ARFrame's worth of camera readings, so the steps below stay
+    /// short and are handed the same numbers
+    private struct Sweep {
+        let session: ARSession
+        let camera: simd_float4x4
+        let forward: SIMD3<Float>
+        let yaw: Float
+        let tracking: Bool
+        let now: TimeInterval
+    }
+
+    /// Drops the ring on the floor once a raycast finds one
+    private func placeFloor(_ sweep: Sweep) {
+        guard !floorVis.isPlaced,
+              sweep.now - lastFloorAt >= floorTickS else {
+            return }
+
+        lastFloorAt = sweep.now
+
+        guard let hit = findFloor(
+            session: sweep.session,
+            camera: sweep.camera,
+            allowEstimated: sweep.now - resetAt >= estimatedFloorDelayS
+        ) else {
+            return }
+
+        floorVis.place(
+            center: SIMD3<Float>(
+                sweep.camera.pos3.x,
+                hit.pos.y,
+                sweep.camera.pos3.z
+            ),
+            normal: hit.normal,
+            baseYaw: coverage.baseYaw ?? sweep.yaw
+        )
+    }
+
+    /// Moves the cursor and repaints which sectors are done
+    private func drawFloor(_ sweep: Sweep) {
+        guard floorVis.isPlaced else { return }
+
+        _ = floorVis.updateCursor(origin: sweep.camera.pos3, dir: sweep.forward)
+
+        floorVis.updateCoverage(seen: coverage.seen, yaw: sweep.yaw)
+    }
+
+    /// Folds the newest LiDAR triangles into the scan mesh, on a timer
+    private func addMesh(_ sweep: Sweep) {
+        guard sweep.now - lastMeshAt >= meshTickS else { return }
+
+        lastMeshAt = sweep.now
+
+        let tris = read.read(
+            session: sweep.session,
+            camera: sweep.camera,
+            limit: 420
+        )
+
+        mesh.add(tris, camera: sweep.camera.pos3)
+    }
+
+    /// Counts the sector being looked at, and asks for a turn if the
+    /// player has stalled. Only counts while the ring is down, tracking
+    /// is good, and the phone is not pointed at the floor or ceiling
+    private func markSector(_ sweep: Sweep) -> FPScanTurn {
+        let canCount = floorVis.isPlaced && sweep.tracking && abs(sweep.forward.y) <= 0.72
+
+        guard canCount else {
+            floorVis.hideHead()
+            return .none
+        }
+
+        let index = coverage.sector(yaw: sweep.yaw)
+
+        coverage.mark(sector: index, now: sweep.now)
+        floorVis.showHead()
+
+        return coverage.turnCue(
+            from: index,
+            now: sweep.now,
+            after: turnDelayS
+        )
     }
 
     private func findFloor(
@@ -264,26 +205,16 @@ final class FPScanSys: System {
         camera: simd_float4x4,
         allowEstimated: Bool
     ) -> FloorHit? {
-        let origin =
-            camera.pos3
+        let origin = camera.pos3
 
-        let down =
-            SIMD3<Float>(
-                0,
-                -1,
-                0
-            )
+        let down = SIMD3<Float>(0, -1, 0)
 
         let exact =
             ARRaycastQuery(
-                origin:
-                    origin,
-                direction:
-                    down,
-                allowing:
-                    .existingPlaneInfinite,
-                alignment:
-                    .horizontal
+                origin: origin,
+                direction: down,
+                allowing: .existingPlaneInfinite,
+                alignment: .horizontal
             )
 
         if let hit =
@@ -291,8 +222,7 @@ final class FPScanSys: System {
                 session.raycast(
                     exact
                 ),
-                cameraY:
-                    origin.y
+                cameraY: origin.y
             ) {
             return hit
         }
@@ -303,22 +233,17 @@ final class FPScanSys: System {
 
         let estimated =
             ARRaycastQuery(
-                origin:
-                    origin,
-                direction:
-                    down,
-                allowing:
-                    .estimatedPlane,
-                alignment:
-                    .horizontal
+                origin: origin,
+                direction: down,
+                allowing: .estimatedPlane,
+                alignment: .horizontal
             )
 
         return bestFloor(
             session.raycast(
                 estimated
             ),
-            cameraY:
-                origin.y
+            cameraY: origin.y
         )
     }
 
@@ -328,12 +253,9 @@ final class FPScanSys: System {
         cameraY: Float
     ) -> FloorHit? {
         results
-            .compactMap {
-                result
-                    -> FloorHit? in
+            .compactMap { result -> FloorHit? in
 
-                let pos =
-                    result
+                let pos = result
                     .worldTransform
                     .pos3
 
@@ -357,37 +279,23 @@ final class FPScanSys: System {
                             .columns.1.z
                     )
 
-                let length =
-                    simd_length(
-                        normal
-                    )
+                let length = simd_length(normal)
 
                 if length
                     > 0.0001 {
-                    normal /=
-                        length
+                    normal /= length
                 } else {
-                    normal =
-                        SIMD3<Float>(
-                            0,
-                            1,
-                            0
-                        )
+                    normal = SIMD3<Float>(0, 1, 0)
                 }
 
                 if normal.y < 0 {
                     normal *= -1
                 }
 
-                return FloorHit(
-                    pos: pos,
-                    normal:
-                        normal
-                )
+                return FloorHit(pos: pos, normal: normal)
             }
             .min {
-                $0.pos.y
-                < $1.pos.y
+                $0.pos.y < $1.pos.y
             }
     }
 
@@ -410,20 +318,12 @@ final class FPScanSys: System {
         lastReset = resetID
         lastHUD = nil
 
-        mesh.reset(
-            on: root
-        )
+        mesh.reset(on: root)
 
-        floorVis.reset(
-            on: root
-        )
+        floorVis.reset(on: root)
 
         post(
-            FPScanHUD(
-                progress: 0,
-                turn: .none,
-                ready: false
-            )
+            FPScanHUD(progress: 0, turn: .none, ready: false)
         )
     }
 
@@ -443,20 +343,13 @@ final class FPScanSys: System {
     ) {
         guard hud
             != lastHUD else {
-            return
-        }
+            return }
 
-        lastHUD =
-            hud
+        lastHUD = hud
 
         NotificationCenter
             .default
-            .post(
-                name:
-                    .fpScanUpdate,
-                object:
-                    hud
-            )
+            .post(name: .fpScanUpdate, object: hud)
     }
 
     private func session(

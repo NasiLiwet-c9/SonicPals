@@ -138,9 +138,7 @@ struct RayMakerTests {
 
     @Test("The centre ray carries full power and no side offset")
     func centreRayIsFullPower() throws {
-        let first = try #require(
-            RayMaker(rings: 3).make(for: WaveSet.standard.far).first
-        )
+        let first = try #require(RayMaker(rings: 3).make(for: WaveSet.standard.far).first)
 
         #expect(first.power == 1)
         #expect(first.sideDeg == 0)
@@ -176,10 +174,7 @@ struct WaveSimTests {
     @Test("An empty room produces a ping with no hits")
     @MainActor
     func emptyRoomHasNoHits() {
-        let data = WaveSim().run(
-            using: EmptyCaster(),
-            from: forwardStart
-        )
+        let data = WaveSim().run(using: EmptyCaster(), from: forwardStart)
 
         #expect(data.hitCount == 0)
         #expect(data.echoCount == 0)

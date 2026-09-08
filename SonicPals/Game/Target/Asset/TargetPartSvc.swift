@@ -20,27 +20,18 @@ struct TargetPartSvc {
             return nil
         }
 
-        let ps =
-            TargetFind.models(
-                in: pulse
-            )
+        let ps = TargetFind.models(in: pulse)
 
-        let ts =
-            TargetFind.models(
-                in: trace
-            )
+        let ts = TargetFind.models(in: trace)
 
         guard ps.count
                 == ts.count else {
             return nil
         }
 
-        var out:
-            [TargetEchoPart] = []
+        var out: [TargetEchoPart] = []
 
-        out.reserveCapacity(
-            ps.count
-        )
+        out.reserveCapacity(ps.count)
 
         for i in ps.indices {
             let p = ps[i]
@@ -53,31 +44,21 @@ struct TargetPartSvc {
                     excludeInactive: false
                 )
 
-            guard b.extents.x > 0.001
-                    || b.extents.y > 0.001
+            guard b.extents.x > 0.001 || b.extents.y > 0.001
                     || b.extents.z > 0.001 else {
                 continue
             }
 
-            let half =
-                b.extents * 0.5
+            let half = b.extents * 0.5
 
-            let r = max(
-                simd_length(half),
-                0.02
-            )
+            let r = max(simd_length(half), 0.02)
 
-            let n =
-                p.name
-                .trimmingCharacters(
-                    in:
-                        .whitespacesAndNewlines
-                )
+            let n = p.name
+                .trimmingCharacters(in: .whitespacesAndNewlines)
 
             out.append(
                 TargetEchoPart(
-                    name:
-                        n.isEmpty
+                    name: n.isEmpty
                         ? "part\(i)"
                         : n,
                     pulse: p,
@@ -85,12 +66,7 @@ struct TargetPartSvc {
                     center: b.center,
                     half: half,
                     radius: r,
-                    isMango:
-                        TargetFind.inside(
-                            p,
-                            named:
-                                "MangoTarget"
-                        )
+                    isMango: TargetFind.inside(p, named: "MangoTarget")
                 )
             )
         }

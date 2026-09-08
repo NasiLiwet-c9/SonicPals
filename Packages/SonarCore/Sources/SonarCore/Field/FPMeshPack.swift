@@ -18,23 +18,16 @@ public struct FPMeshPack: FPMeshPackPort {
         from items: [FPItem],
         camera: SIMD3<Float>
     ) -> [FPKey: FPMeshData] {
-        var buckets:
-            [FPKey: FPMeshData] = [:]
+        var buckets: [FPKey: FPMeshData] = [:]
 
         for item in items {
-            let tri = lift(
-                item.tri,
-                camera: camera
-            )
+            let tri = lift(item.tri, camera: camera)
 
-            var data =
-                buckets[item.sample.key]
-                ?? FPMeshData()
+            var data = buckets[item.sample.key] ?? FPMeshData()
 
             add(
                 tri,
-                distanceM:
-                    item.sample.distanceM,
+                distanceM: item.sample.distanceM,
                 to: &data
             )
 
@@ -48,19 +41,15 @@ public struct FPMeshPack: FPMeshPackPort {
         _ tri: FPTri,
         camera: SIMD3<Float>
     ) -> FPTri {
-        let delta =
-            camera - tri.center
+        let delta = camera - tri.center
 
-        let length =
-            simd_length(delta)
+        let length = simd_length(delta)
 
         guard length > 0.001 else {
             return tri
         }
 
-        let offset =
-            (delta / length)
-            * liftM
+        let offset = (delta / length) * liftM
 
         return FPTri(
             a: tri.a + offset,
@@ -74,8 +63,7 @@ public struct FPMeshPack: FPMeshPackPort {
         distanceM: Float,
         to data: inout FPMeshData
     ) {
-        let base =
-            UInt32(data.pos.count)
+        let base = UInt32(data.pos.count)
 
         data.pos.append(
             contentsOf: [
@@ -93,10 +81,6 @@ public struct FPMeshPack: FPMeshPackPort {
             ]
         )
 
-        data.minM =
-            min(
-                data.minM ?? distanceM,
-                distanceM
-            )
+        data.minM = min(data.minM ?? distanceM, distanceM)
     }
 }

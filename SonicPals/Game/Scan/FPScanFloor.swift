@@ -15,19 +15,9 @@ final class FPScanFloor {
     private let radius: Float
     private let width: Float
 
-    private let doneColor = UIColor(
-        red: 0.25,
-        green: 0.90,
-        blue: 0.42,
-        alpha: 1
-    )
+    private let doneColor = UIColor(red: 0.25, green: 0.90, blue: 0.42, alpha: 1)
 
-    private let scanColor = UIColor(
-        red: 1.00,
-        green: 0.74,
-        blue: 0.24,
-        alpha: 1
-    )
+    private let scanColor = UIColor(red: 1.00, green: 0.74, blue: 0.24, alpha: 1)
 
     private var root = Entity()
     private var coverage = Entity()
@@ -83,29 +73,19 @@ final class FPScanFloor {
         baseYaw: Float
     ) {
         guard !isPlaced else {
-            return
-        }
+            return }
 
         let normal = safeNormal(normal)
 
         planeP = center
         planeN = normal
 
-        coverage.setPosition(
-            center + (normal * 0.012),
-            relativeTo: nil
-        )
+        coverage.setPosition(center + (normal * 0.012), relativeTo: nil)
 
-        coverage.setOrientation(
-            alignY(normal),
-            relativeTo: nil
-        )
+        coverage.setOrientation(alignY(normal), relativeTo: nil)
 
         let step = Float.pi * 2 / Float(sectors)
-        let gap = min(
-            2.0 * Float.pi / 180,
-            step * 0.16
-        )
+        let gap = min(2.0 * Float.pi / 180, step * 0.16)
 
         let ghost = ModelEntity(
             mesh: ringMesh(
@@ -116,10 +96,7 @@ final class FPScanFloor {
                 segments: 144
             ),
             materials: [
-                makeMat(
-                    color: .white,
-                    alpha: 0.035
-                )
+                makeMat(color: .white, alpha: 0.035)
             ]
         )
 
@@ -135,19 +112,13 @@ final class FPScanFloor {
                     segments: 8
                 ),
                 materials: [
-                    makeMat(
-                        color: doneColor,
-                        alpha: 0.42
-                    )
+                    makeMat(color: doneColor, alpha: 0.42)
                 ]
             )
 
             let yaw = baseYaw + Float(index) * step
 
-            part.orientation = simd_quatf(
-                angle: -yaw,
-                axis: SIMD3<Float>(0, 1, 0)
-            )
+            part.orientation = simd_quatf(angle: -yaw, axis: SIMD3<Float>(0, 1, 0))
 
             part.isEnabled = false
             coverage.addChild(part)
@@ -163,10 +134,7 @@ final class FPScanFloor {
                 segments: 8
             ),
             materials: [
-                makeMat(
-                    color: scanColor,
-                    alpha: 0.72
-                )
+                makeMat(color: scanColor, alpha: 0.72)
             ]
         )
 
@@ -182,17 +150,13 @@ final class FPScanFloor {
         yaw: Float
     ) {
         guard isPlaced else {
-            return
-        }
+            return }
 
         for index in done.indices {
             done[index].isEnabled = seen.contains(index)
         }
 
-        head?.orientation = simd_quatf(
-            angle: -yaw,
-            axis: SIMD3<Float>(0, 1, 0)
-        )
+        head?.orientation = simd_quatf(angle: -yaw, axis: SIMD3<Float>(0, 1, 0))
     }
 
     @discardableResult
@@ -207,10 +171,7 @@ final class FPScanFloor {
         }
 
         let dir = simd_normalize(dir)
-        let denom = simd_dot(
-            dir,
-            planeN
-        )
+        let denom = simd_dot(dir, planeN)
 
         guard abs(denom) > 0.015 else {
             cursor.isEnabled = false
@@ -230,15 +191,9 @@ final class FPScanFloor {
 
         let pos = origin + (dir * t)
 
-        cursor.setPosition(
-            pos + (planeN * 0.014),
-            relativeTo: nil
-        )
+        cursor.setPosition(pos + (planeN * 0.014), relativeTo: nil)
 
-        cursor.setOrientation(
-            alignY(planeN),
-            relativeTo: nil
-        )
+        cursor.setOrientation(alignY(planeN), relativeTo: nil)
 
         cursor.isEnabled = true
         return true
@@ -250,8 +205,7 @@ final class FPScanFloor {
 
     func showHead() {
         guard isPlaced else {
-            return
-        }
+            return }
 
         head?.isEnabled = true
     }
@@ -272,10 +226,7 @@ final class FPScanFloor {
                 segments: 64
             ),
             materials: [
-                makeMat(
-                    color: scanColor,
-                    alpha: 0.76
-                )
+                makeMat(color: scanColor, alpha: 0.76)
             ]
         )
 
@@ -288,10 +239,7 @@ final class FPScanFloor {
                 segments: 48
             ),
             materials: [
-                makeMat(
-                    color: scanColor,
-                    alpha: 0.36
-                )
+                makeMat(color: scanColor, alpha: 0.36)
             ]
         )
 
@@ -308,52 +256,28 @@ final class FPScanFloor {
         end: Float,
         segments: Int
     ) -> MeshResource {
-        let inner = max(
-            radius - width,
-            0.001
-        )
+        let inner = max(radius - width, 0.001)
 
-        let count = max(
-            segments,
-            3
-        )
+        let count = max(segments, 3)
 
         var pos: [SIMD3<Float>] = []
         var idx: [UInt32] = []
 
-        pos.reserveCapacity(
-            (count + 1) * 2
-        )
+        pos.reserveCapacity((count + 1) * 2)
 
-        idx.reserveCapacity(
-            count * 6
-        )
+        idx.reserveCapacity(count * 6)
 
         for index in 0...count {
-            let t = Float(index)
-                / Float(count)
+            let t = Float(index) / Float(count)
 
-            let angle = start
-                + ((end - start) * t)
+            let angle = start + ((end - start) * t)
 
             let s = sin(angle)
             let c = cos(angle)
 
-            pos.append(
-                SIMD3<Float>(
-                    s * radius,
-                    0,
-                    -c * radius
-                )
-            )
+            pos.append(SIMD3<Float>(s * radius, 0, -c * radius))
 
-            pos.append(
-                SIMD3<Float>(
-                    s * inner,
-                    0,
-                    -c * inner
-                )
-            )
+            pos.append(SIMD3<Float>(s * inner, 0, -c * inner))
         }
 
         for index in 0..<count {
@@ -372,37 +296,27 @@ final class FPScanFloor {
             ])
         }
 
-        var desc = MeshDescriptor(
-            name: "scanFloorRing"
-        )
+        var desc = MeshDescriptor(name: "scanFloorRing")
 
         desc.positions = .init(pos)
         desc.primitives = .triangles(idx)
 
-        return try! MeshResource.generate(
-            from: [desc]
-        )
+        return (try? MeshResource.generate(from: [desc]))
+            ?? MeshResource.generatePlane(width: 0, depth: 0)
     }
 
     private func makeMat(
         color: UIColor,
         alpha: Float
     ) -> UnlitMaterial {
-        var mat = UnlitMaterial(
-            color: color
-        )
+        var mat = UnlitMaterial(color: color)
 
         mat.faceCulling = .none
         mat.readsDepth = true
         mat.writesDepth = false
 
         mat.blending = .transparent(
-            opacity: .init(
-                floatLiteral: min(
-                    max(alpha, 0),
-                    1
-                )
-            )
+            opacity: .init(floatLiteral: min(max(alpha, 0), 1))
         )
 
         return mat
@@ -417,11 +331,7 @@ final class FPScanFloor {
         if length > 0.0001 {
             value /= length
         } else {
-            value = SIMD3<Float>(
-                0,
-                1,
-                0
-            )
+            value = SIMD3<Float>(0, 1, 0)
         }
 
         if value.y < 0 {
@@ -434,11 +344,7 @@ final class FPScanFloor {
     private func alignY(
         _ value: SIMD3<Float>
     ) -> simd_quatf {
-        let from = SIMD3<Float>(
-            0,
-            1,
-            0
-        )
+        let from = SIMD3<Float>(0, 1, 0)
 
         let to = safeNormal(value)
 
@@ -454,37 +360,15 @@ final class FPScanFloor {
         )
 
         if dot > 0.9999 {
-            return simd_quatf(
-                angle: 0,
-                axis: SIMD3<Float>(
-                    0,
-                    1,
-                    0
-                )
-            )
+            return simd_quatf(angle: 0, axis: SIMD3<Float>(0, 1, 0))
         }
 
         if dot < -0.9999 {
-            return simd_quatf(
-                angle: .pi,
-                axis: SIMD3<Float>(
-                    1,
-                    0,
-                    0
-                )
-            )
+            return simd_quatf(angle: .pi, axis: SIMD3<Float>(1, 0, 0))
         }
 
-        let axis = simd_normalize(
-            simd_cross(
-                from,
-                to
-            )
-        )
+        let axis = simd_normalize(simd_cross(from, to))
 
-        return simd_quatf(
-            angle: acos(dot),
-            axis: axis
-        )
+        return simd_quatf(angle: acos(dot), axis: axis)
     }
 }

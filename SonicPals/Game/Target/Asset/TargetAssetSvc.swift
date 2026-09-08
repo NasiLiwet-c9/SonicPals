@@ -49,10 +49,7 @@ final class TargetAssetSvc: TargetMaking {
         let name = sceneName
 
         let newTask = Task { @MainActor in
-            try await Entity(
-                named: name,
-                in: realityKitContentBundle
-            )
+            try await Entity(named: name, in: realityKitContentBundle)
         }
 
         task = newTask
@@ -134,16 +131,10 @@ final class TargetAssetSvc: TargetMaking {
         let trace = real.clone(recursive: true)
 
         // Real target above mission shade
-        RealityShade.keepBright(
-            real,
-            order: 1
-        )
+        RealityShade.keepBright(real, order: 1)
 
         // Darker RGB only. Opacity stays unchanged
-        sceneSvc.dim(
-            real,
-            factor: TargetCfg.Tree.realDim
-        )
+        sceneSvc.dim(real, factor: TargetCfg.Tree.realDim)
 
         sceneSvc.freeze(pulse)
         sceneSvc.freeze(trace)
@@ -151,10 +142,7 @@ final class TargetAssetSvc: TargetMaking {
         sceneSvc.muteParticles(pulse)
         sceneSvc.muteParticles(trace)
 
-        echoSvc.style(
-            pulse: pulse,
-            trace: trace
-        )
+        echoSvc.style(pulse: pulse, trace: trace)
 
         sceneSvc.noShadow(pulse)
         sceneSvc.noShadow(trace)
