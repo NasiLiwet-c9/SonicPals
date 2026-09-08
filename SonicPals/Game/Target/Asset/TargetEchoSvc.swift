@@ -83,7 +83,8 @@ struct TargetEchoSvc {
                 fill: fill
             )
 
-            return }
+            return
+        }
 
         for child in entity.children {
             setMango(

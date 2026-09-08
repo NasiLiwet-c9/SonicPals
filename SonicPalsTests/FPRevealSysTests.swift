@@ -44,7 +44,8 @@ struct FPRevealSysTests {
 
         guard case .revealing = stage(entity) else {
             Issue.record("expected revealing, got \(String(describing: stage(entity)))")
-            return }
+            return
+        }
 
         let comp = try #require(entity.components[RevealComp.self])
 
@@ -74,7 +75,8 @@ struct FPRevealSysTests {
 
         guard case let .waiting(attempt, _) = stage(entity) else {
             Issue.record("expected waiting")
-            return }
+            return
+        }
 
         #expect(attempt == 1)
         #expect(builder.callCount == 1)
@@ -95,7 +97,8 @@ struct FPRevealSysTests {
 
         guard case .empty = stage(entity) else {
             Issue.record("expected empty, got \(String(describing: stage(entity)))")
-            return }
+            return
+        }
     }
 
     @Test("Nothing happens before the retry delay is up")
@@ -152,7 +155,8 @@ struct FPRevealSysTests {
 
         guard case .holding = stage(entity) else {
             Issue.record("expected holding, got \(String(describing: stage(entity)))")
-            return }
+            return
+        }
     }
 
     // MARK: - Fading
@@ -167,7 +171,8 @@ struct FPRevealSysTests {
 
         guard case let .fading(zoneIndex, _) = stage(entity) else {
             Issue.record("expected fading")
-            return }
+            return
+        }
 
         #expect(zoneIndex == 0)
     }
@@ -215,7 +220,8 @@ struct FPRevealSysTests {
 
         guard case let .fading(zoneIndex, _) = stage(entity) else {
             Issue.record("expected fading")
-            return }
+            return
+        }
 
         #expect(zoneIndex == 0)
     }

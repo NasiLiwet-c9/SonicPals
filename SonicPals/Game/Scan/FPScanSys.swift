@@ -59,7 +59,8 @@ final class FPScanSys: System {
     func update(context: SceneUpdateContext) {
         guard let session = session(in: context.scene),
               let frame = session.currentFrame else {
-            return }
+            return
+        }
 
         let camera = frame.camera.transform
         let forward = ScanGeometry.forward(camera)
@@ -131,7 +132,8 @@ final class FPScanSys: System {
     private func placeFloor(_ sweep: Sweep) {
         guard !floorVis.isPlaced,
               sweep.now - lastFloorAt >= floorTickS else {
-            return }
+            return
+        }
 
         lastFloorAt = sweep.now
 
@@ -140,7 +142,8 @@ final class FPScanSys: System {
             camera: sweep.camera,
             allowEstimated: sweep.now - resetAt >= estimatedFloorDelayS
         ) else {
-            return }
+            return
+        }
 
         floorVis.place(
             center: SIMD3<Float>(
@@ -343,7 +346,8 @@ final class FPScanSys: System {
     ) {
         guard hud
             != lastHUD else {
-            return }
+            return
+        }
 
         lastHUD = hud
 

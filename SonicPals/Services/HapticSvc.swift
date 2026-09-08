@@ -32,7 +32,8 @@ final class HapticSvc {
 
     func direction() {
         guard supported else {
-            return }
+            return
+        }
 
         dir.impactOccurred(intensity: 1.0)
 
@@ -43,7 +44,8 @@ final class HapticSvc {
         strong isStrong: Bool
     ) {
         guard supported else {
-            return }
+            return
+        }
 
         if isStrong {
             strong.impactOccurred(intensity: 1.0)
@@ -54,7 +56,8 @@ final class HapticSvc {
                 try? await Task.sleep(for: .milliseconds(55))
 
                 guard let self else {
-                    return }
+                    return
+                }
 
                 strong.impactOccurred(intensity: 1.0)
 
@@ -69,7 +72,8 @@ final class HapticSvc {
 
     func found() {
         guard supported else {
-            return }
+            return
+        }
 
         strong.impactOccurred(intensity: 1.0)
 
@@ -82,7 +86,8 @@ final class HapticSvc {
             try? await Task.sleep(for: .milliseconds(80))
 
             guard let self else {
-                return }
+                return
+            }
 
             strong.impactOccurred(intensity: 1.0)
 
@@ -93,7 +98,8 @@ final class HapticSvc {
     /// Two quick knocks, for biting the mango
     func munch() {
         guard supported else {
-            return }
+            return
+        }
 
         strong.impactOccurred(intensity: 0.9)
         strong.prepare()
@@ -102,7 +108,8 @@ final class HapticSvc {
             try? await Task.sleep(for: .milliseconds(110))
 
             guard let self else {
-                return }
+                return
+            }
 
             strong.impactOccurred(intensity: 0.7)
             success.notificationOccurred(.success)
@@ -114,7 +121,8 @@ final class HapticSvc {
 
     private func prepare() {
         guard supported else {
-            return }
+            return
+        }
 
         dir.prepare()
         near.prepare()

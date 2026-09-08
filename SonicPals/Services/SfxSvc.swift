@@ -210,7 +210,8 @@ final class SfxSvc {
                 p.volume = next.vol
                 p.play()
             }
-            return }
+            return
+        }
 
         fadeTask?.cancel()
         duckTask?.cancel()
