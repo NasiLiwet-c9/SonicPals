@@ -111,8 +111,7 @@ final class MissionSvc {
 
         if eaten >= goal {
             finish(eaten: eaten, goal: goal)
-            return
-        }
+            return }
 
         say(
             eaten == 1
@@ -330,16 +329,13 @@ final class MissionSvc {
                     print("[MISSION DEBUG] TARGET SPAWNED")
                     debugTargetState()
 #endif
-                    return
-                }
+                    return }
 
 #if DEBUG
                 print("[MISSION DEBUG] NO SAFE TARGET YET")
 #endif
 
-                try? await Task.sleep(
-                    for: .milliseconds(TargetCfg.Preflight.retryMs)
-                )
+                try? await Task.sleep(for: .milliseconds(TargetCfg.Preflight.retryMs))
             }
 
 #if DEBUG

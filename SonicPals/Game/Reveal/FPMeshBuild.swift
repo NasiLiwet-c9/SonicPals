@@ -34,17 +34,9 @@ final class FPMeshBuild: FPMeshBuilding {
         let cone = FPConeScan(data: data)
         let hit = FPHitScan(data: data)
         
-        let sample = FPSampleSvc(
-            cone: cone,
-            hit: hit,
-            cls: FPClassify()
-        )
+        let sample = FPSampleSvc(cone: cone, hit: hit, cls: FPClassify())
         
-        let tris = read.read(
-            session: session,
-            cone: cone,
-            limit: maxRead
-        )
+        let tris = read.read(session: session, cone: cone, limit: maxRead)
         
         var items: [FPItem] = []
         items.reserveCapacity(tris.count)
@@ -54,26 +46,14 @@ final class FPMeshBuild: FPMeshBuilding {
                 continue
             }
             
-            items.append(
-                FPItem(
-                    tri: tri,
-                    sample: result
-                )
-            )
+            items.append(FPItem(tri: tri, sample: result))
         }
         
-        let buckets = pack.make(
-            from: items,
-            camera: data.start.pos
-        )
+        let buckets = pack.make(from: items, camera: data.start.pos)
         
         return buckets
             .compactMap { key, meshData in
-                fact.make(
-                    from: meshData,
-                    key: key,
-                    range: data.fpRange
-                )
+                fact.make(from: meshData, key: key, range: data.fpRange)
             }
             .sorted {
                 $0.delayMs < $1.delayMs

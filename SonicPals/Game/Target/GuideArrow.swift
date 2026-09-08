@@ -23,10 +23,7 @@ enum GuideArrow {
 
     /// Applied in the anchor's frame, outside the roll. Steeper than
     /// this and pointing away foreshortens into a mushroom
-    static let dialPitch = simd_quatf(
-        angle: -0.60,
-        axis: SIMD3<Float>(1, 0, 0)
-    )
+    static let dialPitch = simd_quatf(angle: -0.60, axis: SIMD3<Float>(1, 0, 0))
 
     /// Between the reticle and the bubble. Mesh sizes assume 42cm
     private static let seat = SIMD3<Float>(0, -0.055, -0.42)
@@ -34,12 +31,7 @@ enum GuideArrow {
     /// How far the plate is squashed along its normal
     private static let plateFlatten: Float = 0.24
 
-    private static let violet = UIColor(
-        red: 0.62,
-        green: 0.52,
-        blue: 1,
-        alpha: 1
-    )
+    private static let violet = UIColor(red: 0.62, green: 0.52, blue: 1, alpha: 1)
 
     static func makeAnchor() -> AnchorEntity {
         let anchor = AnchorEntity(.camera)
@@ -123,9 +115,7 @@ enum GuideArrow {
         material.roughness = .init(floatLiteral: 0.32)
         material.metallic = .init(floatLiteral: 0)
 
-        material.blending = .transparent(
-            opacity: .init(floatLiteral: 0.7)
-        )
+        material.blending = .transparent(opacity: .init(floatLiteral: 0.7))
 
         return material
     }

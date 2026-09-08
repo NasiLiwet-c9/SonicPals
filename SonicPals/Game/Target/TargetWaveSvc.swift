@@ -18,38 +18,22 @@ struct TargetWaveSvc:
         data: WaveData,
         in scene: Scene
     ) -> [TargetWaveHit] {
-        let localStart =
-            target.convert(
-                position:
-                    data.start.pos,
-                from: nil
-            )
+        let localStart = target.convert(position: data.start.pos, from: nil)
 
-        var hits:
-            [TargetWaveHit] = []
+        var hits: [TargetWaveHit] = []
 
         for index
         in comp.parts.indices {
-            let part =
-                comp.parts[index]
+            let part = comp.parts[index]
 
-            let nearM =
-                TargetWaveMath.nearestDistance(
-                    from: localStart,
-                    to: part
-                )
+            let nearM = TargetWaveMath.nearestDistance(from: localStart, to: part)
 
             guard nearM
                     <= data.fpRange else {
                 continue
             }
 
-            let center =
-                target.convert(
-                    position:
-                        part.center,
-                    to: nil
-                )
+            let center = target.convert(position: part.center, to: nil)
 
             if hitsCone(
                 center: center,
@@ -58,12 +42,7 @@ struct TargetWaveSvc:
                 data: data,
                 in: scene
             ) {
-                hits.append(
-                    TargetWaveHit(
-                        index: index,
-                        distanceM: nearM
-                    )
-                )
+                hits.append(TargetWaveHit(index: index, distanceM: nearM))
             }
         }
 

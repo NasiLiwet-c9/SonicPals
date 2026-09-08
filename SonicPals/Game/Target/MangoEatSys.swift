@@ -18,13 +18,9 @@ import simd
 /// mesh visible. Proximity and aim are enough, no scanning needed
 @MainActor
 final class MangoEatSys: System {
-    static let query = EntityQuery(
-        where: .has(TargetComp.self)
-    )
+    static let query = EntityQuery(where: .has(TargetComp.self))
 
-    static let sessQuery = EntityQuery(
-        where: .has(SessComp.self)
-    )
+    static let sessQuery = EntityQuery(where: .has(SessComp.self))
 
     /// Spec says ~10cm, but tracking gets noisy that close and the
     /// distance is to the mesh centre, so touching distance reads higher
@@ -45,8 +41,7 @@ final class MangoEatSys: System {
 
     func update(context: SceneUpdateContext) {
         guard let camM = cameraMatrix(in: context.scene) else {
-            return
-        }
+            return }
 
         step(
             targets: context.scene.performQuery(Self.query),
@@ -122,8 +117,7 @@ final class MangoEatSys: System {
 
     private func setReady(_ value: Bool, mango: Entity?) {
         guard value != ready else {
-            return
-        }
+            return }
 
         ready = value
 

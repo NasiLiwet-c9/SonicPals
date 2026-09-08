@@ -41,10 +41,7 @@ private enum GIFLoader {
 
         guard !frames.isEmpty else { return nil }
 
-        return UIImage.animatedImage(
-            with: frames,
-            duration: totalDuration
-        )
+        return UIImage.animatedImage(with: frames, duration: totalDuration)
     }
 
     private static func frameDuration(source: CGImageSource, index: Int) -> Double {
@@ -123,10 +120,7 @@ struct GIFImageView: View {
 
     var body: some View {
         if GIFLoader.data(named: name) != nil {
-            AnimatedGIF(
-                name: name,
-                contentMode: contentMode
-            )
+            AnimatedGIF(name: name, contentMode: contentMode)
         } else {
             Image(systemName: "cube.transparent")
                 .font(.system(size: 56))

@@ -16,10 +16,7 @@ public struct FPClassify: Sendable {
         distanceM: Float,
         fade: Float
     ) -> FPKey {
-        FPKey(
-            band: band(distanceM),
-            zone: zone(fade)
-        )
+        FPKey(band: band(distanceM), zone: zone(fade))
     }
 
     private func band(

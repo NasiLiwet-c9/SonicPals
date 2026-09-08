@@ -15,9 +15,7 @@ struct RealitySceneView: View {
 
     init(world: ECSWorld) {
         self.world = world
-        _shadeAnchor = State(
-            initialValue: RealityShade.makeAnchor()
-        )
+        _shadeAnchor = State(initialValue: RealityShade.makeAnchor())
     }
 
     var body: some View {
@@ -36,17 +34,9 @@ struct RealitySceneView: View {
             // arrow has to sit above it to stay readable
             RealityShade.keepBright(world.guideAnchor, order: 2)
 
-            RealityShade.update(
-                shadeAnchor,
-                visible: showShade,
-                dim: dim
-            )
+            RealityShade.update(shadeAnchor, visible: showShade, dim: dim)
         } update: { _ in
-            RealityShade.update(
-                shadeAnchor,
-                visible: showShade,
-                dim: dim
-            )
+            RealityShade.update(shadeAnchor, visible: showShade, dim: dim)
         }
         .task {
             await world.start()

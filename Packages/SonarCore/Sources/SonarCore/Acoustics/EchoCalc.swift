@@ -22,39 +22,17 @@ public final class EchoCalc: Sendable {
         anglePower: Float,
         frequencyKHz: Float
     ) -> Float {
-        let distance = max(
-            distanceM,
-            refM
-        )
+        let distance = max(distanceM, refM)
 
-        let spreadDb =
-            40 * logValue(
-                distance / refM
-            )
+        let spreadDb = 40 * logValue(distance / refM)
 
-        let airDb =
-            2
-            * airLoss(frequencyKHz)
-            * distance
+        let airDb = 2 * airLoss(frequencyKHz) * distance
 
-        let rayDb =
-            -20
-            * logValue(
-                max(rayPower, 0.001)
-            )
+        let rayDb = -20 * logValue(max(rayPower, 0.001))
 
-        let angleDb =
-            -20
-            * logValue(
-                max(anglePower, 0.05)
-            )
+        let angleDb = -20 * logValue(max(anglePower, 0.05))
 
-        return startDb
-            - spreadDb
-            - airDb
-            - rayDb
-            - angleDb
-            - surfaceLossDb
+        return startDb - spreadDb - airDb - rayDb - angleDb - surfaceLossDb
     }
 
     /// Clears both the hearing floor and the blind zone
@@ -64,10 +42,7 @@ public final class EchoCalc: Sendable {
         setting: WaveSetting,
         soundSpeed: Float
     ) -> Bool {
-        distanceM >= setting.minRange(
-            soundSpeed: soundSpeed
-        )
-        && levelDb >= hearDb
+        distanceM >= setting.minRange(soundSpeed: soundSpeed) && levelDb >= hearDb
     }
 
     public func power(levelDb: Float) -> Float {
@@ -81,24 +56,14 @@ public final class EchoCalc: Sendable {
     }
 
     private func airLoss(_ frequencyKHz: Float) -> Float {
-        let frequency =
-            min(
-                max(frequencyKHz, 20),
-                80
-            )
+        let frequency = min(max(frequencyKHz, 20), 80)
 
-        let amount =
-            (frequency - 20) / 60
+        let amount = (frequency - 20) / 60
 
-        return 0.35
-            + (amount * 1.65)
+        return 0.35 + (amount * 1.65)
     }
 
     private func logValue(_ value: Float) -> Float {
-        Float(
-            Foundation.log10(
-                Double(value)
-            )
-        )
+        Float(Foundation.log10(Double(value)))
     }
 }

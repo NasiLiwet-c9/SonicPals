@@ -1,6 +1,7 @@
 excluded:
   - Packages/RealityKitContent/Sources/RealityKitContent/RealityKitContent.rkassets
   - .build
+  - Packages/SonarCore/.build
 
 lenient: true
 

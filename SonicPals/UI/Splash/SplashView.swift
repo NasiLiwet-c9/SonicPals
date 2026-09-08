@@ -18,11 +18,7 @@ struct SplashView: View {
             let size = geo.size
 
             ZStack {
-                Color(
-                    red: 0.07,
-                    green: 0.06,
-                    blue: 0.16
-                )
+                Color(red: 0.07, green: 0.06, blue: 0.16)
                 .ignoresSafeArea()
 
                 GIFImageView(
@@ -34,18 +30,11 @@ struct SplashView: View {
                         UICfg.Load.bgW,
                         size
                     ),
-                    height: UICfg.v(
-                        UICfg.Load.bgH,
-                        size
-                    )
+                    height: UICfg.v(UICfg.Load.bgH, size)
                 )
                 .position(
                     x: size.width / 2,
-                    y: size.height / 2
-                        + UICfg.y(
-                            UICfg.Load.bgY,
-                            size
-                        )
+                    y: size.height / 2 + UICfg.y(UICfg.Load.bgY, size)
                 )
                 .allowsHitTesting(false)
 
@@ -55,23 +44,14 @@ struct SplashView: View {
                             UICfg.Load.barW,
                             size
                         ),
-                        height: UICfg.v(
-                            UICfg.Load.barH,
-                            size
-                        )
+                        height: UICfg.v(UICfg.Load.barH, size)
                     )
                     .position(
                         x: size.width / 2,
-                        y: UICfg.y(
-                            UICfg.Load.barY,
-                            size
-                        )
+                        y: UICfg.y(UICfg.Load.barY, size)
                     )
             }
-            .frame(
-                width: size.width,
-                height: size.height
-            )
+            .frame(width: size.width, height: size.height)
         }
         .ignoresSafeArea()
         .preferredColorScheme(.dark)
@@ -79,22 +59,15 @@ struct SplashView: View {
             progress = 0
 
             withAnimation(
-                .linear(
-                    duration: UICfg.Load.sec
-                )
+                .linear(duration: UICfg.Load.sec)
             ) {
                 progress = 1
             }
 
-            try? await Task.sleep(
-                for: .seconds(
-                    UICfg.Load.sec
-                )
-            )
+            try? await Task.sleep(for: .seconds(UICfg.Load.sec))
 
             guard !Task.isCancelled else {
-                return
-            }
+                return }
 
             onFinished()
         }
@@ -107,17 +80,12 @@ struct SplashView: View {
                     .fill(.white)
                     .overlay {
                         Capsule()
-                            .stroke(
-                                Color.indigo,
-                                lineWidth: 2
-                            )
+                            .stroke(Color.indigo, lineWidth: 2)
                     }
 
                 Capsule()
                     .fill(.yellow)
-                    .frame(
-                        width: geo.size.width * progress
-                    )
+                    .frame(width: geo.size.width * progress)
                     .padding(2)
             }
         }

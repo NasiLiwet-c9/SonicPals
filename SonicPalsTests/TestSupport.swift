@@ -9,6 +9,7 @@ import ARKit
 import Foundation
 import RealityKit
 import SonarCore
+import Testing
 import simd
 
 @testable import SonicPals
@@ -94,12 +95,18 @@ enum TestCamera {
 // MARK: - Target fixtures
 
 enum TestTarget {
+    struct Made {
+        let entity: Entity
+        let real: Entity
+        let parts: [TargetEchoPart]
+    }
+
     /// Detached, which is all the systems need
     static func make(
         at position: SIMD3<Float> = SIMD3<Float>(0, 0, -2),
         partCount: Int = 2,
         mangoIndices: Set<Int> = [1]
-    ) -> (entity: Entity, real: Entity, parts: [TargetEchoPart]) {
+    ) -> Made {
         let root = Entity()
         let real = Entity()
         real.isEnabled = false
@@ -139,15 +146,18 @@ enum TestTarget {
 
         root.setPosition(position, relativeTo: nil)
 
-        return (root, real, parts)
+        return Made(entity: root, real: real, parts: parts)
     }
 
-    static func comp(_ entity: Entity) -> TargetComp {
-        entity.components[TargetComp.self]!
+    static func comp(_ entity: Entity) throws -> TargetComp {
+        try #require(entity.components[TargetComp.self])
     }
 
-    static func setComp(_ entity: Entity, _ body: (inout TargetComp) -> Void) {
-        var comp = entity.components[TargetComp.self]!
+    static func setComp(
+        _ entity: Entity,
+        _ body: (inout TargetComp) -> Void
+    ) throws {
+        var comp = try #require(entity.components[TargetComp.self])
         body(&comp)
         entity.components[TargetComp.self] = comp
     }

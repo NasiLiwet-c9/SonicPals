@@ -151,11 +151,7 @@ extension ECSWorld {
         let camera = frame.camera.transform
         let cam = camera.pos3
 
-        var back = SIMD3<Float>(
-            camera.columns.2.x,
-            0,
-            camera.columns.2.z
-        )
+        var back = SIMD3<Float>(camera.columns.2.x, 0, camera.columns.2.z)
 
         if simd_length(back) < 0.001 {
             back = SIMD3<Float>(0, 0, 1)
@@ -166,11 +162,7 @@ extension ECSWorld {
         var pos = cam + (back * 1.0)
         pos.y = forceFloorY(at: pos, frame: frame)
 
-        let toCamera = SIMD3<Float>(
-            cam.x - pos.x,
-            0,
-            cam.z - pos.z
-        )
+        let toCamera = SIMD3<Float>(cam.x - pos.x, 0, cam.z - pos.z)
 
         let yaw = atan2(toCamera.x, toCamera.z)
 
@@ -316,10 +308,7 @@ private struct ForceSpawnInstaller: UIViewRepresentable {
 
             uninstall()
 
-            let gesture = UILongPressGestureRecognizer(
-                target: self,
-                action: #selector(trigger(_:))
-            )
+            let gesture = UILongPressGestureRecognizer(target: self, action: #selector(trigger(_:)))
 
             gesture.minimumPressDuration = 2.5
             gesture.numberOfTouchesRequired = 4

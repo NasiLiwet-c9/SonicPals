@@ -1,6 +1,6 @@
 //
-//  POCApp.swift
-//  POC
+//  SonicPalsApp.swift
+//  SonicPals
 //
 //  Created by Shan Newcastle on 10/08/26.
 //
@@ -9,7 +9,7 @@ import RealityKit
 import SwiftUI
 
 @main
-struct POCApp: App {
+struct SonicPalsApp: App {
     init() {
         SessComp.registerComponent()
         RevealComp.registerComponent()

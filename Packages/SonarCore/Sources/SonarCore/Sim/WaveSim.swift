@@ -36,16 +36,9 @@ public final class WaveSim: WaveSimulating {
         using caster: any RayCasting,
         from start: WaveStart
     ) -> WaveData {
-        let checkRays = rayMaker.make(
-            for: set.check,
-            ringCount: 2
-        )
+        let checkRays = rayMaker.make(for: set.check, ringCount: 2)
 
-        let nearest = nearestDistance(
-            using: caster,
-            from: start,
-            rays: checkRays
-        )
+        let nearest = nearestDistance(using: caster, from: start, rays: checkRays)
 
         let setting = set.pick(nearest)
         let rays = rayMaker.make(for: setting)
@@ -75,10 +68,7 @@ public final class WaveSim: WaveSimulating {
         var nearest: Float?
 
         for ray in rays {
-            let dir = worldDir(
-                ray.dir,
-                from: start
-            )
+            let dir = worldDir(ray.dir, from: start)
 
             guard let hit = caster.cast(
                 origin: start.pos,
@@ -88,10 +78,7 @@ public final class WaveSim: WaveSimulating {
                 continue
             }
 
-            nearest = min(
-                nearest ?? hit.distance,
-                hit.distance
-            )
+            nearest = min(nearest ?? hit.distance, hit.distance)
         }
 
         return nearest
@@ -107,10 +94,7 @@ public final class WaveSim: WaveSimulating {
         hits.reserveCapacity(rays.count)
 
         for ray in rays {
-            let dir = worldDir(
-                ray.dir,
-                from: start
-            )
+            let dir = worldDir(ray.dir, from: start)
 
             guard let hit = caster.cast(
                 origin: start.pos,
@@ -126,10 +110,7 @@ public final class WaveSim: WaveSimulating {
                 normal = -normal
             }
 
-            let anglePower = max(
-                simd_dot(-dir, normal),
-                0.05
-            )
+            let anglePower = max(simd_dot(-dir, normal), 0.05)
 
             let levelDb = echoCalc.level(
                 distanceM: hit.distance,
@@ -145,13 +126,7 @@ public final class WaveSim: WaveSimulating {
                 soundSpeed: soundSpeed
             )
 
-            let bounceDir = simd_normalize(
-                dir - (
-                    2
-                    * simd_dot(dir, normal)
-                    * normal
-                )
-            )
+            let bounceDir = simd_normalize(dir - (2 * simd_dot(dir, normal) * normal))
 
             hits.append(
                 WaveHit(
@@ -175,10 +150,6 @@ public final class WaveSim: WaveSimulating {
         _ dir: SIMD3<Float>,
         from start: WaveStart
     ) -> SIMD3<Float> {
-        simd_normalize(
-            (start.right * dir.x)
-            + (start.up * dir.y)
-            + (start.forward * dir.z)
-        )
+        simd_normalize((start.right * dir.x) + (start.up * dir.y) + (start.forward * dir.z))
     }
 }

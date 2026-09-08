@@ -52,10 +52,7 @@ struct SessionGateView: View {
                     EmptyView()
                 }
             }
-            .frame(
-                width: size.width,
-                height: size.height
-            )
+            .frame(width: size.width, height: size.height)
         }
         .ignoresSafeArea()
         .preferredColorScheme(.dark)
@@ -129,8 +126,7 @@ struct SessionGateView: View {
 
     private func openSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else {
-            return
-        }
+            return }
 
         UIApplication.shared.open(url)
     }

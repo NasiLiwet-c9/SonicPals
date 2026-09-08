@@ -21,8 +21,7 @@ extension ECSWorld {
     func scanTarget(with data: WaveData, in scene: Scene) {
         guard let targetEntity,
               var comp = targetEntity.components[TargetComp.self] else {
-            return
-        }
+            return }
 
         let hits = targetWave.hitParts(
             target: targetEntity,
@@ -128,8 +127,7 @@ extension ECSWorld {
             guard let self,
                   let target,
                   self.targetEntity === target else {
-                return
-            }
+                return }
 
             if mango {
                 sfx.mangoDetect()
@@ -152,8 +150,7 @@ extension ECSWorld {
 #if DEBUG
             print("[MANGO FX] NO \"MangoFX\" ENTITY FOUND UNDER targetEntity")
 #endif
-            return
-        }
+            return }
 
         fx.setParent(anchor, preservingWorldTransform: false)
         fx.setPosition(worldPos, relativeTo: nil)
