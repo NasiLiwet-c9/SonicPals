@@ -71,7 +71,8 @@ extension ECSWorld {
         guard stagedTarget == nil,
               model.lidarOK,
               let part = targetMaker.make() else {
-            return }
+            return
+        }
 
         part.root.isEnabled = false
         anchor.addChild(part.root)
@@ -164,7 +165,8 @@ extension ECSWorld {
     func respawnTarget() {
         guard model.hudStage == .mission,
               !model.missionComplete else {
-            return }
+            return
+        }
 
         clearActiveWave()
         clearTraces()
@@ -211,7 +213,8 @@ extension ECSWorld {
         if targetReserve.canCheck(force: true),
            reserveScanTarget() {
             finishScanReady()
-            return }
+            return
+        }
 
         model.scanProgress = TargetCfg.Preflight.waitingProgress
         model.scanTurn = .none
@@ -238,7 +241,8 @@ extension ECSWorld {
         }
 
         guard targetReserve.ready else {
-            return }
+            return
+        }
 
         finishScanReady()
     }
@@ -279,7 +283,8 @@ extension ECSWorld {
                 scanEntity.components[
                     FPScanComp.self
                 ] else {
-            return }
+            return
+        }
 
         comp.active = true
 

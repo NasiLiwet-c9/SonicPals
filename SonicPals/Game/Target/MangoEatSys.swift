@@ -41,7 +41,8 @@ final class MangoEatSys: System {
 
     func update(context: SceneUpdateContext) {
         guard let camM = cameraMatrix(in: context.scene) else {
-            return }
+            return
+        }
 
         step(
             targets: context.scene.performQuery(Self.query),
@@ -117,7 +118,8 @@ final class MangoEatSys: System {
 
     private func setReady(_ value: Bool, mango: Entity?) {
         guard value != ready else {
-            return }
+            return
+        }
 
         ready = value
 

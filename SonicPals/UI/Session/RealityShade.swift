@@ -166,7 +166,8 @@ enum RealityShade {
                 colors: colors,
                 locations: locations
             ) else {
-                return }
+                return
+            }
 
             let point = CGPoint(x: size.width * 0.5, y: size.height * 0.5)
 

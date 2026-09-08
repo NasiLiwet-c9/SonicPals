@@ -67,7 +67,8 @@ struct SplashView: View {
             try? await Task.sleep(for: .seconds(UICfg.Load.sec))
 
             guard !Task.isCancelled else {
-                return }
+                return
+            }
 
             onFinished()
         }

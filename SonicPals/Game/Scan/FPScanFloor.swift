@@ -73,7 +73,8 @@ final class FPScanFloor {
         baseYaw: Float
     ) {
         guard !isPlaced else {
-            return }
+            return
+        }
 
         let normal = safeNormal(normal)
 
@@ -150,7 +151,8 @@ final class FPScanFloor {
         yaw: Float
     ) {
         guard isPlaced else {
-            return }
+            return
+        }
 
         for index in done.indices {
             done[index].isEnabled = seen.contains(index)
@@ -205,7 +207,8 @@ final class FPScanFloor {
 
     func showHead() {
         guard isPlaced else {
-            return }
+            return
+        }
 
         head?.isEnabled = true
     }
