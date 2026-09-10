@@ -64,6 +64,7 @@ needs a real device to play properly.
 
 ## PR + Development Gate Pipeline
 
+```mermaid
 flowchart TD
     A[Developer pushes a branch] --> B[Opens a PR into development]
     B --> C[Xcode Cloud triggers automatically]
@@ -76,6 +77,7 @@ flowchart TD
     H --> I[Merge into development]
     I --> J[Xcode Cloud runs again on development]
     J --> K[Confirms development stays healthy]
+```
 
 ## Credits
 
