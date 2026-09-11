@@ -65,18 +65,30 @@ needs a real device to play properly.
 ## PR + Development Gate Pipeline
 
 ```mermaid
-flowchart TD
-    A[Developer pushes a branch] --> B[Opens a PR into development]
-    B --> C[Xcode Cloud triggers automatically]
-    C --> D[Build + Test + SwiftLint]
-    D --> E{All checks pass?}
-    E -- No --> F[PR flagged, merge blocked]
-    F --> G[Fix code, push again]
-    G --> C
-    E -- Yes --> H[Teammate reviews and approves]
-    H --> I[Merge into development]
-    I --> J[Xcode Cloud runs again on development]
-    J --> K[Confirms development stays healthy]
+sequenceDiagram
+    participant Dev as Developer
+    participant GH as GitHub
+    participant XC as Xcode Cloud
+    participant VM as macOS Build Environment
+
+    Dev->>GH: Push branch / open PR into development
+    GH->>XC: Webhook notifies Xcode Cloud (via GitHub App)
+    XC->>VM: Provisions a clean macOS build environment
+    VM->>VM: Checks out the PR branch, resolves Swift packages
+    VM->>VM: Runs Build action (SwiftLint plugin lints during this step)
+    VM->>VM: Runs Test action
+    VM->>XC: Reports Build + Test + Lint results
+    XC->>GH: Posts a commit status check (pass or fail) on the PR
+    GH->>Dev: Shows the check result on the PR page
+
+    alt Checks fail
+        Dev->>GH: Push a fix
+        GH->>XC: Webhook fires again, new build starts
+    else Checks pass
+        Dev->>GH: Reviewer approves and merges
+        GH->>XC: Webhook fires again for development branch
+        XC->>VM: Runs Build + Test again on development
+    end
 ```
 
 ## Credits
